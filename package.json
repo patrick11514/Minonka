@@ -1,0 +1,47 @@
+{
+    "name": "minonka",
+    "version": "0.0.1",
+    "main": "build/index.js",
+    "type": "module",
+    "scripts": {
+        "dev": "ts-node-dev -r tsconfig-paths/register --respawn ./src/index.ts",
+        "build": "mkdir -p build && tsc",
+        "start": "node -r module-alias/register ./build/index.js",
+        "genDatabaseSchema": "kysely-codegen --out-file ./src/types/database.ts",
+        "format": "prettier --write .",
+        "lint": "prettier --check . && eslint .",
+        "check": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@types/strip-color": "^0.1.2",
+        "cli-color": "^2.0.4",
+        "discord.js": "^14.17.3",
+        "dotenv": "^16.4.5",
+        "express": "4.19.2",
+        "kysely": "^0.27.2",
+        "kysely-codegen": "",
+        "module-alias": "^2.2.3",
+        "mysql2": "^3.9.1",
+        "node-fetch": "^3.3.0",
+        "prettier": "^3.1.0",
+        "strip-color": "^0.1.0",
+        "zod": "^3.23.4"
+    },
+    "devDependencies": {
+        "@eslint/compat": "^1.2.6",
+        "@eslint/js": "^9.19.0",
+        "@types/cli-color": "^2.0.6",
+        "@types/express": "4.17.21",
+        "@types/node": "^20.12.7",
+        "eslint": "^9.19.0",
+        "eslint-config-prettier": "^10.0.1",
+        "kysely-codegen": "^0.15.0",
+        "ts-node-dev": "^2.0.0",
+        "tsconfig-paths": "^4.2.0",
+        "typescript": "^5.4.4",
+        "typescript-eslint": "^8.23.0"
+    },
+    "_moduleAlias": {
+        "$": "./build"
+    }
+}
