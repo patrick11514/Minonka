@@ -2,9 +2,8 @@
     "name": "minonka",
     "version": "0.0.1",
     "main": "build/index.js",
-    "type": "module",
     "scripts": {
-        "dev": "ts-node-dev -r tsconfig-paths/register --respawn ./src/index.ts",
+        "dev": "tsx watch ./src/index.ts",
         "build": "mkdir -p build && tsc",
         "start": "node -r module-alias/register ./build/index.js",
         "genDatabaseSchema": "kysely-codegen --out-file ./src/types/database.ts",
@@ -36,12 +35,18 @@
         "eslint": "^9.19.0",
         "eslint-config-prettier": "^10.0.1",
         "kysely-codegen": "^0.15.0",
-        "ts-node-dev": "^2.0.0",
+        "ts-node": "^10.9.2",
         "tsconfig-paths": "^4.2.0",
+        "tsx": "^4.19.2",
         "typescript": "^5.4.4",
         "typescript-eslint": "^8.23.0"
     },
-    "_moduleAlias": {
+    "_moduleAliases": {
         "$": "./build"
+    },
+    "pnpm": {
+        "onlyBuiltDependencies": [
+            "esbuild"
+        ]
     }
 }
