@@ -15,8 +15,8 @@ server {
 
         server_name minonka.patrick115.eu;
     
-        access_log /opt/NodeApps/minonka/logs/access.log;
-        error_log /opt/NodeApps/minonka/logs/error.log;
+        access_log /opt/NodeApps/Minonka/logs/access.log;
+        error_log /opt/NodeApps/Minonka/logs/error.log;
 
         location / {
             proxy_set_header   X-Real-IP          $remote_addr;
