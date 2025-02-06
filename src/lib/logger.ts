@@ -2,6 +2,8 @@ import clc from 'cli-color';
 import fs from 'node:fs';
 import strip from 'strip-color';
 
+/* eslint-disable no-console */
+
 type color =
     | 'blackBright'
     | 'redBright'

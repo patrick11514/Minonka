@@ -31,9 +31,9 @@ export abstract class Command {
     public addOption(
         option: {
             name: string;
-            localizedName?: Record<Locale, string>;
+            localizedName?: Partial<Record<Locale, string>>;
             description: string;
-            localizedDescription?: Record<Locale, string>;
+            localizedDescription?: Partial<Record<Locale, string>>;
             required: boolean;
         } & (
                 | {
@@ -113,5 +113,5 @@ export abstract class Command {
         this.slashCommand.options.push(optionBuilder);
     }
 
-    abstract handler(interaction: ChatInputCommandInteraction): void;
+    abstract handler(interaction: ChatInputCommandInteraction): Promise<void>;
 }
