@@ -1,11 +1,11 @@
-import { SlashCommandBuilder } from 'discord.js';
+import { SlashCommandBuilder, type ChatInputCommandInteraction } from 'discord.js';
 
 new SlashCommandBuilder().setNameLocalizations({
     'en-US': 'command',
     cs: 'příkaz'
 });
 
-export class Command {
+export abstract class Command {
     slashCommand: SlashCommandBuilder;
 
     constructor(name: string, description: string) {
@@ -15,4 +15,6 @@ export class Command {
     public addOption(name: string, description: string, required: boolean) {
         this.slashCommand.addStringOption((option) => option.setName(name).setDescription(description).setRequired(required));
     }
+
+    abstract handler(interaction: ChatInputCommandInteraction): void;
 }
