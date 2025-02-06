@@ -1,0 +1,23 @@
+[Unit]
+Description=Minonka Discord Bot V4
+After=network.target
+Wants=network.target
+
+[Service]
+User=deploy
+Group=deploy
+KillSignal=SIGINT
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=10
+WorkingDirectory=/opt/NodeApps/Minonka
+
+ExecStart=/opt/NodeApps/Minonka/script/start.sh
+Environment=NODE_ENV=production
+
+StandartOutput=journal
+StandartError=journal
+
+
+[Install]
+WantedBy=multi-user.target
