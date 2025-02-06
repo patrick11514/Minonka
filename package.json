@@ -4,8 +4,10 @@
     "main": "build/index.js",
     "scripts": {
         "dev": "tsx watch ./src/index.ts",
+        "dev:register": "tsx watch ./src/index.ts --register",
         "build": "mkdir -p build && tsc",
         "start": "node -r module-alias/register ./build/index.js",
+        "start:register": "node -r module-alias/register ./build/index.js --register",
         "genDatabaseSchema": "kysely-codegen --out-file ./src/types/database.ts",
         "format": "prettier --write .",
         "lint": "prettier --check . && eslint .",

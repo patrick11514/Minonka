@@ -1,5 +1,5 @@
 import { env } from '$/types/env';
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { EventEmitter } from './EventEmitter';
 import fs from 'node:fs';
 import Path from 'node:path';
@@ -8,6 +8,7 @@ import { Command } from './Command';
 
 type Events = {
     login: (client: Client<true>) => void;
+    commandsLoaded: () => void;
     command: () => void;
 };
 
@@ -43,7 +44,7 @@ export class DiscordBot extends EventEmitter<Events> {
         const classes = result.map((r) => r.default);
 
         //create new instances
-        const instances = classes
+        const instances: Command[] = classes
             .filter((c) => {
                 if (typeof c !== 'function') {
                     l.error(`Class ${c.name} is not a constructor, skipping...`);
@@ -60,9 +61,35 @@ export class DiscordBot extends EventEmitter<Events> {
                 return true;
             });
 
+        //register handlers
+        this.client.on('interactionCreate', (interaction) => {
+            if (!interaction.isChatInputCommand()) return;
+
+            const command = instances.find((c) => c.slashCommand.name === interaction.commandName);
+            if (!command) return;
+
+            command.handler(interaction);
+        });
+
         this.commands = instances;
         l.stop(`Loaded commands (${instances.length}): ${instances.map((c) => c.constructor.name).join(', ')}`);
+        super.emit('commandsLoaded');
     }
 
-    private registerCommands() { }
+    async registerCommands() {
+        const JSONCommands = this.commands.map((c) => c.slashCommand.toJSON());
+
+        const rest = new REST().setToken(env.CLIENT_TOKEN);
+
+        try {
+            return (await rest.put(Routes.applicationCommands(env.CLIENT_ID), { body: JSONCommands })) as Promise<
+                {
+                    name: string;
+                }[]
+            >;
+        } catch (e) {
+            console.error(e);
+            return [];
+        }
+    }
 }
