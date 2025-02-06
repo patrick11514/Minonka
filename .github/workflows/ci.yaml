@@ -1,0 +1,72 @@
+name: CI
+
+on:
+    push:
+
+jobs:
+    lint:
+        name: 'Lint code'
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Install NodeJS
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+
+            - name: Install pnpm
+              run: npm install -g pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build
+              run: pnpm run build
+
+            - name: Check lint
+              run: pnpm run lint
+
+            - name: TypeScript check
+              run: pnpm run check
+
+    deploy:
+        name: Deploy
+        runs-on: ubuntu-latest
+        needs: lint
+        if: github.ref == 'refs/heads/main'
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Deploy via SSH
+              uses: appleboy/ssh-action@v1.2.0
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  port: ${{ secrets.PORT }}
+                  key: ${{ secrets.SSH_KEY }}
+                  script: |
+                      cd /opt/NodeApps/Minonka
+
+                      echo "Setting up nvm"                
+                      export NVM_DIR="$HOME/.nvm"
+                      source "$NVM_DIR/nvm.sh"
+                      nvm use
+
+                      echo "Pulling latest changes from git"
+                      git pull
+
+                      echo "Installing dependencies"
+                      npm install -g pnpm
+
+                      echo "Installing dependencies"
+                      pnpm install --frozen-lockfile
+
+                      echo "Building the app"
+                      pnpm run build
+
+                      echo "Restarting the app"
+                      sudo systemctl restart minonka
+                      echo "Deployment completed"
