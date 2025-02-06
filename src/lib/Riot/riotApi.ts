@@ -9,12 +9,12 @@ type DataObject = {
 
 type ReturnObject<$Data extends DataObject> = {
     [$DataKey in keyof $Data]: $Data[$DataKey] extends ApiSet<infer $Inner>
-    ? {
-        [$InnerKey in keyof $Inner]: (...params: Parameters<$Inner[$InnerKey]>) => ReturnType<typeof baseRequest<ReturnType<$Inner[$InnerKey]>['schema']>>;
-    }
-    : $Data[$DataKey] extends DataObject
-    ? ReturnObject<$Data[$DataKey]>
-    : never;
+        ? {
+              [$InnerKey in keyof $Inner]: (...params: Parameters<$Inner[$InnerKey]>) => ReturnType<typeof baseRequest<ReturnType<$Inner[$InnerKey]>['schema']>>;
+          }
+        : $Data[$DataKey] extends DataObject
+          ? ReturnObject<$Data[$DataKey]>
+          : never;
 };
 
 const transform = <$Data extends DataObject>(data: $Data, regionRoot: string, routingRoot: string): ReturnObject<$Data> => {

@@ -14,5 +14,5 @@ export class ApiSet<
     constructor(
         public subBaseUrl: string,
         public inner: $Inner
-    ) { }
+    ) {}
 }

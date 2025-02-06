@@ -7,14 +7,14 @@ type StatusCode = 400 | 401 | 403 | 404 | 405 | 415 | 429 | 500 | 502 | 503 | 50
 
 type Response<$Data> =
     | {
-        status: true;
-        data: $Data;
-    }
+          status: true;
+          data: $Data;
+      }
     | {
-        status: false;
-        code: StatusCode;
-        message: string;
-    };
+          status: false;
+          code: StatusCode;
+          message: string;
+      };
 
 const l = new Logger('RiotAPI', 'magenta');
 
