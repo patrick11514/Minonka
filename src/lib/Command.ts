@@ -1,4 +1,6 @@
 import {
+    APIApplicationCommandOptionChoice,
+    ClientEvents,
     Locale,
     SlashCommandAttachmentOption,
     SlashCommandBooleanOption,
@@ -13,6 +15,8 @@ import {
 
 export abstract class Command {
     slashCommand: SlashCommandBuilder;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    events: Record<string, (...args: any[]) => void> = {};
 
     constructor(name: string, description: string) {
         this.slashCommand = new SlashCommandBuilder().setName(name).setDescription(description);
@@ -31,16 +35,16 @@ export abstract class Command {
             localizedDescription?: Partial<Record<Locale, string>>;
             required: boolean;
         } & (
-            | {
-                  type: 'STRING' | 'INTEGER' | 'NUMBER';
-                  min?: number;
-                  max?: number;
-                  choices?: { name: string; value: string }[];
-              }
-            | {
-                  type: 'BOOLEAN' | 'USER' | 'CHANNEL' | 'ROLE' | 'MENTIONABLE' | 'ATTACHMENT';
-              }
-        )
+                | {
+                    type: 'STRING' | 'INTEGER' | 'NUMBER';
+                    min?: number;
+                    max?: number;
+                    choices?: APIApplicationCommandOptionChoice<string>[];
+                }
+                | {
+                    type: 'BOOLEAN' | 'USER' | 'CHANNEL' | 'ROLE' | 'MENTIONABLE' | 'ATTACHMENT';
+                }
+            )
     ) {
         let optionBuilder:
             | SlashCommandStringOption
@@ -70,7 +74,7 @@ export abstract class Command {
                 optionBuilder.setMaxLength(option.max as number);
             }
             if ('choices' in option) {
-                optionBuilder.addChoices(option.choices as { name: string; value: string }[]);
+                optionBuilder.addChoices(option.choices as APIApplicationCommandOptionChoice<string>[]);
             }
         } else {
             switch (option.type) {
@@ -106,6 +110,10 @@ export abstract class Command {
         }
 
         this.slashCommand.options.push(optionBuilder);
+    }
+
+    public on<$Event extends keyof ClientEvents>(event: $Event, listener: (...args: ClientEvents[$Event]) => void) {
+        this.events[event] = listener;
     }
 
     abstract handler(interaction: ChatInputCommandInteraction): Promise<void>;

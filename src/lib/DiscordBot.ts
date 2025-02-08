@@ -71,6 +71,12 @@ export class DiscordBot extends EventEmitter<Events> {
             command.handler(interaction);
         });
 
+        for (const instance of instances) {
+            for (const [event, callback] of Object.entries(instance.events)) {
+                this.client.on(event, callback.bind(instance));
+            }
+        }
+
         this.commands = instances;
         l.stop(`Loaded commands (${instances.length}): ${instances.map((c) => c.constructor.name).join(', ')}`);
         super.emit('commandsLoaded');
@@ -88,6 +94,7 @@ export class DiscordBot extends EventEmitter<Events> {
                 }[]
             >;
         } catch (e) {
+            // eslint-disable-next-line no-console
             console.error(e);
             return [];
         }
