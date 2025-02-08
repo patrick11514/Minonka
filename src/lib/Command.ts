@@ -11,11 +11,6 @@ import {
     type ChatInputCommandInteraction
 } from 'discord.js';
 
-new SlashCommandBuilder().setNameLocalizations({
-    'en-US': 'command',
-    cs: 'příkaz'
-});
-
 export abstract class Command {
     slashCommand: SlashCommandBuilder;
 

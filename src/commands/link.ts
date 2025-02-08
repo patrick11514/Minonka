@@ -1,7 +1,6 @@
 import { Command } from '$/lib/Command';
 import api from '$/lib/Riot/api';
 import { ChatInputCommandInteraction, Locale } from 'discord.js';
-import { unknown } from 'zod';
 
 export default class Link extends Command {
     constructor() {
