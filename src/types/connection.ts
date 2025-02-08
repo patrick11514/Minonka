@@ -13,6 +13,6 @@ const dialect = new MysqlDialect({
     })
 });
 
-export const db = new Kysely<DB>({
+export const conn = new Kysely<DB>({
     dialect
 });
