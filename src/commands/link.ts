@@ -2,7 +2,8 @@ import { Command } from '$/lib/Command';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
-import { Region, regions } from '$/lib/Riot/types';
+import { Region } from '$/lib/Riot/types';
+import { setupRiotOptions } from '$/lib/utilities';
 import { conn } from '$/types/connection';
 import { ChatInputCommandInteraction, Locale, MessageFlags } from 'discord.js';
 
@@ -12,51 +13,7 @@ export default class Link extends Command {
     constructor() {
         super('link', 'Link your Riot Account');
         this.addLocalization(Locale.Czech, 'propojit', 'Propojí tvůj Riot Účet');
-        this.addOption({
-            type: 'STRING',
-            name: 'name',
-            localizedName: {
-                [Locale.Czech]: 'jméno'
-            },
-            description: 'Riot Name before #',
-            localizedDescription: {
-                [Locale.Czech]: 'Jméno před #'
-            },
-            required: true
-        });
-        this.addOption({
-            type: 'STRING',
-            name: 'tag',
-            localizedName: {
-                [Locale.Czech]: 'tag'
-            },
-            description: 'Riot Tag after #',
-            localizedDescription: {
-                [Locale.Czech]: 'Tag za #'
-            },
-            required: true
-        });
-        this.addOption({
-            type: 'STRING',
-            name: 'region',
-            localizedName: {
-                [Locale.Czech]: 'region'
-            },
-            description: 'Your lol region',
-            localizedDescription: {
-                [Locale.Czech]: 'Tvůj lol region'
-            },
-            required: true,
-            choices: regions.map((region) => {
-                return {
-                    value: region,
-                    name: getLocale(Locale.EnglishUS).regions[region],
-                    name_localizations: {
-                        [Locale.Czech]: getLocale(Locale.Czech).regions[region]
-                    }
-                };
-            })
-        });
+        setupRiotOptions(this);
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
