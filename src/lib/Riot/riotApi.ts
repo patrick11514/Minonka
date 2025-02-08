@@ -1,4 +1,4 @@
-import { ZodSchema } from 'zod';
+import { z, ZodSchema } from 'zod';
 import { ApiSet } from './apiSet';
 import { baseRequest } from './baseRequest';
 
@@ -10,7 +10,7 @@ type DataObject = {
 type ReturnObject<$Data extends DataObject> = {
     [$DataKey in keyof $Data]: $Data[$DataKey] extends ApiSet<infer $Inner>
         ? {
-              [$InnerKey in keyof $Inner]: (...params: Parameters<$Inner[$InnerKey]>) => ReturnType<typeof baseRequest<ReturnType<$Inner[$InnerKey]>['schema']>>;
+              [$InnerKey in keyof $Inner]: (...params: Parameters<$Inner[$InnerKey]>) => ReturnType<typeof baseRequest<z.infer<ReturnType<$Inner[$InnerKey]>['schema']>>>;
           }
         : $Data[$DataKey] extends DataObject
           ? ReturnObject<$Data[$DataKey]>
