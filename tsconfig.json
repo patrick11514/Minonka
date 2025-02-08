@@ -4,16 +4,27 @@
         "outDir": "build",
         "removeComments": true,
         "target": "ES2022",
-        "module": "CommonJS",
+        "module": "ESNext",
+        "moduleResolution": "node",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "paths": {
-            "$/*": ["./src/*"]
+            "$/*": [
+                "./src/*"
+            ]
         }
     },
-    "include": ["src/**/*"],
-    "exclude": ["node_modules"]
+    "include": [
+        "src/**/*"
+    ],
+    "exclude": [
+        "node_modules"
+    ],
+    "tsc-alias": {
+        "resolveFullPaths": true,
+        "verbose": false
+    }
 }

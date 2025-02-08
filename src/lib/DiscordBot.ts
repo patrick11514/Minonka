@@ -33,7 +33,7 @@ export class DiscordBot extends EventEmitter<Events> {
     private async loadCommands() {
         const l = new Logger('CommandLoader', 'cyan');
         l.start('Loading commands...');
-        const path = Path.join(__dirname, '..', 'commands');
+        const path = Path.join(import.meta.dirname, '..', 'commands');
         const files = fs
             .readdirSync(path)
             .filter((file) => file.endsWith('.js') || file.endsWith('.ts'))

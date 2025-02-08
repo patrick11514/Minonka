@@ -67,6 +67,9 @@ jobs:
                       echo "Building the app"
                       pnpm run build
 
+                      echo "Registering commands"
+                      pnpm run start:register 
+
                       echo "Restarting the app"
                       sudo systemctl restart minonka
                       echo "Deployment completed"
