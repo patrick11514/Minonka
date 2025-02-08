@@ -4,7 +4,8 @@
         "outDir": "build",
         "removeComments": true,
         "target": "ES2022",
-        "module": "CommonJS",
+        "module": "ESNext",
+        "moduleResolution": "node",
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
@@ -15,5 +16,9 @@
         }
     },
     "include": ["src/**/*"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules"],
+    "tsc-alias": {
+        "resolveFullPaths": true,
+        "verbose": false
+    }
 }
