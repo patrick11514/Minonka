@@ -5,7 +5,7 @@ import { env } from './env';
 
 const dialect = new MysqlDialect({
     pool: createPool({
-        host: env.DATABASE_NAME,
+        host: env.DATABASE_IP,
         port: env.DATABASE_PORT,
         user: env.DATABASE_USER,
         password: env.DATABASE_PASSWORD,
