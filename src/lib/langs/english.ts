@@ -20,6 +20,24 @@ export default template.parse({
             success: 'Account **%1#%2** was successfully unlinked'
         }
     },
+    summoner: {
+        choice: "We've found multiple accounts, select one of them:",
+        me: {
+            notFound: "You don't have any connected account",
+            error: 'There was an error, please try again later',
+            success: 'Here are informations about your account:'
+        },
+        name: {
+            notFound: 'Account %1#%2 was not found on server %3',
+            error: 'There was an error, please try again later',
+            success: 'Here are informations about account %1#%2 (%3):'
+        },
+        mention: {
+            notFound: 'User %1 does not have any connected account',
+            error: 'There was an error, please try again later',
+            success: 'Here are informations about account %1#%2 (%3):'
+        }
+    },
     regions: {
         EUN1: 'EUNE',
         EUW1: 'EUW',

@@ -22,5 +22,23 @@ export default z.object({
             success: _
         })
     }),
+    summoner: z.object({
+        choice: _,
+        me: z.object({
+            notFound: _,
+            error: _,
+            success: _
+        }),
+        name: z.object({
+            notFound: _,
+            error: _,
+            success: _
+        }),
+        mention: z.object({
+            notFound: _,
+            error: _,
+            success: _
+        })
+    }),
     regions: z.object(Object.fromEntries(regions.map((region) => [region, _])) as Record<(typeof regions)[number], typeof _>)
 });

@@ -20,6 +20,24 @@ export default template.parse({
             success: 'Účet **%1#%2** byl úspěšně odpojen'
         }
     },
+    summoner: {
+        choice: 'Nalezli jsme více účtů, vyber si jeden z nich:',
+        me: {
+            notFound: 'Nemáš propojený žádný účet',
+            error: 'Nastala chyba, zkus to prosím později',
+            success: 'Zde jsou informace o tvém účtu:'
+        },
+        name: {
+            notFound: 'Účet %1#%2 nebyl na serveru %3 nalezen',
+            error: 'Nastala chyba, zkus to prosím později',
+            success: 'Zde jsou informace o účtu %1#%2 (%3):'
+        },
+        mention: {
+            notFound: 'Uživatel %1 nemá propojený žádný účet',
+            error: 'Nastala chyba, zkus to prosím později',
+            success: 'Zde jsou informace o účtu %1#%2 (%3):'
+        }
+    },
     regions: {
         EUN1: 'EUNE',
         EUW1: 'EUW',
