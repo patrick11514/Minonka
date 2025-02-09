@@ -26,6 +26,9 @@ importers:
       kysely:
         specifier: ^0.27.5
         version: 0.27.5
+      microjob:
+        specifier: ^0.7.0
+        version: 0.7.0
       module-alias:
         specifier: ^2.2.3
         version: 2.2.3
@@ -1084,6 +1087,10 @@ packages:
   methods@1.1.2:
     resolution: {integrity: sha512-iclAHeNqNm68zFtnZ0e+1L2yUIdvzNoauKU4WBA3VvH/vPFieF7qfRlwUZU+DA9P9bPXIS90ulxoUoCH23sV2w==}
     engines: {node: '>= 0.6'}
+
+  microjob@0.7.0:
+    resolution: {integrity: sha512-ofDpqaVEv67ymCYdCE8eIVMCJY0H/hAtGxYmi1pXjtNkLOM0UUuUDshA1YLdVFwPwwt5+SW9EbBtSfsNokf+PA==}
+    engines: {node: '>=10.5.0', npm: '>= 6.0.0'}
 
   micromatch@4.0.8:
     resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
@@ -2527,6 +2534,8 @@ snapshots:
   merge2@1.4.1: {}
 
   methods@1.1.2: {}
+
+  microjob@0.7.0: {}
 
   micromatch@4.0.8:
     dependencies:

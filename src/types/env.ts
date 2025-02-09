@@ -10,7 +10,8 @@ const schema = z.object({
     DATABASE_NAME: z.string(),
     RIOT_API_KEY: z.string(),
     CLIENT_ID: z.string(),
-    CLIENT_TOKEN: z.string()
+    CLIENT_TOKEN: z.string(),
+    THREADS: z.coerce.number()
 });
 
 export const env = schema.parse(process.env);

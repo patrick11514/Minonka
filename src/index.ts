@@ -1,6 +1,7 @@
 import { exit } from 'process';
 import { DiscordBot } from './lib/DiscordBot';
 import Logger from './lib/logger';
+import { ThreadPool } from './lib/Worker/Pool';
 
 if (process.argv.includes('--register')) {
     const l = new Logger('CommandRegister', 'cyan');
@@ -16,6 +17,8 @@ if (process.argv.includes('--register')) {
         exit(0);
     });
 } else {
+    const threadPool = new ThreadPool();
+
     const l = new Logger('DiscordBot', 'yellow');
     l.start('Starting Discord Bot...');
 
@@ -23,5 +26,9 @@ if (process.argv.includes('--register')) {
 
     discordBot.on('login', (client) => {
         l.stop('Connected to discord as ' + client.user.tag);
+    });
+
+    process.on('SIGINT', async () => {
+        await threadPool.stop();
     });
 }
