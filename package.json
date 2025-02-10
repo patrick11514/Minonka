@@ -11,7 +11,7 @@
         "start:register": "node -r module-alias/register ./build/index.js --register",
         "genDatabaseSchema": "kysely-codegen --out-file ./src/types/database.ts",
         "format": "prettier --write .",
-        "lint": "prettier --check . && eslint .",
+        "lint": "prettier --check . && eslint src",
         "check": "tsc --noEmit"
     },
     "dependencies": {
