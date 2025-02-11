@@ -2,19 +2,23 @@ import { env } from '$/types/env';
 import { z } from 'zod';
 import Logger from '../logger';
 import fetch from 'node-fetch';
+import template from '$/lib/langs/_template';
+import { replacePlaceholders } from '../langs';
 
 type StatusCode = 400 | 401 | 403 | 404 | 405 | 415 | 429 | 500 | 502 | 503 | 504;
+
+type RiotErrorResponse = {
+    status: false;
+    code: StatusCode;
+    message: string;
+};
 
 type Response<$Data> =
     | {
           status: true;
           data: $Data;
       }
-    | {
-          status: false;
-          code: StatusCode;
-          message: string;
-      };
+    | RiotErrorResponse;
 
 const l = new Logger('RiotAPI', 'magenta');
 
@@ -66,4 +70,15 @@ export const baseRequest = async <$ResponseData>(
             message: e.message
         };
     }
+};
+
+export const formatErrorResponse = (
+    lang: z.infer<typeof template>,
+    response: RiotErrorResponse
+) => {
+    return replacePlaceholders(
+        lang.riotApi.error,
+        response.code.toString(),
+        response.message
+    );
 };

@@ -2,6 +2,7 @@ import { Command } from '$/lib/Command';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
+import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { Region } from '$/lib/Riot/types';
 import { setupRiotOptions } from '$/lib/utilities';
 import { conn } from '$/types/connection';
@@ -34,11 +35,7 @@ export default class Link extends Command {
             } else {
                 await interaction.reply({
                     flags: MessageFlags.Ephemeral,
-                    content: replacePlaceholders(
-                        lang.riotApi.error,
-                        userInfo.code.toString(),
-                        userInfo.message
-                    )
+                    content: formatErrorResponse(lang, userInfo)
                 });
             }
             return;
@@ -76,11 +73,7 @@ export default class Link extends Command {
             } else {
                 await interaction.reply({
                     flags: MessageFlags.Ephemeral,
-                    content: replacePlaceholders(
-                        lang.riotApi.error,
-                        summoner.code.toString(),
-                        summoner.message
-                    )
+                    content: formatErrorResponse(lang, summoner)
                 });
             }
             return;
