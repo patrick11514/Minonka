@@ -40,5 +40,10 @@ export default z.object({
             success: _
         })
     }),
-    regions: z.object(Object.fromEntries(regions.map((region) => [region, _])) as Record<(typeof regions)[number], typeof _>)
+    regions: z.object(
+        Object.fromEntries(regions.map((region) => [region, _])) as Record<
+            (typeof regions)[number],
+            typeof _
+        >
+    )
 });

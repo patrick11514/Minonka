@@ -36,6 +36,9 @@ const RiotAPIStructure = {
     })
 };
 
-const createForRegion = (region: Region) => RiotAPI(RiotAPIStructure, getBaseURL(region), BASE_ROUTING_URL);
+const createForRegion = (region: Region) =>
+    RiotAPI(RiotAPIStructure, getBaseURL(region), BASE_ROUTING_URL);
 
-export default Object.fromEntries(regions.map((region) => [region, createForRegion(region)])) as Record<Region, ReturnType<typeof createForRegion>>;
+export default Object.fromEntries(
+    regions.map((region) => [region, createForRegion(region)])
+) as Record<Region, ReturnType<typeof createForRegion>>;

@@ -18,7 +18,10 @@ type Response<$Data> =
 
 const l = new Logger('RiotAPI', 'magenta');
 
-export const baseRequest = async <$ResponseData>(url: string, schema: z.ZodType<$ResponseData>): Promise<Response<$ResponseData>> => {
+export const baseRequest = async <$ResponseData>(
+    url: string,
+    schema: z.ZodType<$ResponseData>
+): Promise<Response<$ResponseData>> => {
     try {
         const response = await fetch(url, {
             headers: {

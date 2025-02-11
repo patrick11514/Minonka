@@ -22,5 +22,21 @@ export class RiotPUUID {
     }
 }
 
-export const regions = ['BR1', 'EUN1', 'EUW1', 'JP1', 'KR', 'LA1', 'LA2', 'NA1', 'OC1', 'TR1', 'RU', 'SG2', 'TW2', 'VN2', 'ME1'] as const;
+export const regions = [
+    'BR1',
+    'EUN1',
+    'EUW1',
+    'JP1',
+    'KR',
+    'LA1',
+    'LA2',
+    'NA1',
+    'OC1',
+    'TR1',
+    'RU',
+    'SG2',
+    'TW2',
+    'VN2',
+    'ME1'
+] as const;
 export type Region = (typeof regions)[number];

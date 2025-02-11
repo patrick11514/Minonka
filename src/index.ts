@@ -13,7 +13,9 @@ if (process.argv.includes('--register')) {
             l.stopError('Failed to register commands');
             return;
         }
-        l.stop(`Registered commands (${registered.length}): ${registered.map((c) => c.name).join(', ')}`);
+        l.stop(
+            `Registered commands (${registered.length}): ${registered.map((c) => c.name).join(', ')}`
+        );
         exit(0);
     });
 } else {

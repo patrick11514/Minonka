@@ -31,17 +31,38 @@ export default class Summoner extends Command {
         super('summoner', 'Show information about your account');
         super.addLocalization(Locale.Czech, 'summoner', 'Zobrazí informace o tvém účtu');
 
-        this.meSubCommand = new SubCommand('me', 'Show information about your account(s)');
-        this.meSubCommand.addLocalization(Locale.Czech, 'já', 'Zobrazí informace o tvém účtu/tvých účtech');
+        this.meSubCommand = new SubCommand(
+            'me',
+            'Show information about your account(s)'
+        );
+        this.meSubCommand.addLocalization(
+            Locale.Czech,
+            'já',
+            'Zobrazí informace o tvém účtu/tvých účtech'
+        );
         super.addSubCommand(this.meSubCommand);
 
-        this.nameSubCommand = new SubCommand('name', 'Show information about a specific account');
-        this.nameSubCommand.addLocalization(Locale.Czech, 'jméno', 'Zobrazí informace o konkrétním účtu');
+        this.nameSubCommand = new SubCommand(
+            'name',
+            'Show information about a specific account'
+        );
+        this.nameSubCommand.addLocalization(
+            Locale.Czech,
+            'jméno',
+            'Zobrazí informace o konkrétním účtu'
+        );
         setupRiotOptions(this.nameSubCommand);
         super.addSubCommand(this.nameSubCommand);
 
-        this.mentionSubCommand = new SubCommand('mention', 'Show information about a mentioned account');
-        this.mentionSubCommand.addLocalization(Locale.Czech, 'zmínka', 'Zobrazí informace o zmíněném účtu');
+        this.mentionSubCommand = new SubCommand(
+            'mention',
+            'Show information about a mentioned account'
+        );
+        this.mentionSubCommand.addLocalization(
+            Locale.Czech,
+            'zmínka',
+            'Zobrazí informace o zmíněném účtu'
+        );
         this.mentionSubCommand.addOption({
             type: 'USER',
             name: 'user',
@@ -66,7 +87,11 @@ export default class Summoner extends Command {
 
         if (this.meSubCommand.match(interaction)) {
             try {
-                accounts = await conn.selectFrom('account').selectAll().where('discord_id', '=', interaction.user.id).execute();
+                accounts = await conn
+                    .selectFrom('account')
+                    .selectAll()
+                    .where('discord_id', '=', interaction.user.id)
+                    .execute();
 
                 if (accounts.length == 0) {
                     await interaction.reply({
@@ -94,7 +119,12 @@ export default class Summoner extends Command {
                 if (account.code === 404) {
                     await interaction.reply({
                         flags: MessageFlags.Ephemeral,
-                        content: replacePlaceholders(lang.summoner.name.notFound, gameName, tagLine, lang.regions[region])
+                        content: replacePlaceholders(
+                            lang.summoner.name.notFound,
+                            gameName,
+                            tagLine,
+                            lang.regions[region]
+                        )
                     });
                 } else {
                     await interaction.reply({
@@ -110,7 +140,12 @@ export default class Summoner extends Command {
                 if (summoner.code === 404) {
                     await interaction.reply({
                         flags: MessageFlags.Ephemeral,
-                        content: replacePlaceholders(lang.summoner.name.notFound, gameName, tagLine, lang.regions[region])
+                        content: replacePlaceholders(
+                            lang.summoner.name.notFound,
+                            gameName,
+                            tagLine,
+                            lang.regions[region]
+                        )
                     });
                 } else {
                     await interaction.reply({
@@ -136,12 +171,19 @@ export default class Summoner extends Command {
         } else {
             const mention = interaction.options.getUser('user', true);
             try {
-                accounts = await conn.selectFrom('account').selectAll().where('discord_id', '=', mention.id).execute();
+                accounts = await conn
+                    .selectFrom('account')
+                    .selectAll()
+                    .where('discord_id', '=', mention.id)
+                    .execute();
 
                 if (accounts.length == 0) {
                     await interaction.reply({
                         flags: MessageFlags.Ephemeral,
-                        content: replacePlaceholders(lang.summoner.mention.notFound, mention.toString())
+                        content: replacePlaceholders(
+                            lang.summoner.mention.notFound,
+                            mention.toString()
+                        )
                     });
 
                     return;
@@ -158,16 +200,22 @@ export default class Summoner extends Command {
         }
 
         if (accounts.length > 1) {
-            const select = new StringSelectMenuBuilder().setCustomId('summoner').addOptions(
-                accounts.map((account) => {
-                    const builder = new StringSelectMenuOptionBuilder()
-                        .setValue(account.summoner_id)
-                        .setLabel(`${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`);
+            const select = new StringSelectMenuBuilder()
+                .setCustomId('summoner')
+                .addOptions(
+                    accounts.map((account) => {
+                        const builder = new StringSelectMenuOptionBuilder()
+                            .setValue(account.summoner_id)
+                            .setLabel(
+                                `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`
+                            );
 
-                    return builder;
-                })
+                        return builder;
+                    })
+                );
+            const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+                select
             );
-            const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
 
             await interaction.reply({
                 content: lang.summoner.choice,
@@ -185,7 +233,10 @@ export default class Summoner extends Command {
         this.handleSummoner(interaction, interaction.values[0]);
     }
 
-    private async handleSummoner(interaction: RepliableInteraction<CacheType>, summonerId: string) {
+    private async handleSummoner(
+        interaction: RepliableInteraction<CacheType>,
+        summonerId: string
+    ) {
         interaction.reply({
             content: summonerId
         });

@@ -38,7 +38,11 @@ export const constructOption = (option: OptionType) => {
         | SlashCommandMentionableOption
         | SlashCommandAttachmentOption;
 
-    if (option.type === 'STRING' || option.type === 'INTEGER' || option.type === 'NUMBER') {
+    if (
+        option.type === 'STRING' ||
+        option.type === 'INTEGER' ||
+        option.type === 'NUMBER'
+    ) {
         switch (option.type) {
             case 'STRING':
                 optionBuilder = new SlashCommandStringOption();
@@ -57,7 +61,9 @@ export const constructOption = (option: OptionType) => {
             optionBuilder.setMaxLength(option.max as number);
         }
         if ('choices' in option) {
-            optionBuilder.addChoices(option.choices as APIApplicationCommandOptionChoice<string>[]);
+            optionBuilder.addChoices(
+                option.choices as APIApplicationCommandOptionChoice<string>[]
+            );
         }
     } else {
         switch (option.type) {
@@ -82,14 +88,21 @@ export const constructOption = (option: OptionType) => {
         }
     }
 
-    optionBuilder.setName(option.name).setDescription(option.description).setRequired(option.required);
+    optionBuilder
+        .setName(option.name)
+        .setDescription(option.description)
+        .setRequired(option.required);
 
     if ('localizedName' in option) {
-        optionBuilder.setNameLocalizations(option.localizedName as Record<Locale, string>);
+        optionBuilder.setNameLocalizations(
+            option.localizedName as Record<Locale, string>
+        );
     }
 
     if ('localizedDescription' in option) {
-        optionBuilder.setDescriptionLocalizations(option.localizedDescription as Record<Locale, string>);
+        optionBuilder.setDescriptionLocalizations(
+            option.localizedDescription as Record<Locale, string>
+        );
     }
 
     return optionBuilder;

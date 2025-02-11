@@ -34,13 +34,21 @@ export default class Link extends Command {
             } else {
                 await interaction.reply({
                     flags: MessageFlags.Ephemeral,
-                    content: replacePlaceholders(lang.riotApi.error, userInfo.code.toString(), userInfo.message)
+                    content: replacePlaceholders(
+                        lang.riotApi.error,
+                        userInfo.code.toString(),
+                        userInfo.message
+                    )
                 });
             }
             return;
         }
         try {
-            const exists = await conn.selectFrom('account').select(['id']).where('puuid', '=', userInfo.data.puuid).executeTakeFirst();
+            const exists = await conn
+                .selectFrom('account')
+                .select(['id'])
+                .where('puuid', '=', userInfo.data.puuid)
+                .executeTakeFirst();
             if (exists) {
                 await interaction.reply({
                     flags: MessageFlags.Ephemeral,
@@ -68,7 +76,11 @@ export default class Link extends Command {
             } else {
                 await interaction.reply({
                     flags: MessageFlags.Ephemeral,
-                    content: replacePlaceholders(lang.riotApi.error, summoner.code.toString(), summoner.message)
+                    content: replacePlaceholders(
+                        lang.riotApi.error,
+                        summoner.code.toString(),
+                        summoner.message
+                    )
                 });
             }
             return;
@@ -90,7 +102,12 @@ export default class Link extends Command {
 
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
-                content: replacePlaceholders(lang.lang.success, userInfo.data.gameName, userInfo.data.tagLine, summoner.data.summonerLevel.toString())
+                content: replacePlaceholders(
+                    lang.lang.success,
+                    userInfo.data.gameName,
+                    userInfo.data.tagLine,
+                    summoner.data.summonerLevel.toString()
+                )
             });
         } catch (e) {
             l.error(e);

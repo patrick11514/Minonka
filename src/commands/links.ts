@@ -3,7 +3,16 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import { Region } from '$/lib/Riot/types';
 import { conn } from '$/types/connection';
-import { ActionRowBuilder, CacheType, ChatInputCommandInteraction, Interaction, Locale, MessageFlags, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } from 'discord.js';
+import {
+    ActionRowBuilder,
+    CacheType,
+    ChatInputCommandInteraction,
+    Interaction,
+    Locale,
+    MessageFlags,
+    StringSelectMenuBuilder,
+    StringSelectMenuOptionBuilder
+} from 'discord.js';
 
 const l = new Logger('Links', 'red');
 
@@ -11,14 +20,22 @@ export default class Links extends Command {
     constructor() {
         super('links', 'Get all your linked accounts');
 
-        super.addLocalization(Locale.Czech, 'propojení', 'Zobrazí všechny tvoje propojené účty');
+        super.addLocalization(
+            Locale.Czech,
+            'propojení',
+            'Zobrazí všechny tvoje propojené účty'
+        );
         super.on('interactionCreate', this.menuHandle);
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
         const lang = getLocale(interaction.locale);
 
-        const accounts = await conn.selectFrom('account').selectAll().where('discord_id', '=', interaction.user.id).execute();
+        const accounts = await conn
+            .selectFrom('account')
+            .selectAll()
+            .where('discord_id', '=', interaction.user.id)
+            .execute();
 
         if (accounts.length == 0) {
             await interaction.reply({
@@ -42,7 +59,9 @@ export default class Links extends Command {
                 accounts.map((account) => {
                     return new StringSelectMenuOptionBuilder()
                         .setValue(account.id.toString())
-                        .setLabel(`${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`);
+                        .setLabel(
+                            `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`
+                        );
                 })
             );
         const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(select);
@@ -73,7 +92,12 @@ export default class Links extends Command {
         const account = await conn
             .selectFrom('account')
             .selectAll()
-            .where((eb) => eb.and([eb('id', '=', accountId), eb('discord_id', '=', interaction.user.id)]))
+            .where((eb) =>
+                eb.and([
+                    eb('id', '=', accountId),
+                    eb('discord_id', '=', interaction.user.id)
+                ])
+            )
             .executeTakeFirst();
 
         if (!account) {
@@ -90,7 +114,11 @@ export default class Links extends Command {
 
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
-                content: replacePlaceholders(lang.langs.unlink.success, account.gameName, account.tagLine)
+                content: replacePlaceholders(
+                    lang.langs.unlink.success,
+                    account.gameName,
+                    account.tagLine
+                )
             });
         } catch (e) {
             l.error(e);

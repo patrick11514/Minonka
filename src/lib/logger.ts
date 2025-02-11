@@ -39,9 +39,16 @@ class Logger {
 
         //HH:MM:SS:MS
         const hours = date.getHours() < 10 ? `0${date.getHours()}` : date.getHours();
-        const minutes = date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
-        const seconds = date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds();
-        const milliseconds = date.getMilliseconds() < 10 ? `00${date.getMilliseconds()}` : date.getMilliseconds() < 100 ? `0${date.getMilliseconds()}` : date.getMilliseconds();
+        const minutes =
+            date.getMinutes() < 10 ? `0${date.getMinutes()}` : date.getMinutes();
+        const seconds =
+            date.getSeconds() < 10 ? `0${date.getSeconds()}` : date.getSeconds();
+        const milliseconds =
+            date.getMilliseconds() < 10
+                ? `00${date.getMilliseconds()}`
+                : date.getMilliseconds() < 100
+                  ? `0${date.getMilliseconds()}`
+                  : date.getMilliseconds();
 
         return `${hours}:${minutes}:${seconds}:${milliseconds}`;
     }

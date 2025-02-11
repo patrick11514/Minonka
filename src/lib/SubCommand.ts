@@ -1,11 +1,17 @@
-import { ChatInputCommandInteraction, Locale, SlashCommandSubcommandBuilder } from 'discord.js';
+import {
+    ChatInputCommandInteraction,
+    Locale,
+    SlashCommandSubcommandBuilder
+} from 'discord.js';
 import { constructOption, OptionType } from './types';
 
 export class SubCommand {
     subCommand: SlashCommandSubcommandBuilder;
 
     constructor(name: string, description: string) {
-        this.subCommand = new SlashCommandSubcommandBuilder().setName(name).setDescription(description);
+        this.subCommand = new SlashCommandSubcommandBuilder()
+            .setName(name)
+            .setDescription(description);
     }
 
     public addLocalization(lang: Locale, name: string, description: string) {

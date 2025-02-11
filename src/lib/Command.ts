@@ -1,4 +1,9 @@
-import { ClientEvents, Locale, SlashCommandBuilder, type ChatInputCommandInteraction } from 'discord.js';
+import {
+    ClientEvents,
+    Locale,
+    SlashCommandBuilder,
+    type ChatInputCommandInteraction
+} from 'discord.js';
 import { constructOption, OptionType } from './types';
 import { SubCommand } from './SubCommand';
 
@@ -8,7 +13,9 @@ export abstract class Command {
     events: Record<string, (...args: any[]) => void> = {};
 
     constructor(name: string, description: string) {
-        this.slashCommand = new SlashCommandBuilder().setName(name).setDescription(description);
+        this.slashCommand = new SlashCommandBuilder()
+            .setName(name)
+            .setDescription(description);
     }
 
     public addLocalization(lang: Locale, name: string, description: string) {
@@ -24,7 +31,10 @@ export abstract class Command {
         this.slashCommand.addSubcommand(subCommand.subCommand);
     }
 
-    public on<$Event extends keyof ClientEvents>(event: $Event, listener: (...args: ClientEvents[$Event]) => void) {
+    public on<$Event extends keyof ClientEvents>(
+        event: $Event,
+        listener: (...args: ClientEvents[$Event]) => void
+    ) {
         this.events[event] = listener;
     }
 
