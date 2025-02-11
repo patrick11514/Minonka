@@ -8,6 +8,15 @@ const getBaseURL = (region: Region) => {
     return `https://${region}.api.riotgames.com`;
 };
 
+const SummonerSchema = z.object({
+    accountId: z.string(),
+    profileIconId: z.number(),
+    revisionDate: z.number(),
+    id: z.string(),
+    puuid: z.string(),
+    summonerLevel: z.number()
+});
+
 const RiotAPIStructure = {
     account: new ApiSet('/riot/account/v1/accounts', {
         name: (gameName: string, tagLine: string) => ({
@@ -24,14 +33,12 @@ const RiotAPIStructure = {
         byPuuid: (puuid: string) => ({
             regional: true,
             endOfUrl: `/by-puuid/${puuid}`,
-            schema: z.object({
-                accountId: z.string(),
-                profileIconId: z.number(),
-                revisionDate: z.number(),
-                id: z.string(),
-                puuid: z.string(),
-                summonerLevel: z.number()
-            })
+            schema: SummonerSchema
+        }),
+        bySummonerId: (summonerId: string) => ({
+            regional: true,
+            endOfUrl: `/${summonerId}`,
+            schema: SummonerSchema
         })
     })
 };
