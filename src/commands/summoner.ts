@@ -19,6 +19,9 @@ import Logger from '$/lib/logger';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import api from '$/lib/Riot/api';
 import { Region } from '$/lib/Riot/types';
+import { formatErrorResponse } from '$/lib/Riot/baseRequest';
+import { SummonerData } from '$/lib/Worker/tasks/summoner';
+import SummonerTask from '$/lib/Worker/tasks/summoner';
 
 const l = new Logger('Summoner', 'green');
 
@@ -205,7 +208,7 @@ export default class Summoner extends Command {
                 .addOptions(
                     accounts.map((account) => {
                         const builder = new StringSelectMenuOptionBuilder()
-                            .setValue(account.summoner_id)
+                            .setValue(account.summoner_id + '@@' + account.region)
                             .setLabel(
                                 `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`
                             );
@@ -224,21 +227,68 @@ export default class Summoner extends Command {
             return;
         }
 
-        this.handleSummoner(interaction, accounts[0].summoner_id);
+        this.handleSummoner(
+            interaction,
+            accounts[0].summoner_id,
+            accounts[0].region as Region
+        );
     }
 
     async menuHandle(interaction: Interaction<CacheType>) {
         if (!interaction.isStringSelectMenu()) return;
 
-        this.handleSummoner(interaction, interaction.values[0]);
+        const [summonerId, region] = interaction.values[0].split('@@');
+
+        this.handleSummoner(interaction, summonerId, region as Region);
     }
 
     private async handleSummoner(
         interaction: RepliableInteraction<CacheType>,
-        summonerId: string
+        summonerId: string,
+        region: Region
     ) {
-        interaction.reply({
-            content: summonerId
-        });
+        const lang = getLocale(interaction.locale);
+
+        const summoner = await api[region].summoner.bySummonerId(summonerId);
+        if (!summoner.status) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: formatErrorResponse(lang, summoner)
+            });
+            return;
+        }
+
+        const challenges = await api[region].challenges.byPuuid(summoner.data.puuid);
+        if (!challenges.status) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: formatErrorResponse(lang, challenges)
+            });
+            return;
+        }
+
+        const account = await api[region].account.byPuuid(summoner.data.puuid);
+        if (!account.status) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: formatErrorResponse(lang, account)
+            });
+            return;
+        }
+
+        const data = {
+            level: summoner.data.summonerLevel,
+            gameName: account.data.gameName,
+            tagLine: account.data.tagLine,
+            profileIconId: summoner.data.profileIconId,
+            titleId: challenges.data.preferences.title,
+            banner: challenges.data.preferences.bannerAccent,
+            crest: challenges.data.preferences.crestBorder,
+            challenges: challenges.data.preferences.challengeIds,
+            locale: interaction.locale
+        } satisfies SummonerData;
+
+        const result = await process.workerServer.addJobWait('summoner', data);
+        console.log(result);
     }
 }

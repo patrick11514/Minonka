@@ -47,6 +47,7 @@ export const baseRequest = async <$ResponseData>(
 
         if (!parse.success) {
             l.error(`Failed to parse response from ${url}`);
+            l.error(parse.error);
             return {
                 status: false,
                 code: 500,
