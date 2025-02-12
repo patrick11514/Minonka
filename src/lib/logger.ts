@@ -1,5 +1,6 @@
 import clc from 'cli-color';
 import fs from 'node:fs';
+import path from 'node:path';
 import strip from 'strip-color';
 
 /* eslint-disable no-console */
@@ -26,6 +27,7 @@ class Logger {
     name: string;
     color: color;
     time: number = 0;
+    static loggingDirectory = './logs';
     private sensitive: boolean;
 
     constructor(name: string, color: color = 'yellow', sensitive = false) {
@@ -84,6 +86,10 @@ class Logger {
         const textType = type == 'INFO' ? clc.blue('INFO') : clc.red('ERROR');
         const textColor = type == 'INFO' ? clc.white : clc.red;
 
+        if (!fs.existsSync(Logger.loggingDirectory)) {
+            fs.mkdirSync(Logger.loggingDirectory);
+        }
+
         if (this.sensitive) {
             console.log(
                 `${clc.white('[')}${clc.green(this.getTime())}${clc.white(']')} ${clc.white('[')}${textType}${clc.white(
@@ -112,7 +118,10 @@ class Logger {
             const message = strip(formattedMessage);
 
             //add it to new line of file
-            fs.appendFileSync(`./logs/${filename}`, message + '\n');
+            fs.appendFileSync(
+                path.join('./', Logger.loggingDirectory, filename),
+                message + '\n'
+            );
         }
     }
 }
