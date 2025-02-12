@@ -11,7 +11,9 @@ const schema = z.object({
     RIOT_API_KEY: z.string(),
     CLIENT_ID: z.string(),
     CLIENT_TOKEN: z.string(),
-    THREADS: z.coerce.number()
+    WEBSOCKET_PORT: z.coerce.number(),
+    WEBSOCKET_HOST: z.string(),
+    CACHE_PATH: z.string()
 });
 
 export const env = schema.parse(process.env);
