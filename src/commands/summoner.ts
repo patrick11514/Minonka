@@ -220,6 +220,7 @@ export default class Summoner extends Command {
             );
 
             await interaction.reply({
+                flags: MessageFlags.Ephemeral,
                 content: lang.summoner.choice,
                 components: [row]
             });
@@ -276,18 +277,42 @@ export default class Summoner extends Command {
         }
 
         const data = {
+            summonerId: summoner.data.id,
+            region: region,
             level: summoner.data.summonerLevel,
             gameName: account.data.gameName,
             tagLine: account.data.tagLine,
             profileIconId: summoner.data.profileIconId,
             titleId: challenges.data.preferences.title,
-            banner: challenges.data.preferences.bannerAccent,
-            crest: challenges.data.preferences.crestBorder,
-            challenges: challenges.data.preferences.challengeIds,
+            banner: challenges.data.preferences.bannerAccent ?? 1,
+            crest: challenges.data.preferences.crestBorder ?? 1,
+            prestigeCrest: challenges.data.preferences.prestigeCrestBorderLevel ?? 1,
+            challenges: challenges.data.preferences.challengeIds ?? [],
+            userChallenges: challenges.data.challenges,
             locale: interaction.locale
         } satisfies SummonerData;
 
-        const result = await process.workerServer.addJobWait('summoner', data);
-        console.log(result);
+        try {
+            const result = await process.workerServer.addJobWait('summoner', data);
+
+            await interaction.reply({
+                files: [result]
+            });
+        } catch (e) {
+            if (e instanceof Error) {
+                l.error(e);
+                await interaction.reply({
+                    flags: MessageFlags.Ephemeral,
+                    content: replacePlaceholders(lang.workerError, e.message)
+                });
+                return;
+            }
+
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: lang.genericError
+            });
+            return;
+        }
     }
 }
