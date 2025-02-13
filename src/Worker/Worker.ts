@@ -43,6 +43,8 @@ const setupWebSocket = () => {
     websocket.on('message', async (message) => {
         const [job, jobId, startDate, strData] = message.toString().split(';');
 
+        l.start('Got job ' + job + ' with id ' + jobId);
+
         try {
             const data = JSON.parse(strData);
 
@@ -61,8 +63,10 @@ const setupWebSocket = () => {
 
             const result = await jobFunction(data);
             sendJobBack(jobId, result, startDate);
+            l.stop('Job ' + job + ' with id ' + jobId + ' completed');
         } catch (e) {
             sendJobBack(jobId, e as Error, startDate);
+            l.stopError('Job ' + job + ' with id ' + jobId + ' failed');
         }
     });
 

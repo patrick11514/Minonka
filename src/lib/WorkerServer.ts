@@ -76,6 +76,7 @@ export class WorkerServer extends EventEmitter<Events> {
                 } else if (str.startsWith('error')) {
                     const [, jobId, error, startTimestmap] = str.split(';');
                     Workers[newId].state = WorkerState.FREE;
+                    console.log('ERROR with job');
                     const elapsed = Date.now() - parseInt(startTimestmap);
                     const jobResult = {
                         data: new Error(error),
@@ -85,6 +86,7 @@ export class WorkerServer extends EventEmitter<Events> {
                     this.jobResults.set(jobId, jobResult);
                     super.emit('jobDone', jobId, jobResult);
                 }
+                this.schedule();
             });
 
             ws.on('close', () => {
@@ -95,6 +97,8 @@ export class WorkerServer extends EventEmitter<Events> {
 
     private schedule() {
         if (Object.keys(Workers).length === 0) {
+            //we should clear job list, because we have no workers
+            this.jobs = [];
             throw new Error('No workers available');
         }
 
@@ -140,18 +144,33 @@ export class WorkerServer extends EventEmitter<Events> {
     }
 
     async wait(jobId: string) {
+        if (this.jobResults.has(jobId)) {
+            const result = this.jobResults.get(jobId)!;
+
+            //remove, since we got it
+            this.jobResults.delete(jobId);
+
+            if (result instanceof Error) {
+                throw result;
+            }
+
+            return result.data as string;
+        }
+
         const result = await Promise.race([
             new Promise<string>((resolve, reject) => {
                 super.once('jobDone', (id, result) => {
                     if (id !== jobId) return;
-                    if (result instanceof Error) {
-                        reject(result);
+                    //remove job from map, because we got it using the event
+                    this.jobResults.delete(jobId);
+
+                    if (result.data instanceof Error) {
+                        reject(result.data);
                     }
 
                     l.log(`Job ${jobId} completed in ${result.elapsed}ms`);
 
                     resolve(result.data as string);
-                    this.jobResults.delete(jobId);
                 });
             }),
             new Promise<undefined>((resolve) => setTimeout(resolve, TIMEOUT))
