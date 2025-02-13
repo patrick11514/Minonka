@@ -31,7 +31,7 @@ const ASSET_PATHS = {
     [AssetType.OTHER]: '/other',
     [AssetType.DDRAGON_DATA]: '/ddragon/_ROOT_/data/%%LANGUAGE%%',
     [AssetType.DDRAGON_PROFILEICON]: '/ddragon/_ROOT_/img/profileicon',
-    [AssetType.DDRAGON_CHALLENGES]: "/ddragon/img/challenges-images"
+    [AssetType.DDRAGON_CHALLENGES]: '/ddragon/img/challenges-images'
 } satisfies Record<AssetType, string>;
 
 export type RiotLanguage =
