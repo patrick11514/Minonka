@@ -1,4 +1,3 @@
-import sharp from 'sharp';
 import { Composite } from './Composite';
 import { Position, Size } from './types';
 
