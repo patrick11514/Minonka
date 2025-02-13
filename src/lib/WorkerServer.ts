@@ -3,6 +3,7 @@ import { WebSocket, WebSocketServer } from 'ws';
 import crypto from 'node:crypto';
 import { SummonerData } from '$/Worker/tasks/summoner';
 import Logger from './logger';
+import { EventEmitter } from './EventEmitter';
 
 enum WorkerState {
     FREE,
@@ -23,7 +24,16 @@ type Jobs = {
 
 const l = new Logger('WorkerServer', 'magenta');
 
-export class WorkerServer {
+type JobResult = {
+    data: unknown;
+    elapsed: number;
+};
+
+type Events = {
+    jobDone: (jobId: string, result: JobResult) => void;
+};
+
+export class WorkerServer extends EventEmitter<Events> {
     private WSS: WebSocketServer;
     private jobs: {
         id: string;
@@ -31,15 +41,11 @@ export class WorkerServer {
         data: unknown;
     }[] = [];
 
-    private jobResults = new Map<
-        string,
-        {
-            data: unknown;
-            elapsed: number;
-        }
-    >();
+    private jobResults = new Map<string, JobResult>();
 
     constructor() {
+        super();
+
         this.WSS = new WebSocketServer({
             host: env.WEBSOCKET_HOST,
             port: env.WEBSOCKET_PORT
@@ -58,18 +64,24 @@ export class WorkerServer {
                     const [, jobId, result, startTimestamp] = str.split(';');
                     Workers[newId].state = WorkerState.FREE;
                     const elapsed = Date.now() - parseInt(startTimestamp);
-                    this.jobResults.set(jobId, {
+                    const jobResult = {
                         data: JSON.parse(result),
                         elapsed
-                    });
+                    };
+
+                    this.jobResults.set(jobId, jobResult);
+                    super.emit('jobDone', jobId, jobResult);
                 } else if (str.startsWith('error')) {
                     const [, jobId, error, startTimestmap] = str.split(';');
                     Workers[newId].state = WorkerState.FREE;
                     const elapsed = Date.now() - parseInt(startTimestmap);
-                    this.jobResults.set(jobId, {
+                    const jobResult = {
                         data: new Error(error),
                         elapsed
-                    });
+                    };
+
+                    this.jobResults.set(jobId, jobResult);
+                    super.emit('jobDone', jobId, jobResult);
                 }
             });
 
@@ -122,20 +134,17 @@ export class WorkerServer {
 
     async wait(jobId: string) {
         return new Promise<string>((resolve, reject) => {
-            const interval = setInterval(() => {
-                if (this.jobResults.has(jobId)) {
-                    clearInterval(interval);
-                    const result = this.jobResults.get(jobId)!;
-                    if (result instanceof Error) {
-                        reject(result);
-                    }
-
-                    l.log(`Job ${jobId} completed in ${result.elapsed}ms`);
-
-                    resolve(result.data as string);
-                    this.jobResults.delete(jobId);
+            super.once('jobDone', (id, result) => {
+                if (id !== jobId) return;
+                if (result instanceof Error) {
+                    reject(result);
                 }
-            }, 100);
+
+                l.log(`Job ${jobId} completed in ${result.elapsed}ms`);
+
+                resolve(result.data as string);
+                this.jobResults.delete(jobId);
+            });
         });
     }
 
