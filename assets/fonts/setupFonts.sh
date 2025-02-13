@@ -5,4 +5,4 @@ if [ ! -d ~/.local/share/fonts ]; then
 fi
 
 #copy all fonts to ~/.fonts
-cp -r ./fonts/* ~/.local/share/fonts
+cp -r *.ttf ~/.local/share/fonts

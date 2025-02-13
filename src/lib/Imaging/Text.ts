@@ -14,6 +14,10 @@ export class Text extends Composite {
         super(position);
     }
 
+    async getSize(): Promise<Size> {
+        return this.size;
+    }
+
     async render() {
         let xPosition;
         if (this.alignment === 'center') {
@@ -36,7 +40,7 @@ export class Text extends Composite {
                 {
                     input: Buffer.from(`<svg width="${this.size.width}" height="${this.size}">
                     <text x="${xPosition}" y="${this.size.height / 2}" font-size="${this.fontSize}" fill="${this.color}"
-                        font-family="LOL..." text-anchor="${this.alignment}">
+                        font-family="Beaufort for LOL Ja" text-anchor="${this.alignment}">
                         ${this.text}
                     </text>
                 </svg>`),
