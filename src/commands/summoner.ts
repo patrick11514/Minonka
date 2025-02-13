@@ -21,6 +21,7 @@ import api from '$/lib/Riot/api';
 import { Region } from '$/lib/Riot/types';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { SummonerData } from '$/Worker/tasks/summoner';
+import fs from 'node:fs';
 
 const l = new Logger('Summoner', 'green');
 
@@ -298,6 +299,8 @@ export default class Summoner extends Command {
             await interaction.reply({
                 files: [result]
             });
+
+            fs.unlinkSync(result);
         } catch (e) {
             if (e instanceof Error) {
                 l.error(e);
