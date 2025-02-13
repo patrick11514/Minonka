@@ -18,7 +18,7 @@ export class Image extends Composite {
             if (!Number.isInteger(size.width)) {
                 width = Math.ceil(origSize.width * size.width);
             } else {
-                width = origSize.width;
+                width = size.width;
             }
         }
 
@@ -28,7 +28,7 @@ export class Image extends Composite {
             if (!Number.isInteger(origSize.height)) {
                 height = Math.ceil(origSize.height * size.height);
             } else {
-                height = origSize.height;
+                height = size.height;
             }
         }
 
