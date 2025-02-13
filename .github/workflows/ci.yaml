@@ -72,4 +72,5 @@ jobs:
 
                       echo "Restarting the app"
                       sudo systemctl restart minonka
+                      sudo ./script/restartWorkers.sh
                       echo "Deployment completed"
