@@ -55,7 +55,9 @@ export class DiscordBot extends EventEmitter<Events> {
             .map((c) => new c())
             .filter((c) => {
                 if (!(c instanceof Command)) {
-                    l.error(`Class ${c.constructor.name} is not an instance of Command, skipping...`);
+                    l.error(
+                        `Class ${c.constructor.name} is not an instance of Command, skipping...`
+                    );
                     return false;
                 }
                 return true;
@@ -65,7 +67,9 @@ export class DiscordBot extends EventEmitter<Events> {
         this.client.on('interactionCreate', (interaction) => {
             if (!interaction.isChatInputCommand()) return;
 
-            const command = instances.find((c) => c.slashCommand.name === interaction.commandName);
+            const command = instances.find(
+                (c) => c.slashCommand.name === interaction.commandName
+            );
             if (!command) return;
 
             command.handler(interaction);
@@ -78,7 +82,9 @@ export class DiscordBot extends EventEmitter<Events> {
         }
 
         this.commands = instances;
-        l.stop(`Loaded commands (${instances.length}): ${instances.map((c) => c.constructor.name).join(', ')}`);
+        l.stop(
+            `Loaded commands (${instances.length}): ${instances.map((c) => c.constructor.name).join(', ')}`
+        );
         super.emit('commandsLoaded');
     }
 
@@ -88,7 +94,9 @@ export class DiscordBot extends EventEmitter<Events> {
         const rest = new REST().setToken(env.CLIENT_TOKEN);
 
         try {
-            return (await rest.put(Routes.applicationCommands(env.CLIENT_ID), { body: JSONCommands })) as Promise<
+            return (await rest.put(Routes.applicationCommands(env.CLIENT_ID), {
+                body: JSONCommands
+            })) as Promise<
                 {
                     name: string;
                 }[]

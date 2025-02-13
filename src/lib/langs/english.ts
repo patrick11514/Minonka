@@ -3,6 +3,11 @@ import template from './_template';
 
 export default template.parse({
     genericError: 'There was an error, please try again later',
+    workerError: 'There was and error, while generating image: %1',
+    assets: {
+        error: 'There was an error while loading assets: %1',
+        challenges: 'Challenge'
+    },
     riotApi: {
         error: 'There was an error while comunicating with Riot API: (%1) %2'
     },
@@ -19,6 +24,27 @@ export default template.parse({
             notFound: 'This account is no longer connected',
             success: 'Account **%1#%2** was successfully unlinked'
         }
+    },
+    summoner: {
+        choice: "We've found multiple accounts, select one of them:",
+        me: {
+            notFound: "You don't have any connected account",
+            error: 'There was an error, please try again later',
+            success: 'Here are informations about your account:'
+        },
+        name: {
+            notFound: 'Account %1#%2 was not found on server %3',
+            error: 'There was an error, please try again later',
+            success: 'Here are informations about account %1#%2 (%3):'
+        },
+        mention: {
+            notFound: 'User %1 does not have any connected account',
+            error: 'There was an error, please try again later',
+            success: 'Here are informations about account %1#%2 (%3):'
+        }
+    },
+    league: {
+        error: 'We were unable to get your ranked data'
     },
     regions: {
         EUN1: 'EUNE',

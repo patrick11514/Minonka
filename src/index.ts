@@ -1,6 +1,13 @@
+/**
+ * Main entry point for the bot
+ * @author Patrik Mintěl
+ * @license MIT
+ */
+
 import { exit } from 'process';
 import { DiscordBot } from './lib/DiscordBot';
 import Logger from './lib/logger';
+import { WorkerServer } from './lib/WorkerServer';
 
 if (process.argv.includes('--register')) {
     const l = new Logger('CommandRegister', 'cyan');
@@ -12,11 +19,16 @@ if (process.argv.includes('--register')) {
             l.stopError('Failed to register commands');
             return;
         }
-        l.stop(`Registered commands (${registered.length}): ${registered.map((c) => c.name).join(', ')}`);
+        l.stop(
+            `Registered commands (${registered.length}): ${registered.map((c) => c.name).join(', ')}`
+        );
         exit(0);
     });
 } else {
     const l = new Logger('DiscordBot', 'yellow');
+    const workerServer = new WorkerServer();
+    process.workerServer = workerServer;
+
     l.start('Starting Discord Bot...');
 
     const discordBot = new DiscordBot();

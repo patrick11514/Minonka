@@ -10,14 +10,22 @@ type DataObject = {
 type ReturnObject<$Data extends DataObject> = {
     [$DataKey in keyof $Data]: $Data[$DataKey] extends ApiSet<infer $Inner>
         ? {
-              [$InnerKey in keyof $Inner]: (...params: Parameters<$Inner[$InnerKey]>) => ReturnType<typeof baseRequest<z.infer<ReturnType<$Inner[$InnerKey]>['schema']>>>;
+              [$InnerKey in keyof $Inner]: (
+                  ...params: Parameters<$Inner[$InnerKey]>
+              ) => ReturnType<
+                  typeof baseRequest<z.infer<ReturnType<$Inner[$InnerKey]>['schema']>>
+              >;
           }
         : $Data[$DataKey] extends DataObject
           ? ReturnObject<$Data[$DataKey]>
           : never;
 };
 
-const transform = <$Data extends DataObject>(data: $Data, regionRoot: string, routingRoot: string): ReturnObject<$Data> => {
+const transform = <$Data extends DataObject>(
+    data: $Data,
+    regionRoot: string,
+    routingRoot: string
+): ReturnObject<$Data> => {
     type UnknownHell = {
         [key: string]: UnknownHell | unknown;
     };
@@ -26,7 +34,11 @@ const transform = <$Data extends DataObject>(data: $Data, regionRoot: string, ro
 
     for (const [key, value] of Object.entries(data)) {
         if (!(value instanceof ApiSet)) {
-            resultObject[key] = transform(value as DataObject, `${regionRoot}/${key}`, `${routingRoot}/${key}`);
+            resultObject[key] = transform(
+                value as DataObject,
+                `${regionRoot}/${key}`,
+                `${routingRoot}/${key}`
+            );
 
             continue;
         }
@@ -42,7 +54,10 @@ const transform = <$Data extends DataObject>(data: $Data, regionRoot: string, ro
                         schema: ZodSchema<unknown>;
                     }
                 )(...args);
-                return await baseRequest(`${regional ? regionRoot : routingRoot}${value.subBaseUrl}${endOfUrl}`, schema);
+                return await baseRequest(
+                    `${regional ? regionRoot : routingRoot}${value.subBaseUrl}${endOfUrl}`,
+                    schema
+                );
             };
         }
     }

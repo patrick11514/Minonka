@@ -3,6 +3,11 @@ import template from './_template';
 
 export default template.parse({
     genericError: 'Nastala chyba, zkus to prosím později',
+    workerError: 'Nastala chyba při generaci obrázku: %1',
+    assets: {
+        error: 'Nastala chyba při načítání zdrojů: %1',
+        challenges: 'Challenge'
+    },
     riotApi: {
         error: 'Nastala chyba při komunikaci s Riot API: (%1) %2'
     },
@@ -19,6 +24,27 @@ export default template.parse({
             notFound: 'Tento účet již není propojen',
             success: 'Účet **%1#%2** byl úspěšně odpojen'
         }
+    },
+    summoner: {
+        choice: 'Nalezli jsme více účtů, vyber si jeden z nich:',
+        me: {
+            notFound: 'Nemáš propojený žádný účet',
+            error: 'Nastala chyba, zkus to prosím později',
+            success: 'Zde jsou informace o tvém účtu:'
+        },
+        name: {
+            notFound: 'Účet %1#%2 nebyl na serveru %3 nalezen',
+            error: 'Nastala chyba, zkus to prosím později',
+            success: 'Zde jsou informace o účtu %1#%2 (%3):'
+        },
+        mention: {
+            notFound: 'Uživatel %1 nemá propojený žádný účet',
+            error: 'Nastala chyba, zkus to prosím později',
+            success: 'Zde jsou informace o účtu %1#%2 (%3):'
+        }
+    },
+    league: {
+        error: 'Nepovedlo se získat informace o tvém ranku'
     },
     regions: {
         EUN1: 'EUNE',

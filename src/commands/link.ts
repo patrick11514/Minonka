@@ -2,7 +2,9 @@ import { Command } from '$/lib/Command';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
-import { Region, regions } from '$/lib/Riot/types';
+import { formatErrorResponse } from '$/lib/Riot/baseRequest';
+import { Region } from '$/lib/Riot/types';
+import { setupRiotOptions } from '$/lib/utilities';
 import { conn } from '$/types/connection';
 import { ChatInputCommandInteraction, Locale, MessageFlags } from 'discord.js';
 
@@ -12,51 +14,7 @@ export default class Link extends Command {
     constructor() {
         super('link', 'Link your Riot Account');
         this.addLocalization(Locale.Czech, 'propojit', 'Propojí tvůj Riot Účet');
-        this.addOption({
-            type: 'STRING',
-            name: 'name',
-            localizedName: {
-                [Locale.Czech]: 'jméno'
-            },
-            description: 'Riot Name before #',
-            localizedDescription: {
-                [Locale.Czech]: 'Jméno před #'
-            },
-            required: true
-        });
-        this.addOption({
-            type: 'STRING',
-            name: 'tag',
-            localizedName: {
-                [Locale.Czech]: 'tag'
-            },
-            description: 'Riot Tag after #',
-            localizedDescription: {
-                [Locale.Czech]: 'Tag za #'
-            },
-            required: true
-        });
-        this.addOption({
-            type: 'STRING',
-            name: 'region',
-            localizedName: {
-                [Locale.Czech]: 'region'
-            },
-            description: 'Your lol region',
-            localizedDescription: {
-                [Locale.Czech]: 'Tvůj lol region'
-            },
-            required: true,
-            choices: regions.map((region) => {
-                return {
-                    value: region,
-                    name: getLocale(Locale.EnglishUS).regions[region],
-                    name_localizations: {
-                        [Locale.Czech]: getLocale(Locale.Czech).regions[region]
-                    }
-                };
-            })
-        });
+        setupRiotOptions(this);
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
@@ -77,13 +35,17 @@ export default class Link extends Command {
             } else {
                 await interaction.reply({
                     flags: MessageFlags.Ephemeral,
-                    content: replacePlaceholders(lang.riotApi.error, userInfo.code.toString(), userInfo.message)
+                    content: formatErrorResponse(lang, userInfo)
                 });
             }
             return;
         }
         try {
-            const exists = await conn.selectFrom('account').select(['id']).where('puuid', '=', userInfo.data.puuid).executeTakeFirst();
+            const exists = await conn
+                .selectFrom('account')
+                .select(['id'])
+                .where('puuid', '=', userInfo.data.puuid)
+                .executeTakeFirst();
             if (exists) {
                 await interaction.reply({
                     flags: MessageFlags.Ephemeral,
@@ -111,7 +73,7 @@ export default class Link extends Command {
             } else {
                 await interaction.reply({
                     flags: MessageFlags.Ephemeral,
-                    content: replacePlaceholders(lang.riotApi.error, summoner.code.toString(), summoner.message)
+                    content: formatErrorResponse(lang, summoner)
                 });
             }
             return;
@@ -133,7 +95,12 @@ export default class Link extends Command {
 
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
-                content: replacePlaceholders(lang.lang.success, userInfo.data.gameName, userInfo.data.tagLine, summoner.data.summonerLevel.toString())
+                content: replacePlaceholders(
+                    lang.lang.success,
+                    userInfo.data.gameName,
+                    userInfo.data.tagLine,
+                    summoner.data.summonerLevel.toString()
+                )
             });
         } catch (e) {
             l.error(e);
