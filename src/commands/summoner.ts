@@ -20,8 +20,7 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import api from '$/lib/Riot/api';
 import { Region } from '$/lib/Riot/types';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
-import { SummonerData } from '$/lib/Worker/tasks/summoner';
-import SummonerTask from '$/lib/Worker/tasks/summoner';
+import { SummonerData } from '$/Worker/tasks/summoner';
 
 const l = new Logger('Summoner', 'green');
 
