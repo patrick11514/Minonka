@@ -23,7 +23,7 @@ const SummonerSchema = z.object({
     summonerLevel: z.number()
 });
 
-const ChallengeTier = z
+export const ChallengeTier = z
     .literal('IRON')
     .or(z.literal('BRONZE'))
     .or(z.literal('SILVER'))
@@ -34,6 +34,46 @@ const ChallengeTier = z
     .or(z.literal('GRANDMASTER'))
     .or(z.literal('CHALLENGER'))
     .or(z.literal('NONE'));
+
+const ChallengeSchema = z.object({
+    totalPoints: z.object({
+        level: ChallengeTier,
+        current: z.number(),
+        max: z.number(),
+        percentile: z.number().optional()
+    }),
+    categoryPoints: z.record(
+        z.string(),
+        z.object({
+            level: ChallengeTier,
+            current: z.number(),
+            max: z.number(),
+            percentile: z.number().optional()
+        })
+    ),
+    challenges: z.array(
+        z.object({
+            challengeId: z.number(),
+            percentile: z.number(),
+            level: ChallengeTier,
+            value: z.number(),
+            achievedTime: z.number().optional(),
+            position: z.number().optional(),
+            playersInLevel: z.number().optional()
+        })
+    ),
+    preferences: z
+        .object({
+            bannerAccent: z.coerce.number(),
+            title: z.string(),
+            challengeIds: z.array(z.number()),
+            crestBorder: z.coerce.number(),
+            prestigeCrestBorderLevel: z.coerce.number()
+        })
+        .partial()
+});
+
+export type ChallengeData = z.infer<typeof ChallengeSchema>;
 
 const RiotAPIStructure = {
     account: new ApiSet('/riot/account/v1/accounts', {
@@ -64,41 +104,7 @@ const RiotAPIStructure = {
         byPuuid: (puuid: string) => ({
             regional: true,
             endOfUrl: `/player-data/${puuid}`,
-            schema: z.object({
-                totalPoints: z.object({
-                    level: ChallengeTier,
-                    current: z.number(),
-                    max: z.number(),
-                    percentile: z.number()
-                }),
-                categoryPoints: z.record(
-                    z.string(),
-                    z.object({
-                        level: ChallengeTier,
-                        current: z.number(),
-                        max: z.number(),
-                        percentile: z.number()
-                    })
-                ),
-                challenges: z.array(
-                    z.object({
-                        challengeId: z.number(),
-                        percentile: z.number(),
-                        level: ChallengeTier,
-                        value: z.number(),
-                        achievedTime: z.number().optional(),
-                        position: z.number().optional(),
-                        playersInLevel: z.number().optional()
-                    })
-                ),
-                preferences: z.object({
-                    bannerAccent: z.coerce.number(),
-                    title: z.string(),
-                    challengeIds: z.array(z.number()),
-                    crestBorder: z.coerce.number(),
-                    prestigeCrestBorderLevel: z.coerce.number()
-                })
-            })
+            schema: ChallengeSchema
         })
     }),
     league: new ApiSet('/lol/league/v4', {

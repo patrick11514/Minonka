@@ -1,6 +1,11 @@
 import Path from 'node:path';
 import fs from 'node:fs';
 import { Locale } from 'discord.js';
+import Logger from './logger';
+import { z } from 'zod';
+import { ChallengeTier } from './Riot/api';
+
+const l = new Logger('Assets', 'blue');
 
 export enum AssetType {
     BANNER,
@@ -11,7 +16,9 @@ export enum AssetType {
     OTHER,
     ///DRAGON TYPES,
     //@TODO
-    DDRAGON_DATA
+    DDRAGON_DATA,
+    DDRAGON_PROFILEICON,
+    DDRAGON_CHALLENGES
 }
 
 const ROOT = 'assets';
@@ -22,7 +29,9 @@ const ASSET_PATHS = {
     [AssetType.RANK]: '/ranks/Ranked Emblems Latest',
     [AssetType.WING]: '/ranks/Ranked Emblems Latest/Wings',
     [AssetType.OTHER]: '/other',
-    [AssetType.DDRAGON_DATA]: '/ddragon/_ROOT_/data/%%LANGUAGE%%'
+    [AssetType.DDRAGON_DATA]: '/ddragon/_ROOT_/data/%%LANGUAGE%%',
+    [AssetType.DDRAGON_PROFILEICON]: '/ddragon/_ROOT_/img/profileicon',
+    [AssetType.DDRAGON_CHALLENGES]: "/ddragon/img/challenges-images"
 } satisfies Record<AssetType, string>;
 
 export type RiotLanguage =
@@ -131,4 +140,43 @@ export const getAsset = (type: AssetType, name: string, language?: RiotLanguage)
     }
 
     return fs.readFileSync(path);
+};
+
+export const getChallenges = (lang: RiotLanguage) => {
+    const schema = z.array(
+        z.object({
+            id: z.number(),
+            name: z.string(),
+            description: z.string(),
+            thresholds: z
+                .record(
+                    ChallengeTier,
+                    z.object({
+                        value: z.number(),
+                        rewards: z
+                            .array(
+                                z.object({
+                                    category: z.string(),
+                                    quantity: z.number(),
+                                    title: z.string().optional()
+                                })
+                            )
+                            .optional()
+                    })
+                )
+                .optional()
+        })
+    );
+
+    try {
+        const challenges = schema.parse(
+            JSON.parse(
+                getAsset(AssetType.DDRAGON_DATA, 'challenges.json', lang)!.toString()
+            )
+        );
+        return challenges;
+    } catch (e) {
+        l.error(e);
+        return null;
+    }
 };

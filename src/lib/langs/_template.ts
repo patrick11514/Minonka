@@ -6,6 +6,10 @@ const _ = z.string();
 export default z.object({
     genericError: _,
     workerError: _,
+    assets: z.object({
+        error: _,
+        challenges: _
+    }),
     riotApi: z.object({
         error: _
     }),
