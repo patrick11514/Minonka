@@ -76,7 +76,6 @@ export class WorkerServer extends EventEmitter<Events> {
                 } else if (str.startsWith('error')) {
                     const [, jobId, error, startTimestmap] = str.split(';');
                     Workers[newId].state = WorkerState.FREE;
-                    console.log('ERROR with job');
                     const elapsed = Date.now() - parseInt(startTimestmap);
                     const jobResult = {
                         data: new Error(error),
@@ -117,12 +116,12 @@ export class WorkerServer extends EventEmitter<Events> {
 
             freeWorker.socket.send(
                 job.name +
-                    ';' +
-                    job.id +
-                    ';' +
-                    Date.now() +
-                    ';' +
-                    JSON.stringify(job.data)
+                ';' +
+                job.id +
+                ';' +
+                Date.now() +
+                ';' +
+                JSON.stringify(job.data)
             );
             freeWorker.state = WorkerState.BUSY;
             return false;
