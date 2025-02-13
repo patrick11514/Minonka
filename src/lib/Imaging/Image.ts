@@ -40,6 +40,22 @@ export class Image extends Composite {
         };
     }
 
+    async roundify() {
+        const size = await this.getSize();
+        const roundedCorners = Buffer.from(
+            `<svg><rect x="0" y="0" width="${size.width}" height="${size.height}" rx="100" ry="100"/></svg>`
+        );
+
+        this.image = this.image
+            .composite([
+                {
+                    input: roundedCorners,
+                    blend: 'dest-in'
+                }
+            ])
+            .png();
+    }
+
     async render() {
         return this.image.toBuffer();
     }
