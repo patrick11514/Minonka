@@ -18,14 +18,6 @@ if (InstanceId) {
 const l = new Logger('Worker' + InstanceId, 'yellow');
 l.start('Connecting to server');
 
-const resolveModule = (path: string) => {
-    let module = import.meta.resolve(path);
-    if (process.env.NODE_ENV === 'production' && !module.endsWith('.js')) {
-        module += '.js';
-    }
-    return module;
-};
-
 const setupWebSocket = () => {
     const websocket = new WebSocket(`ws://${env.WEBSOCKET_HOST}:${env.WEBSOCKET_PORT}`);
 
@@ -58,7 +50,7 @@ const setupWebSocket = () => {
 
             if (!jobsCache.has(job)) {
                 const imported = await import(
-                    resolveModule(Path.join(import.meta.dirname, 'tasks', job))
+                    import.meta.resolve(Path.join(import.meta.dirname, 'tasks', job))
                 );
 
                 jobsCache.set(job, imported.default);
