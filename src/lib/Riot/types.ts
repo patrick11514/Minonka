@@ -77,7 +77,11 @@ export class Rank {
     }
 
     toString() {
-        return `${deCapitalize(tier[this.tier])} ${rank[this.rank]} (${this.lp} LP)`;
+        if (this.isTiered()) {
+            return `${deCapitalize(tier[this.tier])} ${rank[this.rank]} (${this.lp} LP)`;
+        }
+
+        return `${deCapitalize(tier[this.tier])} (${this.lp} LP)`;
     }
 
     valueOf() {
@@ -94,5 +98,9 @@ export class Rank {
 
     getRank() {
         return rank[this.rank];
+    }
+
+    isTiered() {
+        return this.tier < 7;
     }
 }
