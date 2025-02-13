@@ -15,6 +15,10 @@ export class Blank extends Composite {
         this.children.push(element);
     }
 
+    async getSize(): Promise<Size> {
+        return this.size;
+    }
+
     async render() {
         const base = sharp({
             create: {
@@ -25,15 +29,36 @@ export class Blank extends Composite {
             }
         });
 
-        const children = await Promise.all(this.children.map((e) => e.render()));
+        const mySize = await this.getSize();
 
         return base
+
             .composite(
-                this.children.map((element, index) => ({
-                    input: children[index],
-                    top: element.position.y,
-                    left: element.position.x
-                }))
+                await Promise.all(
+                    this.children.map(async (element) => {
+                        let top: number;
+                        if (element.position.y === 'center') {
+                            const size = await element.getSize();
+                            top = Math.floor((mySize.height - size.height) / 2);
+                        } else {
+                            top = element.position.y;
+                        }
+
+                        let left: number;
+                        if (element.position.x === 'center') {
+                            const size = await element.getSize();
+                            left = Math.floor((mySize.width - size.width) / 2);
+                        } else {
+                            left = element.position.x;
+                        }
+
+                        return {
+                            input: await element.render(),
+                            top,
+                            left
+                        };
+                    })
+                )
             )
             .toBuffer();
     }

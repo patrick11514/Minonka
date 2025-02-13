@@ -1,6 +1,6 @@
 export type Position = {
-    x: number;
-    y: number;
+    x: number | 'center';
+    y: number | 'center';
 };
 
 export type Size = {
