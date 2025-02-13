@@ -39,6 +39,9 @@ export default template.parse({
             success: 'Zde jsou informace o účtu %1#%2 (%3):'
         }
     },
+    league: {
+        error: 'Nepovedlo se získat informace o tvém ranku'
+    },
     regions: {
         EUN1: 'EUNE',
         EUW1: 'EUW',

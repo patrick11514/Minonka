@@ -41,6 +41,9 @@ export default z.object({
             success: _
         })
     }),
+    league: z.object({
+        error: _
+    }),
     regions: z.object(
         Object.fromEntries(regions.map((region) => [region, _])) as Record<
             (typeof regions)[number],

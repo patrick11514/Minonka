@@ -100,6 +100,31 @@ const RiotAPIStructure = {
                 })
             })
         })
+    }),
+    league: new ApiSet('/lol/league/v4', {
+        bySummonerId: (summonerId: string) => ({
+            regional: true,
+            endOfUrl: `/entries/by-summoner/${summonerId}`,
+            schema: z.array(
+                z.object({
+                    leagueId: z.string(),
+                    summonerId: z.string(),
+                    queueType: z.string(),
+                    tier: z.string(),
+                    rank: z.string(),
+                    leaguePoints: z.number(),
+                    wins: z.number(),
+                    losses: z.number(),
+                    hotStreak: z.boolean(),
+                    veteran: z.boolean(),
+                    freshBlood: z.boolean(),
+                    inactive: z.boolean()
+                    /*miniSeries: z.optional(
+                        z.record(z.string(), z.union([z.literal('W'), z.literal('L')]))
+                    )*/ //placements, dont exists anymore in game
+                })
+            )
+        })
     })
 };
 

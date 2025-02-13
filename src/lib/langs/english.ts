@@ -39,6 +39,9 @@ export default template.parse({
             success: 'Here are informations about account %1#%2 (%3):'
         }
     },
+    league: {
+        error: 'We were unable to get your ranked data'
+    },
     regions: {
         EUN1: 'EUNE',
         EUW1: 'EUW',
