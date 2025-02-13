@@ -9,7 +9,8 @@ export class Text extends Composite {
         private size: Size,
         private fontSize: number,
         private color: string,
-        private alignment: 'left' | 'center' | 'right' = 'left'
+        private alignment: 'left' | 'middle' | 'right' = 'left',
+        private weight: 'bold' | 'normal' = 'bold'
     ) {
         super(position);
     }
@@ -20,7 +21,7 @@ export class Text extends Composite {
 
     async render() {
         let xPosition;
-        if (this.alignment === 'center') {
+        if (this.alignment === 'middle') {
             xPosition = this.size.width / 2;
         } else if (this.alignment === 'right') {
             xPosition = this.size.width - 10;
@@ -28,26 +29,11 @@ export class Text extends Composite {
             xPosition = 10;
         }
 
-        return sharp({
-            create: {
-                width: this.size.width,
-                height: this.size.height,
-                channels: 4,
-                background: { r: 0, g: 0, b: 0, alpha: 0 }
-            }
-        })
-            .composite([
-                {
-                    input: Buffer.from(`<svg width="${this.size.width}" height="${this.size}">
-                    <text x="${xPosition}" y="${this.size.height / 2}" font-size="${this.fontSize}" fill="${this.color}"
-                        font-family="Beaufort for LOL Ja" text-anchor="${this.alignment}">
+        return Buffer.from(`<svg width="${this.size.width}" height="${this.size.height}">
+                    <text x="${xPosition}" y="${this.size.height / 2 + this.fontSize / 3}" font-size="${this.fontSize}" fill="${this.color}"
+                        font-family="Beaufort for LOL Ja" dominant-baseline="${this.alignment}" text-anchor="${this.alignment}" font-weight="${this.weight}">
                         ${this.text}
                     </text>
-                </svg>`),
-                    top: 0,
-                    left: 0
-                }
-            ])
-            .toBuffer();
+                </svg>`);
     }
 }
