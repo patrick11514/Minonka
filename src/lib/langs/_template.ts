@@ -5,6 +5,7 @@ const _ = z.string();
 
 export default z.object({
     genericError: _,
+    workerError: _,
     riotApi: z.object({
         error: _
     }),

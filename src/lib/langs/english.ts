@@ -3,6 +3,7 @@ import template from './_template';
 
 export default template.parse({
     genericError: 'There was an error, please try again later',
+    workerError: 'There was and error, while generating image: %1',
     riotApi: {
         error: 'There was an error while comunicating with Riot API: (%1) %2'
     },

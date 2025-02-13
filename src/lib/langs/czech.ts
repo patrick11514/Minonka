@@ -3,6 +3,7 @@ import template from './_template';
 
 export default template.parse({
     genericError: 'Nastala chyba, zkus to prosím později',
+    workerError: 'Nastala chyba při generaci obrázku: %1',
     riotApi: {
         error: 'Nastala chyba při komunikaci s Riot API: (%1) %2'
     },

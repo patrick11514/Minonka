@@ -24,6 +24,8 @@ type Jobs = {
 
 const l = new Logger('WorkerServer', 'magenta');
 
+const TIMEOUT = 20 * 1000; // 20s
+
 type JobResult = {
     data: unknown;
     elapsed: number;
@@ -91,7 +93,11 @@ export class WorkerServer extends EventEmitter<Events> {
         });
     }
 
-    private async schedule() {
+    private schedule() {
+        if (Object.keys(Workers).length === 0) {
+            throw new Error('No workers available');
+        }
+
         if (this.jobs.length === 0) {
             return;
         }
@@ -129,27 +135,38 @@ export class WorkerServer extends EventEmitter<Events> {
         });
 
         this.schedule();
+
         return jobId;
     }
 
     async wait(jobId: string) {
-        return new Promise<string>((resolve, reject) => {
-            super.once('jobDone', (id, result) => {
-                if (id !== jobId) return;
-                if (result instanceof Error) {
-                    reject(result);
-                }
+        const result = await Promise.race([
+            new Promise<string>((resolve, reject) => {
+                super.once('jobDone', (id, result) => {
+                    if (id !== jobId) return;
+                    if (result instanceof Error) {
+                        reject(result);
+                    }
 
-                l.log(`Job ${jobId} completed in ${result.elapsed}ms`);
+                    l.log(`Job ${jobId} completed in ${result.elapsed}ms`);
 
-                resolve(result.data as string);
-                this.jobResults.delete(jobId);
-            });
-        });
+                    resolve(result.data as string);
+                    this.jobResults.delete(jobId);
+                });
+            }),
+            new Promise<undefined>((resolve) => setTimeout(resolve, TIMEOUT))
+        ]);
+
+        if (result === undefined) {
+            throw new Error('Job timedouted');
+        }
+
+        return result;
     }
 
     async addJobWait<$Job extends keyof Jobs>(jobName: $Job, data: Jobs[$Job]) {
         const jobId = this.addJob(jobName, data);
+
         return this.wait(jobId);
     }
 }
