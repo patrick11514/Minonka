@@ -15,6 +15,10 @@ export class Background {
         this.elements.push(element);
     }
 
+    addElements(elements: Composite[]) {
+        this.elements.push(...elements);
+    }
+
     async getSize(): Promise<Size> {
         if (!this.metadata) {
             this.metadata = await this.image.metadata();
