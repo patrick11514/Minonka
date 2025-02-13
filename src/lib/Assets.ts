@@ -8,6 +8,7 @@ export enum AssetType {
     LANE,
     RANK,
     WING,
+    OTHER,
     ///DRAGON TYPES,
     //@TODO
     DDRAGON_DATA
@@ -20,6 +21,7 @@ const ASSET_PATHS = {
     [AssetType.LANE]: '/lanes',
     [AssetType.RANK]: '/ranks/Ranked Emblems Latest',
     [AssetType.WING]: '/ranks/Ranked Emblems Latest/Wings',
+    [AssetType.OTHER]: '/other',
     [AssetType.DDRAGON_DATA]: '/ddragon/_ROOT_/data/%%LANGUAGE%%'
 } satisfies Record<AssetType, string>;
 
