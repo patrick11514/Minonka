@@ -5,7 +5,7 @@ export class Background {
     private image: sharp.Sharp;
     private elements: Composite[] = [];
 
-    constructor(path: string) {
+    constructor(path: string | Buffer) {
         this.image = sharp(path);
     }
 

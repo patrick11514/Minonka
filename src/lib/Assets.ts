@@ -104,7 +104,7 @@ export const getRiotLanguageFromDiscordLocale = (locale: Locale): RiotLanguage =
     }
 };
 
-const getAssetPath = (type: AssetType, name: string, language?: RiotLanguage) => {
+export const getAssetPath = (type: AssetType, name: string, language?: RiotLanguage) => {
     return Path.join(ROOT, ASSET_PATHS[type], name).replace(
         '%%LANGUAGE%%',
         language ?? 'en_US'
