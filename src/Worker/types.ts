@@ -1,4 +1,4 @@
-import { Region } from 'sharp';
+import { Region } from '$/lib/Riot/types';
 
 export type DefaultParameters = {
     summonerId: string;
@@ -6,4 +6,5 @@ export type DefaultParameters = {
     level: number;
     gameName: string;
     tagLine: string;
+    profileIconId: number;
 };

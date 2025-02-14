@@ -18,7 +18,6 @@ import type { ChallengeData } from '$/lib/Riot/api';
 import { DefaultParameters } from '../types';
 
 export type SummonerData = {
-    profileIconId: number;
     titleId?: string;
     crest: number;
     prestigeCrest: number;
