@@ -90,7 +90,13 @@ export abstract class AccountCommand extends Command {
         const select = new StringSelectMenuBuilder().setCustomId('summoner').addOptions(
             accounts.map((account) => {
                 const builder = new StringSelectMenuOptionBuilder()
-                    .setValue(account.summoner_id + '@@' + account.region)
+                    .setValue(
+                        this.slashCommand.name +
+                            '@@' +
+                            account.summoner_id +
+                            '@@' +
+                            account.region
+                    )
                     .setLabel(
                         `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`
                     );
@@ -241,7 +247,8 @@ export abstract class AccountCommand extends Command {
     async menuHandle(interaction: Interaction<CacheType>) {
         if (!interaction.isStringSelectMenu()) return;
 
-        const [summonerId, region] = interaction.values[0].split('@@');
+        const [commandSource, summonerId, region] = interaction.values[0].split('@@');
+        if (commandSource !== this.slashCommand.name) return;
 
         this.onMenuSelect(interaction, summonerId, region as Region);
     }
