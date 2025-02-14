@@ -46,6 +46,26 @@ export default template.parse({
     league: {
         error: 'We were unable to get your ranked data'
     },
+    rank: {
+        queues: {
+            RANKED_SOLO_5x5: 'Solo/Duo',
+            RANKED_FLEX_SR: 'Flex'
+        },
+        tiers: {
+            IRON: 'Iron',
+            BRONZE: 'Bronze',
+            SILVER: 'Silver',
+            GOLD: 'Gold',
+            PLATINUM: 'Platinum',
+            EMERALD: 'Emerald',
+            DIAMOND: 'Diamond',
+            MASTER: 'Master',
+            GRANDMASTER: 'Grandmaster',
+            CHALLENGER: 'Challenger'
+        },
+        wins: 'Wins',
+        losses: 'Losses'
+    },
     regions: {
         EUN1: 'EUNE',
         EUW1: 'EUW',

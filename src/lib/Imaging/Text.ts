@@ -8,7 +8,7 @@ export class Text extends Composite {
         private size: Size,
         private fontSize: number,
         private color: string,
-        private alignment: 'left' | 'middle' | 'right' = 'left',
+        private alignment: 'start' | 'middle' | 'end' = 'start',
         private weight: 'bold' | 'normal' = 'bold'
     ) {
         super(position);
@@ -22,7 +22,7 @@ export class Text extends Composite {
         let xPosition;
         if (this.alignment === 'middle') {
             xPosition = this.size.width / 2;
-        } else if (this.alignment === 'right') {
+        } else if (this.alignment === 'end') {
             xPosition = this.size.width - 10;
         } else {
             xPosition = 10;

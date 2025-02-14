@@ -41,7 +41,7 @@ export const regions = [
 ] as const;
 export type Region = (typeof regions)[number];
 
-const tier = [
+export const tier = [
     'IRON',
     'BRONZE',
     'SILVER',
@@ -53,9 +53,12 @@ const tier = [
     'GRANDMASTER',
     'CHALLENGER'
 ] as const;
-const rank = ['IV', 'III', 'II', 'I'] as const;
+export type _Tier = (typeof tier)[number];
 
-const deCapitalize = (str: string) => str.charAt(0) + str.slice(1).toLowerCase();
+const rank = ['IV', 'III', 'II', 'I'] as const;
+export type _Rank = (typeof rank)[number];
+
+export const deCapitalize = (str: string) => str.charAt(0) + str.slice(1).toLowerCase();
 
 export class Rank {
     private tier: number;
