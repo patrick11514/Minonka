@@ -1,17 +1,10 @@
-import { Command } from '$/lib/Command';
 import {
-    ActionRowBuilder,
     CacheType,
     ChatInputCommandInteraction,
-    Interaction,
     Locale,
     MessageFlags,
-    RepliableInteraction,
-    StringSelectMenuBuilder,
-    StringSelectMenuOptionBuilder
+    RepliableInteraction
 } from 'discord.js';
-import { SubCommand } from '$/lib/SubCommand';
-import { setupRiotOptions } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import { Selectable } from 'kysely';
 import { conn } from '$/types/connection';
@@ -19,68 +12,17 @@ import Logger from '$/lib/logger';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import api from '$/lib/Riot/api';
 import { Region } from '$/lib/Riot/types';
+import { AccountCommand } from '$/lib/AccountCommand';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { SummonerData } from '$/Worker/tasks/summoner';
 import fs from 'node:fs';
 
 const l = new Logger('Summoner', 'green');
 
-export default class Summoner extends Command {
-    private meSubCommand: SubCommand;
-    private nameSubCommand: SubCommand;
-    private mentionSubCommand: SubCommand;
-
+export default class Summoner extends AccountCommand {
     constructor() {
         super('summoner', 'Show information about your account');
         super.addLocalization(Locale.Czech, 'summoner', 'Zobrazí informace o tvém účtu');
-
-        this.meSubCommand = new SubCommand(
-            'me',
-            'Show information about your account(s)'
-        );
-        this.meSubCommand.addLocalization(
-            Locale.Czech,
-            'já',
-            'Zobrazí informace o tvém účtu/tvých účtech'
-        );
-        super.addSubCommand(this.meSubCommand);
-
-        this.nameSubCommand = new SubCommand(
-            'name',
-            'Show information about a specific account'
-        );
-        this.nameSubCommand.addLocalization(
-            Locale.Czech,
-            'jméno',
-            'Zobrazí informace o konkrétním účtu'
-        );
-        setupRiotOptions(this.nameSubCommand);
-        super.addSubCommand(this.nameSubCommand);
-
-        this.mentionSubCommand = new SubCommand(
-            'mention',
-            'Show information about a mentioned account'
-        );
-        this.mentionSubCommand.addLocalization(
-            Locale.Czech,
-            'zmínka',
-            'Zobrazí informace o zmíněném účtu'
-        );
-        this.mentionSubCommand.addOption({
-            type: 'USER',
-            name: 'user',
-            localizedName: {
-                [Locale.Czech]: 'uživatel'
-            },
-            description: 'Mentioned user',
-            localizedDescription: {
-                [Locale.Czech]: 'Zmíněný uživatel'
-            },
-            required: true
-        });
-        super.addSubCommand(this.mentionSubCommand);
-
-        super.on('interactionCreate', this.menuHandle);
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
@@ -166,7 +108,7 @@ export default class Summoner extends Command {
                     puuid: account.data.puuid,
                     account_id: summoner.data.accountId,
                     summoner_id: summoner.data.id,
-                    region: region as string,
+                    region: region,
                     gameName: account.data.gameName,
                     tagLine: account.data.tagLine
                 }
@@ -203,47 +145,18 @@ export default class Summoner extends Command {
         }
 
         if (accounts.length > 1) {
-            const select = new StringSelectMenuBuilder()
-                .setCustomId('summoner')
-                .addOptions(
-                    accounts.map((account) => {
-                        const builder = new StringSelectMenuOptionBuilder()
-                            .setValue(account.summoner_id + '@@' + account.region)
-                            .setLabel(
-                                `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`
-                            );
-
-                        return builder;
-                    })
-                );
-            const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
-                select
-            );
-
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: lang.summoner.choice,
-                components: [row]
-            });
+            await this.sendAccountSelect(interaction, accounts, lang);
             return;
         }
 
-        this.handleSummoner(
+        this.onMenuSelect(
             interaction,
             accounts[0].summoner_id,
             accounts[0].region as Region
         );
     }
 
-    async menuHandle(interaction: Interaction<CacheType>) {
-        if (!interaction.isStringSelectMenu()) return;
-
-        const [summonerId, region] = interaction.values[0].split('@@');
-
-        this.handleSummoner(interaction, summonerId, region as Region);
-    }
-
-    private async handleSummoner(
+    async onMenuSelect(
         interaction: RepliableInteraction<CacheType>,
         summonerId: string,
         region: Region
