@@ -5,9 +5,6 @@ import {
     MessageFlags,
     RepliableInteraction
 } from 'discord.js';
-import { Account } from '$/types/database';
-import { Selectable } from 'kysely';
-import { conn } from '$/types/connection';
 import Logger from '$/lib/logger';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import api from '$/lib/Riot/api';
@@ -26,134 +23,7 @@ export default class Summoner extends AccountCommand {
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
-        const lang = getLocale(interaction.locale);
-
-        let accounts: Selectable<Account>[];
-
-        if (this.meSubCommand.match(interaction)) {
-            try {
-                accounts = await conn
-                    .selectFrom('account')
-                    .selectAll()
-                    .where('discord_id', '=', interaction.user.id)
-                    .execute();
-
-                if (accounts.length == 0) {
-                    await interaction.reply({
-                        flags: MessageFlags.Ephemeral,
-                        content: lang.summoner.me.notFound
-                    });
-
-                    return;
-                }
-            } catch (e) {
-                l.error(e);
-                await interaction.reply({
-                    flags: MessageFlags.Ephemeral,
-                    content: lang.genericError
-                });
-                return;
-            }
-        } else if (this.nameSubCommand.match(interaction)) {
-            const region = interaction.options.getString('region', true) as Region;
-            const gameName = interaction.options.getString('name', true);
-            const tagLine = interaction.options.getString('tag', true);
-
-            const account = await api[region].account.name(gameName, tagLine);
-            if (!account.status) {
-                if (account.code === 404) {
-                    await interaction.reply({
-                        flags: MessageFlags.Ephemeral,
-                        content: replacePlaceholders(
-                            lang.summoner.name.notFound,
-                            gameName,
-                            tagLine,
-                            lang.regions[region]
-                        )
-                    });
-                } else {
-                    await interaction.reply({
-                        flags: MessageFlags.Ephemeral,
-                        content: lang.riotApi.error
-                    });
-                }
-                return;
-            }
-
-            const summoner = await api[region].summoner.byPuuid(account.data.puuid);
-            if (!summoner.status) {
-                if (summoner.code === 404) {
-                    await interaction.reply({
-                        flags: MessageFlags.Ephemeral,
-                        content: replacePlaceholders(
-                            lang.summoner.name.notFound,
-                            gameName,
-                            tagLine,
-                            lang.regions[region]
-                        )
-                    });
-                } else {
-                    await interaction.reply({
-                        flags: MessageFlags.Ephemeral,
-                        content: lang.riotApi.error
-                    });
-                }
-                return;
-            }
-
-            accounts = [
-                {
-                    id: 0,
-                    discord_id: interaction.user.id,
-                    puuid: account.data.puuid,
-                    account_id: summoner.data.accountId,
-                    summoner_id: summoner.data.id,
-                    region: region,
-                    gameName: account.data.gameName,
-                    tagLine: account.data.tagLine
-                }
-            ];
-        } else {
-            const mention = interaction.options.getUser('user', true);
-            try {
-                accounts = await conn
-                    .selectFrom('account')
-                    .selectAll()
-                    .where('discord_id', '=', mention.id)
-                    .execute();
-
-                if (accounts.length == 0) {
-                    await interaction.reply({
-                        flags: MessageFlags.Ephemeral,
-                        content: replacePlaceholders(
-                            lang.summoner.mention.notFound,
-                            mention.toString()
-                        )
-                    });
-
-                    return;
-                }
-            } catch (e) {
-                l.error(e);
-                await interaction.reply({
-                    flags: MessageFlags.Ephemeral,
-                    content: lang.genericError
-                });
-
-                return;
-            }
-        }
-
-        if (accounts.length > 1) {
-            await this.sendAccountSelect(interaction, accounts, lang);
-            return;
-        }
-
-        this.onMenuSelect(
-            interaction,
-            accounts[0].summoner_id,
-            accounts[0].region as Region
-        );
+        this.handleAccountCommand(interaction, l);
     }
 
     async onMenuSelect(

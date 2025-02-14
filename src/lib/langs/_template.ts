@@ -27,7 +27,7 @@ export default z.object({
             success: _
         })
     }),
-    summoner: z.object({
+    account: z.object({
         choice: _,
         me: z.object({
             notFound: _,

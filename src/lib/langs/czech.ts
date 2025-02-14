@@ -25,7 +25,7 @@ export default template.parse({
             success: 'Účet **%1#%2** byl úspěšně odpojen'
         }
     },
-    summoner: {
+    account: {
         choice: 'Nalezli jsme více účtů, vyber si jeden z nich:',
         me: {
             notFound: 'Nemáš propojený žádný účet',

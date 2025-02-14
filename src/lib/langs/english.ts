@@ -25,7 +25,7 @@ export default template.parse({
             success: 'Account **%1#%2** was successfully unlinked'
         }
     },
-    summoner: {
+    account: {
         choice: "We've found multiple accounts, select one of them:",
         me: {
             notFound: "You don't have any connected account",
