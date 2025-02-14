@@ -25,40 +25,27 @@ export abstract class AccountCommand extends Command {
     protected nameSubCommand: SubCommand;
     protected mentionSubCommand: SubCommand;
 
-    constructor(name: string, description: string) {
+    constructor(
+        name: string,
+        description: string,
+        subCommands: Record<
+            'me' | 'name' | 'mention',
+            {
+                description: string;
+                localizedDescription: Record<Locale.Czech, string>;
+            }
+        >
+    ) {
         super(name, description);
 
-        this.meSubCommand = new SubCommand(
-            'me',
-            'Show information about your account(s)'
-        );
-        this.meSubCommand.addLocalization(
-            Locale.Czech,
-            'já',
-            'Zobrazí informace o tvém účtu/tvých účtech'
-        );
-        super.addSubCommand(this.meSubCommand);
+        const names = [['já'], ['jméno'], ['zmínka']] as const;
 
-        this.nameSubCommand = new SubCommand(
-            'name',
-            'Show information about a specific account'
-        );
-        this.nameSubCommand.addLocalization(
-            Locale.Czech,
-            'jméno',
-            'Zobrazí informace o konkrétním účtu'
-        );
+        this.meSubCommand = new SubCommand('me', subCommands.me.description);
+        this.nameSubCommand = new SubCommand('name', subCommands.name.description);
         setupRiotOptions(this.nameSubCommand);
-        super.addSubCommand(this.nameSubCommand);
-
         this.mentionSubCommand = new SubCommand(
             'mention',
-            'Show information about a mentioned account'
-        );
-        this.mentionSubCommand.addLocalization(
-            Locale.Czech,
-            'zmínka',
-            'Zobrazí informace o zmíněném účtu'
+            subCommands.mention.description
         );
         this.mentionSubCommand.addOption({
             type: 'USER',
@@ -72,7 +59,25 @@ export abstract class AccountCommand extends Command {
             },
             required: true
         });
-        super.addSubCommand(this.mentionSubCommand);
+
+        const subCommandList = [
+            this.meSubCommand,
+            this.nameSubCommand,
+            this.mentionSubCommand
+        ] as const;
+
+        for (let i = 0; i < subCommandList.length; ++i) {
+            const subCommand = subCommandList[i];
+            const descs = Object.values(subCommands)[i].localizedDescription;
+            const langs = Object.keys(descs);
+            const values = Object.values(descs);
+
+            for (let l = 0; l < names[i].length; ++l) {
+                subCommand.addLocalization(langs[l] as Locale, names[i][l], values[l]);
+            }
+        }
+
+        subCommandList.forEach((subCommand) => super.addSubCommand(subCommand));
 
         super.on('interactionCreate', this.menuHandle);
     }

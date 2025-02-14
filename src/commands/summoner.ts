@@ -18,7 +18,26 @@ const l = new Logger('Summoner', 'green');
 
 export default class Summoner extends AccountCommand {
     constructor() {
-        super('summoner', 'Show information about your account');
+        super('summoner', 'Show information about your account', {
+            me: {
+                description: 'Show information about your account',
+                localizedDescription: {
+                    [Locale.Czech]: 'Zobrazí informace o tvém účtu'
+                }
+            },
+            name: {
+                description: 'Show information about another account',
+                localizedDescription: {
+                    [Locale.Czech]: 'Zobrazí informace o jiném účtu'
+                }
+            },
+            mention: {
+                description: 'Show information about mentioned account',
+                localizedDescription: {
+                    [Locale.Czech]: 'Zobrazí informace o zmíněném účtu'
+                }
+            }
+        });
         super.addLocalization(Locale.Czech, 'summoner', 'Zobrazí informace o tvém účtu');
     }
 
