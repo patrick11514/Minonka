@@ -100,7 +100,7 @@ export default class Summoner extends AccountCommand {
         try {
             const result = await process.workerServer.addJobWait('summoner', data);
 
-            await interaction.reply({
+            await interaction.editReply({
                 files: [result]
             });
 
