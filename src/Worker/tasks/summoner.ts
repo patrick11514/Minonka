@@ -15,6 +15,7 @@ import { Image } from '$/lib/Imaging/Image';
 import { Text } from '$/lib/Imaging/Text';
 import type { ChallengeData } from '$/lib/Riot/api';
 import { DefaultParameters } from '../types';
+import { Color } from '$/lib/Imaging/types';
 
 export type SummonerData = {
     titleId?: string;
@@ -112,7 +113,7 @@ export default async (data: SummonerData) => {
             height: 20
         },
         15,
-        '#ffffff',
+        Color.WHITE,
         'middle'
     );
     background.addElement(region);
@@ -130,7 +131,7 @@ export default async (data: SummonerData) => {
             height: levelBgSize.height
         },
         18,
-        '#ffffff',
+        Color.WHITE,
         'middle'
     );
     background.addElement(text);
@@ -182,7 +183,7 @@ export default async (data: SummonerData) => {
                     height: 40
                 },
                 15,
-                '#ffffff',
+                Color.WHITE,
                 'middle'
             );
             background.addElement(divisionText);
@@ -216,7 +217,7 @@ export default async (data: SummonerData) => {
             height: 40
         },
         20,
-        '#ffffff',
+        Color.WHITE,
         'middle'
     );
     background.addElement(name);
@@ -258,7 +259,7 @@ export default async (data: SummonerData) => {
                     height: 20
                 },
                 18,
-                '#8A8578',
+                Color.GRAY,
                 'middle',
                 'normal'
             );
