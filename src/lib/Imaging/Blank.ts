@@ -27,12 +27,11 @@ export class Blank extends Composite {
                 channels: 4,
                 background: { r: 0, g: 0, b: 0, alpha: 0 }
             }
-        });
+        }).png();
 
         const mySize = await this.getSize();
 
         return base
-
             .composite(
                 await Promise.all(
                     this.children.map(async (element) => {
