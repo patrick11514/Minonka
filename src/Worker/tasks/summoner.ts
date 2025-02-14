@@ -8,20 +8,16 @@ import {
 import { Background } from '$/lib/Imaging/Background';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import api from '$/lib/Riot/api';
-import { Rank, Region } from '$/lib/Riot/types';
+import { Rank } from '$/lib/Riot/types';
 import { Locale } from 'discord.js';
 import fs from 'node:fs';
 import { save } from '../utilities';
 import { Image } from '$/lib/Imaging/Image';
 import { Text } from '$/lib/Imaging/Text';
 import type { ChallengeData } from '$/lib/Riot/api';
+import { DefaultParameters } from '../types';
 
 export type SummonerData = {
-    summonerId: string;
-    region: Region;
-    level: number;
-    gameName: string;
-    tagLine: string;
     profileIconId: number;
     titleId?: string;
     crest: number;
@@ -30,7 +26,7 @@ export type SummonerData = {
     challenges: number[];
     userChallenges: ChallengeData['challenges'];
     locale: Locale;
-};
+} & DefaultParameters;
 
 /*
 
