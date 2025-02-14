@@ -9,7 +9,6 @@ import { Background } from '$/lib/Imaging/Background';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import api from '$/lib/Riot/api';
 import { Rank } from '$/lib/Riot/types';
-import { Locale } from 'discord.js';
 import fs from 'node:fs';
 import { save } from '../utilities';
 import { Image } from '$/lib/Imaging/Image';
@@ -24,7 +23,6 @@ export type SummonerData = {
     banner: number;
     challenges: number[];
     userChallenges: ChallengeData['challenges'];
-    locale: Locale;
 } & DefaultParameters;
 
 /*
@@ -42,10 +40,6 @@ BANNERS:
 crests:
 - level -> prestige_crest_lvl_XXX.png
 - 2 -> ranked -> rank_base.png
-
-
-
-
 
 */
 

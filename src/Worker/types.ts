@@ -1,4 +1,5 @@
 import { Region } from '$/lib/Riot/types';
+import { Locale } from 'discord.js';
 
 export type DefaultParameters = {
     summonerId: string;
@@ -7,4 +8,5 @@ export type DefaultParameters = {
     gameName: string;
     tagLine: string;
     profileIconId: number;
+    locale: Locale;
 };
