@@ -76,6 +76,8 @@ export default class Summoner extends AccountCommand {
             locale: interaction.locale
         } satisfies SummonerData;
 
+        await interaction.deferReply();
+
         try {
             const result = await process.workerServer.addJobWait('summoner', data);
 
@@ -87,15 +89,13 @@ export default class Summoner extends AccountCommand {
         } catch (e) {
             if (e instanceof Error) {
                 l.error(e);
-                await interaction.reply({
-                    flags: MessageFlags.Ephemeral,
+                await interaction.editReply({
                     content: replacePlaceholders(lang.workerError, e.message)
                 });
                 return;
             }
 
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
+            await interaction.editReply({
                 content: lang.genericError
             });
             return;
