@@ -8,29 +8,23 @@ import {
 import { Background } from '$/lib/Imaging/Background';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import api from '$/lib/Riot/api';
-import { Rank, Region } from '$/lib/Riot/types';
-import { Locale } from 'discord.js';
+import { Rank } from '$/lib/Riot/types';
 import fs from 'node:fs';
 import { save } from '../utilities';
 import { Image } from '$/lib/Imaging/Image';
 import { Text } from '$/lib/Imaging/Text';
 import type { ChallengeData } from '$/lib/Riot/api';
+import { DefaultParameters } from '../types';
+import { Color } from '$/lib/Imaging/types';
 
 export type SummonerData = {
-    summonerId: string;
-    region: Region;
-    level: number;
-    gameName: string;
-    tagLine: string;
-    profileIconId: number;
     titleId?: string;
     crest: number;
     prestigeCrest: number;
     banner: number;
     challenges: number[];
     userChallenges: ChallengeData['challenges'];
-    locale: Locale;
-};
+} & DefaultParameters;
 
 /*
 
@@ -47,10 +41,6 @@ BANNERS:
 crests:
 - level -> prestige_crest_lvl_XXX.png
 - 2 -> ranked -> rank_base.png
-
-
-
-
 
 */
 
@@ -123,7 +113,7 @@ export default async (data: SummonerData) => {
             height: 20
         },
         15,
-        '#ffffff',
+        Color.WHITE,
         'middle'
     );
     background.addElement(region);
@@ -141,7 +131,7 @@ export default async (data: SummonerData) => {
             height: levelBgSize.height
         },
         18,
-        '#ffffff',
+        Color.WHITE,
         'middle'
     );
     background.addElement(text);
@@ -193,7 +183,7 @@ export default async (data: SummonerData) => {
                     height: 40
                 },
                 15,
-                '#ffffff',
+                Color.WHITE,
                 'middle'
             );
             background.addElement(divisionText);
@@ -227,7 +217,7 @@ export default async (data: SummonerData) => {
             height: 40
         },
         20,
-        '#ffffff',
+        Color.WHITE,
         'middle'
     );
     background.addElement(name);
@@ -269,7 +259,7 @@ export default async (data: SummonerData) => {
                     height: 20
                 },
                 18,
-                '#8A8578',
+                Color.GRAY,
                 'middle',
                 'normal'
             );

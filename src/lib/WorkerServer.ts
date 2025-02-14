@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import { SummonerData } from '$/Worker/tasks/summoner';
 import Logger from './logger';
 import { EventEmitter } from './EventEmitter';
+import { RankData } from '$/Worker/tasks/rank';
 
 enum WorkerState {
     FREE,
@@ -20,6 +21,7 @@ const Workers: Record<
 
 type Jobs = {
     summoner: SummonerData;
+    rank: RankData;
 };
 
 const l = new Logger('WorkerServer', 'magenta');

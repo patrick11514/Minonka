@@ -25,7 +25,7 @@ export default template.parse({
             success: 'Account **%1#%2** was successfully unlinked'
         }
     },
-    summoner: {
+    account: {
         choice: "We've found multiple accounts, select one of them:",
         me: {
             notFound: "You don't have any connected account",
@@ -45,6 +45,26 @@ export default template.parse({
     },
     league: {
         error: 'We were unable to get your ranked data'
+    },
+    rank: {
+        queues: {
+            RANKED_SOLO_5x5: 'Solo/Duo',
+            RANKED_FLEX_SR: 'Flex'
+        },
+        tiers: {
+            IRON: 'Iron',
+            BRONZE: 'Bronze',
+            SILVER: 'Silver',
+            GOLD: 'Gold',
+            PLATINUM: 'Platinum',
+            EMERALD: 'Emerald',
+            DIAMOND: 'Diamond',
+            MASTER: 'Master',
+            GRANDMASTER: 'Grandmaster',
+            CHALLENGER: 'Challenger'
+        },
+        wins: 'Wins',
+        losses: 'Losses'
     },
     regions: {
         EUN1: 'EUNE',

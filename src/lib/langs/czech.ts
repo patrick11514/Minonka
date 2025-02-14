@@ -25,7 +25,7 @@ export default template.parse({
             success: 'Účet **%1#%2** byl úspěšně odpojen'
         }
     },
-    summoner: {
+    account: {
         choice: 'Nalezli jsme více účtů, vyber si jeden z nich:',
         me: {
             notFound: 'Nemáš propojený žádný účet',
@@ -45,6 +45,26 @@ export default template.parse({
     },
     league: {
         error: 'Nepovedlo se získat informace o tvém ranku'
+    },
+    rank: {
+        queues: {
+            RANKED_SOLO_5x5: 'Solo/Tandem',
+            RANKED_FLEX_SR: 'Flex'
+        },
+        tiers: {
+            IRON: 'Železná',
+            BRONZE: 'Bronzová',
+            SILVER: 'Stříbrná',
+            GOLD: 'Zlatá',
+            PLATINUM: 'Platinová',
+            EMERALD: 'Smaragdová',
+            DIAMOND: 'Diamantová',
+            MASTER: 'Mistrovská',
+            GRANDMASTER: 'Velmistrovská',
+            CHALLENGER: 'Vyzyvatelská'
+        },
+        wins: 'Výhry',
+        losses: 'Prohry'
     },
     regions: {
         EUN1: 'EUNE',
