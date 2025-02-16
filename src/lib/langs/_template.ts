@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { regions, tier } from '../Riot/types';
+import { QueueId, queues, regions, tier } from '../Riot/types';
 
 const _ = z.string();
 
@@ -65,6 +65,12 @@ export default z.object({
     regions: z.object(
         Object.fromEntries(regions.map((region) => [region, _])) as Record<
             (typeof regions)[number],
+            typeof _
+        >
+    ),
+    queues: z.object(
+        Object.fromEntries(queues.map((queue) => [queue.queueId, _])) as Record<
+            QueueId,
             typeof _
         >
     )
