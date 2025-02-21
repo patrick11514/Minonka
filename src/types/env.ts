@@ -13,7 +13,8 @@ const schema = z.object({
     CLIENT_TOKEN: z.string(),
     WEBSOCKET_PORT: z.coerce.number(),
     WEBSOCKET_HOST: z.string(),
-    CACHE_PATH: z.string()
+    CACHE_PATH: z.string(),
+    PERSISTANT_CACHE_PATH: z.string()
 });
 
 export const env = schema.parse(process.env);

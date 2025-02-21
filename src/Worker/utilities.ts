@@ -13,3 +13,20 @@ export const save = async (image: Background) => {
     fs.writeFileSync(`${env.CACHE_PATH}/${name}.png`, await image.render());
     return `${env.CACHE_PATH}/${name}.png`;
 };
+
+export const persistantExists = (name: string) => {
+    return fs.existsSync(`${env.PERSISTANT_CACHE_PATH}/${name}`);
+};
+
+export const getPersistant = (name: string) => {
+    return `${env.PERSISTANT_CACHE_PATH}/${name}`;
+};
+
+export const savePersistant = async (image: Background, name: string) => {
+    if (!fs.existsSync(env.PERSISTANT_CACHE_PATH)) {
+        fs.mkdirSync(env.PERSISTANT_CACHE_PATH);
+    }
+
+    fs.writeFileSync(`${env.PERSISTANT_CACHE_PATH}/${name}`, await image.render());
+    return `${env.PERSISTANT_CACHE_PATH}/${name}`;
+};
