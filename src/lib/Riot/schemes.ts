@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { fromEntries } from '../utilities';
+import { QueueId, queues } from './types';
 
 export const AccountSchema = z.object({
     puuid: z.string(),
@@ -150,6 +151,8 @@ const ParticipantSchema = z.object({
     win: z.boolean()
 });
 
+const queueIds = queues.map((queue) => queue.queueId);
+
 export const MatchSchema = z.object({
     metadata: z.object({
         dataVersion: z.string(),
@@ -166,6 +169,47 @@ export const MatchSchema = z.object({
         gameMode: z.string(),
         gameName: z.string(),
         mapId: z.number(),
-        participants: z.array(ParticipantSchema)
+        participants: z.array(ParticipantSchema),
+        queueId: z.number().refine((v): v is QueueId => queueIds.includes(v as QueueId)),
+        teams: z.array(
+            z.object({
+                bans: z.array(
+                    z.object({
+                        championId: z.number(),
+                        pickTurn: z.number()
+                    })
+                ),
+                feats: z
+                    .record(
+                        z.union([
+                            z.literal('EPIC_MONSTER_KILL'),
+                            z.literal('FIRST_BLOOD'),
+                            z.literal('FIRST_TURRET')
+                        ]),
+                        z.object({
+                            featState: z.number()
+                        })
+                    )
+                    .optional(),
+                objectives: z.record(
+                    z.union([
+                        z.literal('atakhan'),
+                        z.literal('baron'),
+                        z.literal('champion'),
+                        z.literal('dragon'),
+                        z.literal('horde'),
+                        z.literal('inhibitor'),
+                        z.literal('riftHerald'),
+                        z.literal('tower')
+                    ]),
+                    z.object({
+                        first: z.boolean(),
+                        kills: z.number()
+                    })
+                ),
+                teamId: z.literal(100).or(z.literal(200)),
+                win: z.boolean()
+            })
+        )
     })
 });
