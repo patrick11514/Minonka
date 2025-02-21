@@ -98,12 +98,14 @@ const ParticipantSchema = z.object({
         Array.from({ length: 7 }).map((_, id) => [`item${id}`, z.number()]) as any
     ),
     kills: z.number(),
+    assists: z.number(),
     lane: z
         .literal('TOP')
         .or(z.literal('JUNGLE'))
         .or(z.literal('MIDDLE'))
         .or(z.literal('BOTTOM'))
-        .or(z.literal('UTILITY')),
+        .or(z.literal('UTILITY'))
+        .or(z.literal('NONE')),
     largestMultiKill: z.number(),
     neutralMinionsKilled: z.number(),
     perks: z.object({
@@ -148,7 +150,8 @@ const ParticipantSchema = z.object({
     totalDamageDealt: z.number(),
     totalMinionsKilled: z.number(),
     visionScore: z.number(),
-    win: z.boolean()
+    win: z.boolean(),
+    summonerId: z.string()
 });
 
 const queueIds = queues.map((queue) => queue.queueId);

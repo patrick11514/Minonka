@@ -30,3 +30,11 @@ export const savePersistant = async (image: Background, name: string) => {
     fs.writeFileSync(`${env.PERSISTANT_CACHE_PATH}/${name}`, await image.render());
     return `${env.PERSISTANT_CACHE_PATH}/${name}`;
 };
+
+export const toMMSS = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60)
+        .toString()
+        .padStart(2, '0');
+    const remainingSeconds = (seconds % 60).toString().padStart(2, '0');
+    return `${minutes}:${remainingSeconds}`;
+};

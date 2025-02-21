@@ -66,6 +66,11 @@ export default template.parse({
         wins: 'Výhry',
         losses: 'Prohry'
     },
+    match: {
+        empty: 'Nebyl nalezený žádný zápas. Zkus upravit filtrování nebo zkusit později.',
+        win: 'Výhra',
+        lose: 'Prohra'
+    },
     regions: {
         EUN1: 'EUNE',
         EUW1: 'EUW',
@@ -95,13 +100,13 @@ export default template.parse({
         313: 'Black Market Brawlers',
         317: 'Definitely Not Dominion',
         325: 'All Random',
-        400: '5v5 Draft Pick',
-        420: '5v5 Ranked Solo',
-        430: '5v5 Blind Pick',
-        440: '5v5 Ranked Flex',
-        450: '5v5 ARAM',
+        400: 'Draft',
+        420: 'Solo/Tandem',
+        430: 'Výběr na slepo',
+        440: 'Flexibilní',
+        450: 'ARAM',
         480: 'Swiftplay',
-        490: 'Quicplay',
+        490: 'Quickplay',
         600: 'Blood Hunt Assassin',
         610: 'Dark Star: Singularity',
         700: 'Clash',

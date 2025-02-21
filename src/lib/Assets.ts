@@ -18,7 +18,11 @@ export enum AssetType {
     //@TODO
     DDRAGON_DATA,
     DDRAGON_PROFILEICON,
-    DDRAGON_CHALLENGES
+    DDRAGON_CHALLENGES,
+    DDRAGON_CHAMPION,
+    DDRAGON_IMG,
+    DDRAGON_SPELL,
+    DDRAGON_ITEM
 }
 
 const ROOT = 'assets';
@@ -31,7 +35,11 @@ const ASSET_PATHS = {
     [AssetType.OTHER]: '/other',
     [AssetType.DDRAGON_DATA]: '/ddragon/_ROOT_/data/%%LANGUAGE%%',
     [AssetType.DDRAGON_PROFILEICON]: '/ddragon/_ROOT_/img/profileicon',
-    [AssetType.DDRAGON_CHALLENGES]: '/ddragon/img/challenges-images'
+    [AssetType.DDRAGON_CHALLENGES]: '/ddragon/img/challenges-images',
+    [AssetType.DDRAGON_CHAMPION]: '/ddragon/_ROOT_/img/champion',
+    [AssetType.DDRAGON_IMG]: '/ddragon/img',
+    [AssetType.DDRAGON_SPELL]: '/ddragon/_ROOT_/img/spell',
+    [AssetType.DDRAGON_ITEM]: '/ddragon/_ROOT_/img/item'
 } satisfies Record<AssetType, string>;
 
 export type RiotLanguage =
@@ -175,6 +183,73 @@ export const getChallenges = (lang: RiotLanguage) => {
             )
         );
         return challenges;
+    } catch (e) {
+        l.error(e);
+        return null;
+    }
+};
+
+export const getRunesReforged = (lang: RiotLanguage) => {
+    const BaseRune = z.object({
+        id: z.number(),
+        key: z.string(),
+        icon: z.string(),
+        name: z.string()
+    });
+
+    const schema = z.array(
+        BaseRune.merge(
+            z.object({
+                slots: z.array(
+                    z.object({
+                        runes: z.array(
+                            BaseRune.merge(
+                                z.object({
+                                    shortDesc: z.string(),
+                                    longDesc: z.string()
+                                })
+                            )
+                        )
+                    })
+                )
+            })
+        )
+    );
+
+    try {
+        const runes = schema.parse(
+            JSON.parse(
+                getAsset(AssetType.DDRAGON_DATA, 'runesReforged.json', lang)!.toString()
+            )
+        );
+        return runes;
+    } catch (e) {
+        l.error(e);
+        return null;
+    }
+};
+
+export const getSummonerSpells = (lang: RiotLanguage) => {
+    const schema = z.object({
+        type: z.literal('summoner'),
+        data: z.record(
+            z.string(),
+            z.object({
+                key: z.coerce.number(),
+                image: z.object({
+                    full: z.string()
+                })
+            })
+        )
+    });
+
+    try {
+        const spells = schema.parse(
+            JSON.parse(
+                getAsset(AssetType.DDRAGON_DATA, 'summoner.json', lang)!.toString()
+            )
+        );
+        return spells;
     } catch (e) {
         l.error(e);
         return null;

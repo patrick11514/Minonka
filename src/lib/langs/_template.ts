@@ -62,6 +62,11 @@ export default z.object({
         wins: _,
         losses: _
     }),
+    match: z.object({
+        empty: _,
+        win: _,
+        lose: _
+    }),
     regions: z.object(
         Object.fromEntries(regions.map((region) => [region, _])) as Record<
             (typeof regions)[number],
