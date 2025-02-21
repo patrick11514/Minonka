@@ -13,9 +13,9 @@ import fs from 'node:fs';
 import { save } from '../utilities';
 import { Image } from '$/lib/Imaging/Image';
 import { Text } from '$/lib/Imaging/Text';
-import type { ChallengeData } from '$/lib/Riot/api';
 import { DefaultParameters } from '../types';
 import { Color } from '$/lib/Imaging/types';
+import { ChallengeData } from '$/lib/Riot/schemes';
 
 export type SummonerData = {
     titleId?: string;

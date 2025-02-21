@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import { Locale } from 'discord.js';
 import Logger from './logger';
 import { z } from 'zod';
-import { ChallengeTier } from './Riot/api';
+import { ChallengeTier } from './Riot/schemes';
 
 const l = new Logger('Assets', 'blue');
 

@@ -2,78 +2,12 @@ import { z } from 'zod';
 import { ApiSet } from './apiSet';
 import { Region, regions } from './types';
 import RiotAPI from './riotApi';
+import { AccountSchema, ChallengeSchema, MatchSchema, SummonerSchema } from './schemes';
 
 const BASE_ROUTING_URL = 'https://EUROPE.api.riotgames.com';
 const getBaseURL = (region: Region) => {
     return `https://${region}.api.riotgames.com`;
 };
-
-const AccountSchema = z.object({
-    puuid: z.string(),
-    gameName: z.string(),
-    tagLine: z.string()
-});
-
-const SummonerSchema = z.object({
-    accountId: z.string(),
-    profileIconId: z.number(),
-    revisionDate: z.number(),
-    id: z.string(),
-    puuid: z.string(),
-    summonerLevel: z.number()
-});
-
-export const ChallengeTier = z
-    .literal('IRON')
-    .or(z.literal('BRONZE'))
-    .or(z.literal('SILVER'))
-    .or(z.literal('GOLD'))
-    .or(z.literal('PLATINUM'))
-    .or(z.literal('DIAMOND'))
-    .or(z.literal('MASTER'))
-    .or(z.literal('GRANDMASTER'))
-    .or(z.literal('CHALLENGER'))
-    .or(z.literal('NONE'));
-
-const ChallengeSchema = z.object({
-    totalPoints: z.object({
-        level: ChallengeTier,
-        current: z.number(),
-        max: z.number(),
-        percentile: z.number().optional()
-    }),
-    categoryPoints: z.record(
-        z.string(),
-        z.object({
-            level: ChallengeTier,
-            current: z.number(),
-            max: z.number(),
-            percentile: z.number().optional()
-        })
-    ),
-    challenges: z.array(
-        z.object({
-            challengeId: z.number(),
-            percentile: z.number(),
-            level: ChallengeTier,
-            value: z.number(),
-            achievedTime: z.number().optional(),
-            position: z.number().optional(),
-            playersInLevel: z.number().optional()
-        })
-    ),
-    preferences: z
-        .object({
-            bannerAccent: z.coerce.number(),
-            title: z.string(),
-            challengeIds: z.array(z.number()),
-            crestBorder: z.coerce.number(),
-            prestigeCrestBorderLevel: z.coerce.number()
-        })
-        .partial()
-});
-
-export type ChallengeData = z.infer<typeof ChallengeSchema>;
 
 const RiotAPIStructure = {
     account: new ApiSet('/riot/account/v1/accounts', {
@@ -130,6 +64,36 @@ const RiotAPIStructure = {
                     )*/ //placements, dont exists anymore in game
                 })
             )
+        })
+    }),
+    match: new ApiSet('/lol/match/v5', {
+        ids: (
+            puuid: string,
+            query: Partial<{
+                startTime: number;
+                endTime: number;
+                queue: string;
+                type: 'ranked' | 'normal' | 'tourney' | 'tutorial';
+                start: number;
+                count: number;
+            }>
+        ) => ({
+            regional: false,
+            endOfUrl: `/matches/by-puuid/${puuid}/ids?${new URLSearchParams({
+                start: '0',
+                count: '20',
+                ...Object.fromEntries(
+                    Object.entries(query)
+                        .filter(([, value]) => value !== undefined && value !== null)
+                        .map(([key, value]) => [key, value.toString()])
+                )
+            }).toString()}`,
+            schema: z.array(z.string())
+        }),
+        match: (matchId: string) => ({
+            regional: false,
+            endOfUrl: `/matches/${matchId}`,
+            schema: MatchSchema
         })
     })
 };
