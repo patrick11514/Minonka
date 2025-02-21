@@ -75,8 +75,6 @@ export class WorkerServer extends EventEmitter<Events> {
                         elapsed
                     };
 
-                    console.log('JOB RESULT', jobResult, jobId);
-
                     this.jobResults.set(jobId, jobResult);
                     super.emit('jobDone', jobId, jobResult);
                 } else if (str.startsWith('error')) {
@@ -111,13 +109,10 @@ export class WorkerServer extends EventEmitter<Events> {
             return;
         }
 
-        console.log('JOBS', this.jobs.length);
-
         this.jobs = this.jobs.filter((job) => {
             const freeWorker = Object.values(Workers).find(
                 (worker) => worker.state === WorkerState.FREE
             );
-            console.log(freeWorker);
 
             if (!freeWorker) return true;
 
@@ -135,8 +130,6 @@ export class WorkerServer extends EventEmitter<Events> {
             freeWorker.state = WorkerState.BUSY;
             return false;
         });
-
-        console.log('REMAINING JOBS', this.jobs.length);
     }
 
     addJob<$Job extends keyof Jobs>(jobName: $Job, data: Jobs[$Job]) {
