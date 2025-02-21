@@ -5,6 +5,7 @@ import { SummonerData } from '$/Worker/tasks/summoner';
 import Logger from './logger';
 import { EventEmitter } from './EventEmitter';
 import { RankData } from '$/Worker/tasks/rank';
+import { MatchData } from '$/Worker/tasks/match';
 
 enum WorkerState {
     FREE,
@@ -22,6 +23,7 @@ const Workers: Record<
 type Jobs = {
     summoner: SummonerData;
     rank: RankData;
+    match: MatchData;
 };
 
 const l = new Logger('WorkerServer', 'magenta');
@@ -73,6 +75,8 @@ export class WorkerServer extends EventEmitter<Events> {
                         elapsed
                     };
 
+                    console.log('JOB RESULT', jobResult, jobId);
+
                     this.jobResults.set(jobId, jobResult);
                     super.emit('jobDone', jobId, jobResult);
                 } else if (str.startsWith('error')) {
@@ -107,10 +111,13 @@ export class WorkerServer extends EventEmitter<Events> {
             return;
         }
 
+        console.log('JOBS', this.jobs.length);
+
         this.jobs = this.jobs.filter((job) => {
             const freeWorker = Object.values(Workers).find(
                 (worker) => worker.state === WorkerState.FREE
             );
+            console.log(freeWorker);
 
             if (!freeWorker) return true;
 
@@ -128,6 +135,8 @@ export class WorkerServer extends EventEmitter<Events> {
             freeWorker.state = WorkerState.BUSY;
             return false;
         });
+
+        console.log('REMAINING JOBS', this.jobs.length);
     }
 
     addJob<$Job extends keyof Jobs>(jobName: $Job, data: Jobs[$Job]) {
@@ -160,10 +169,11 @@ export class WorkerServer extends EventEmitter<Events> {
 
         const result = await Promise.race([
             new Promise<string>((resolve, reject) => {
-                super.once('jobDone', (id, result) => {
+                const checkJob = (id: string, result: JobResult) => {
                     if (id !== jobId) return;
                     //remove job from map, because we got it using the event
                     this.jobResults.delete(jobId);
+                    super.clearEvent('jobDone', checkJob);
 
                     if (result.data instanceof Error) {
                         reject(result.data);
@@ -172,7 +182,9 @@ export class WorkerServer extends EventEmitter<Events> {
                     l.log(`Job ${jobId} completed in ${result.elapsed}ms`);
 
                     resolve(result.data as string);
-                });
+                };
+
+                super.on('jobDone', checkJob);
             }),
             new Promise<undefined>((resolve) => setTimeout(resolve, TIMEOUT))
         ]);
