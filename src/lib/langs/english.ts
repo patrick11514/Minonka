@@ -100,6 +100,7 @@ export default template.parse({
         430: '5v5 Blind Pick',
         440: '5v5 Ranked Flex',
         450: '5v5 ARAM',
+        480: 'Swiftplay',
         490: 'Quicplay',
         600: 'Blood Hunt Assassin',
         610: 'Dark Star: Singularity',

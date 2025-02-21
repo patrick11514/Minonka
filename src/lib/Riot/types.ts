@@ -1,6 +1,6 @@
 export class RiotAccountID {
     private _type = 'RiotAccountID';
-    constructor(public value: string) { }
+    constructor(public value: string) {}
     get() {
         return this.value;
     }
@@ -8,7 +8,7 @@ export class RiotAccountID {
 
 export class RiotSummonerID {
     private _type = 'RiotSummonerID';
-    constructor(public value: string) { }
+    constructor(public value: string) {}
     get() {
         return this.value;
     }
@@ -16,7 +16,7 @@ export class RiotSummonerID {
 
 export class RiotPUUID {
     private _type = 'RiotPUUID';
-    constructor(public value: string) { }
+    constructor(public value: string) {}
     get() {
         return this.value;
     }
@@ -209,7 +209,12 @@ export const queues = [
         description: '5v5 ARAM games',
         notes: null
     },
-
+    {
+        queueId: 480,
+        map: "Summoner's Rift",
+        description: 'Swiftplay games',
+        notes: null
+    },
     {
         queueId: 490,
         map: "Summoner's Rift",
