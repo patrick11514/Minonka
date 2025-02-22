@@ -8,7 +8,7 @@
         "dev:worker": "tsx watch ./src/Worker/Worker.ts",
         "dev:register": "tsx ./src/index.ts --register",
         "build": "mkdir -p build && tsc && tsc-alias",
-        "start": "node --es-module-specifier-resolution=node -r module-alias/register ./build/index.js",
+        "start": "node ./build/index.js",
         "start:register": "node ./build/index.js --register",
         "start:worker": "node ./build/Worker/Worker.js",
         "genDatabaseSchema": "kysely-codegen --out-file ./src/types/database.ts",
@@ -45,9 +45,6 @@
         "tsx": "^4.19.2",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.23.0"
-    },
-    "_moduleAliases": {
-        "$": "./build"
     },
     "pnpm": {
         "onlyBuiltDependencies": [
