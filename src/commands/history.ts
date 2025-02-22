@@ -17,11 +17,11 @@ const l = new Logger('History', 'white');
 
 export default class History extends AccountCommand {
     constructor() {
-        super('history', 'Show you match history of last 5 games', {
+        super('history', 'Show you match history of last 6 games', {
             me: {
-                description: 'Show your match history of last 5 games',
+                description: 'Show your match history of last 6 games',
                 localizedDescription: {
-                    [Locale.Czech]: 'Zobrazí tvou historii posledních 5 her'
+                    [Locale.Czech]: 'Zobrazí tvou historii posledních 6 her'
                 }
             },
             name: {
@@ -72,7 +72,7 @@ export default class History extends AccountCommand {
                 type: 'INTEGER',
                 required: false,
                 min: 1,
-                max: 8
+                max: 6
             });
             subCommand.addOption({
                 name: 'offset',
@@ -99,7 +99,7 @@ export default class History extends AccountCommand {
         if (!interaction.isChatInputCommand()) return;
         const lang = getLocale(interaction.locale);
         const queue = interaction.options.getString('queue');
-        const count = interaction.options.getInteger('count') || 8;
+        const count = interaction.options.getInteger('count') || 6;
         const offset = interaction.options.getInteger('offset') || 0;
 
         const summoner = await api[region].summoner.bySummonerId(summonerId);
