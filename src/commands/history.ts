@@ -325,7 +325,9 @@ export default class History extends AccountCommand {
             offset
         );
 
-        await interaction.deferReply();
+        await interaction.deferReply({
+            flags: MessageFlags.Ephemeral
+        });
 
         try {
             await interaction.message.edit({
