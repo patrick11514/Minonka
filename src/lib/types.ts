@@ -19,17 +19,17 @@ export type OptionType = {
     localizedDescription?: Partial<Record<Locale, string>>;
     required: boolean;
 } & (
-        | {
-            type: 'STRING' | 'INTEGER' | 'NUMBER';
-            min?: number;
-            max?: number;
-            choices?: APIApplicationCommandOptionChoice<string | number>[];
-            autocomplete?: boolean;
-        }
-        | {
-            type: 'BOOLEAN' | 'USER' | 'CHANNEL' | 'ROLE' | 'MENTIONABLE' | 'ATTACHMENT';
-        }
-    );
+    | {
+          type: 'STRING' | 'INTEGER' | 'NUMBER';
+          min?: number;
+          max?: number;
+          choices?: APIApplicationCommandOptionChoice<string | number>[];
+          autocomplete?: boolean;
+      }
+    | {
+          type: 'BOOLEAN' | 'USER' | 'CHANNEL' | 'ROLE' | 'MENTIONABLE' | 'ATTACHMENT';
+      }
+);
 
 export const constructOption = (option: OptionType) => {
     let optionBuilder:

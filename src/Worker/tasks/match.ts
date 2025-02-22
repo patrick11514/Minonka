@@ -10,13 +10,7 @@ import { MatchSchema } from '$/lib/Riot/schemes';
 import { Region } from '$/lib/Riot/types';
 import { Locale } from 'discord.js';
 import { z } from 'zod';
-import {
-    getPersistant,
-    persistantExists,
-    save,
-    savePersistant,
-    toMMSS
-} from '../utilities';
+import { getPersistant, persistantExists, savePersistant, toMMSS } from '../utilities';
 import { Blank } from '$/lib/Imaging/Blank';
 import { Text } from '$/lib/Imaging/Text';
 import { getLocale } from '$/lib/langs';
@@ -535,5 +529,5 @@ export default async (data: MatchData) => {
         }
     }
 
-    return save(background);
+    return savePersistant(background, imageName);
 };
