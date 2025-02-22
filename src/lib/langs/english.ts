@@ -4,6 +4,7 @@ import template from './_template';
 export default template.parse({
     genericError: 'There was an error, please try again later',
     workerError: 'There was and error, while generating image: %1',
+    noPermission: 'You do not have permission to do that',
     assets: {
         error: 'There was an error while loading assets: %1',
         challenges: 'Challenge'
@@ -69,7 +70,8 @@ export default template.parse({
     match: {
         empty: 'No match found. Try to adjust filters, or try again later',
         win: 'Victory',
-        lose: 'Loss'
+        lose: 'Loss',
+        buttonInfoText: 'Showing %1-%2 last matches'
     },
     regions: {
         EUN1: 'EUNE',

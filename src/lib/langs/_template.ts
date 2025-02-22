@@ -6,6 +6,7 @@ const _ = z.string();
 export default z.object({
     genericError: _,
     workerError: _,
+    noPermission: _,
     assets: z.object({
         error: _,
         challenges: _
@@ -65,7 +66,8 @@ export default z.object({
     match: z.object({
         empty: _,
         win: _,
-        lose: _
+        lose: _,
+        buttonInfoText: _
     }),
     regions: z.object(
         Object.fromEntries(regions.map((region) => [region, _])) as Record<
