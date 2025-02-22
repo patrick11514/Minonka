@@ -4,6 +4,8 @@ import { Position, Size } from './types';
 
 export class Blank extends Composite {
     private children: Composite[] = [];
+    private debug = 0;
+    private reverse = false;
     constructor(
         position: Position,
         private size: Size
@@ -13,6 +15,12 @@ export class Blank extends Composite {
 
     addElement(element: Composite) {
         this.children.push(element);
+    }
+    debugMode() {
+        this.debug = 1;
+    }
+    setReverse() {
+        this.reverse = true;
     }
 
     async getSize(): Promise<Size> {
@@ -25,7 +33,12 @@ export class Blank extends Composite {
                 width: this.size.width,
                 height: this.size.height,
                 channels: 4,
-                background: { r: 0, g: 0, b: 0, alpha: 0 }
+                background: {
+                    r: this.debug * 255,
+                    g: this.debug * 255,
+                    b: this.debug * 255,
+                    alpha: this.debug * 255
+                }
             }
         }).png();
 
@@ -48,7 +61,12 @@ export class Blank extends Composite {
                             const size = await element.getSize();
                             left = Math.floor((mySize.width - size.width) / 2);
                         } else {
-                            left = element.position.x;
+                            if (this.reverse) {
+                                const size = await element.getSize();
+                                left = mySize.width - element.position.x - size.width;
+                            } else {
+                                left = element.position.x;
+                            }
                         }
 
                         return {

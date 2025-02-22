@@ -9,7 +9,8 @@ export class Text extends Composite {
         private fontSize: number,
         private color: string,
         private alignment: 'start' | 'middle' | 'end' = 'start',
-        private weight: 'bold' | 'normal' = 'bold'
+        private weight: 'bold' | 'normal' = 'bold',
+        private outline: boolean | string = false
     ) {
         super(position);
     }
@@ -29,7 +30,16 @@ export class Text extends Composite {
         }
 
         return Buffer.from(`<svg width="${this.size.width}" height="${this.size.height}">
-                    <text x="${xPosition}" y="${this.size.height / 2 + this.fontSize / 3}" font-size="${this.fontSize}" fill="${this.color}"
+                    <style>
+                        .outline {
+                            paint-order: stroke;
+                            stroke: ${this.outline === true ? 'black' : this.outline};
+                            stroke-width: 6px;
+                            stroke-linecap: butt;
+                            stroke-linejoin: miter;
+                        }
+                    </style>
+                    <text class="${this.outline ? 'outline' : ''}" x="${xPosition}" y="${this.size.height / 2 + this.fontSize / 3}" font-size="${this.fontSize}" fill="${this.color}"
                         font-family="Beaufort for LOL Ja" dominant-baseline="${this.alignment}" text-anchor="${this.alignment}" font-weight="${this.weight}">
                         ${this.text}
                     </text>

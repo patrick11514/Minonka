@@ -5,6 +5,7 @@ import { SummonerData } from '$/Worker/tasks/summoner';
 import Logger from './logger';
 import { EventEmitter } from './EventEmitter';
 import { RankData } from '$/Worker/tasks/rank';
+import { MatchData } from '$/Worker/tasks/match';
 
 enum WorkerState {
     FREE,
@@ -22,6 +23,7 @@ const Workers: Record<
 type Jobs = {
     summoner: SummonerData;
     rank: RankData;
+    match: MatchData;
 };
 
 const l = new Logger('WorkerServer', 'magenta');
@@ -160,10 +162,11 @@ export class WorkerServer extends EventEmitter<Events> {
 
         const result = await Promise.race([
             new Promise<string>((resolve, reject) => {
-                super.once('jobDone', (id, result) => {
+                const checkJob = (id: string, result: JobResult) => {
                     if (id !== jobId) return;
                     //remove job from map, because we got it using the event
                     this.jobResults.delete(jobId);
+                    super.clearEvent('jobDone', checkJob);
 
                     if (result.data instanceof Error) {
                         reject(result.data);
@@ -172,7 +175,9 @@ export class WorkerServer extends EventEmitter<Events> {
                     l.log(`Job ${jobId} completed in ${result.elapsed}ms`);
 
                     resolve(result.data as string);
-                });
+                };
+
+                super.on('jobDone', checkJob);
             }),
             new Promise<undefined>((resolve) => setTimeout(resolve, TIMEOUT))
         ]);

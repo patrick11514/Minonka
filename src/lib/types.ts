@@ -4,7 +4,9 @@ import {
     SlashCommandAttachmentOption,
     SlashCommandBooleanOption,
     SlashCommandChannelOption,
+    SlashCommandIntegerOption,
     SlashCommandMentionableOption,
+    SlashCommandNumberOption,
     SlashCommandRoleOption,
     SlashCommandStringOption,
     SlashCommandUserOption
@@ -21,7 +23,8 @@ export type OptionType = {
           type: 'STRING' | 'INTEGER' | 'NUMBER';
           min?: number;
           max?: number;
-          choices?: APIApplicationCommandOptionChoice<string>[];
+          choices?: APIApplicationCommandOptionChoice<string | number>[];
+          autocomplete?: boolean;
       }
     | {
           type: 'BOOLEAN' | 'USER' | 'CHANNEL' | 'ROLE' | 'MENTIONABLE' | 'ATTACHMENT';
@@ -36,7 +39,9 @@ export const constructOption = (option: OptionType) => {
         | SlashCommandChannelOption
         | SlashCommandRoleOption
         | SlashCommandMentionableOption
-        | SlashCommandAttachmentOption;
+        | SlashCommandAttachmentOption
+        | SlashCommandIntegerOption
+        | SlashCommandNumberOption;
 
     if (
         option.type === 'STRING' ||
@@ -46,24 +51,41 @@ export const constructOption = (option: OptionType) => {
         switch (option.type) {
             case 'STRING':
                 optionBuilder = new SlashCommandStringOption();
+
                 break;
             case 'INTEGER':
-                optionBuilder = new SlashCommandStringOption();
+                optionBuilder = new SlashCommandIntegerOption();
                 break;
             case 'NUMBER':
-                optionBuilder = new SlashCommandStringOption();
+                optionBuilder = new SlashCommandNumberOption();
                 break;
         }
+
         if ('min' in option) {
-            optionBuilder.setMinLength(option.min as number);
+            if (optionBuilder instanceof SlashCommandStringOption) {
+                optionBuilder.setMinLength(option.min as number);
+            } else if (
+                optionBuilder instanceof SlashCommandIntegerOption ||
+                optionBuilder instanceof SlashCommandNumberOption
+            ) {
+                optionBuilder.setMinValue(option.min as number);
+            }
         }
         if ('max' in option) {
-            optionBuilder.setMaxLength(option.max as number);
+            if (optionBuilder instanceof SlashCommandIntegerOption) {
+                optionBuilder.setMaxValue(option.max as number);
+            } else if (optionBuilder instanceof SlashCommandNumberOption) {
+                optionBuilder.setMaxValue(option.max as number);
+            }
         }
         if ('choices' in option) {
-            optionBuilder.addChoices(
-                option.choices as APIApplicationCommandOptionChoice<string>[]
-            );
+            //inner assert will handle if user provide bad type eg. number in StringOption
+            //eslint-disable-next-line @typescript-eslint/no-explicit-any
+            optionBuilder.addChoices(option.choices as any);
+        }
+
+        if ('autocomplete' in option) {
+            optionBuilder.setAutocomplete(option.autocomplete as boolean);
         }
     } else {
         switch (option.type) {
