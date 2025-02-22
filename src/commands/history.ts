@@ -10,7 +10,10 @@ import {
     ChatInputCommandInteraction,
     Locale,
     Interaction,
-    MessageFlags
+    MessageFlags,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
 } from 'discord.js';
 
 const l = new Logger('History', 'white');
@@ -89,6 +92,95 @@ export default class History extends AccountCommand {
         }
 
         super.on('interactionCreate', this.autocomplete);
+        super.on('interactionCreate', this.onButton);
+    }
+
+    async getFiles(
+        locale: Locale,
+        region: Region,
+        summonerId: string,
+        queue: string | null,
+        count: number,
+        offset: number
+    ) {
+        const lang = getLocale(locale);
+
+        const summoner = await api[region].summoner.bySummonerId(summonerId);
+        if (!summoner.status) {
+            return formatErrorResponse(lang, summoner);
+        }
+
+        const matchIds = await api[region].match.ids(summoner.data.puuid, {
+            start: offset,
+            count,
+            queue: queue || undefined
+        });
+        if (!matchIds.status) {
+            return formatErrorResponse(lang, matchIds);
+        }
+
+        if (matchIds.data.length === 0) {
+            return lang.match.empty;
+        }
+
+        const matches = matchIds.data.map((matchId) => api[region].match.match(matchId));
+        const matchesData = await Promise.all(matches);
+        if (matchesData.some((match) => !match.status)) {
+            return formatErrorResponse(lang, matchesData.find((match) => !match.status)!);
+        }
+        try {
+            const files = matchesData.map((match) =>
+                process.workerServer.addJobWait('match', {
+                    ...(match as toValidResponse<typeof match>).data,
+                    locale,
+                    region,
+                    mySummonerId: summonerId
+                })
+            );
+
+            return await Promise.all(files);
+        } catch (e) {
+            if (e instanceof Error) {
+                l.error(e);
+                return replacePlaceholders(lang.workerError, e.message);
+            }
+
+            return lang.genericError;
+        }
+    }
+
+    generateButtonRow(
+        lang: ReturnType<typeof getLocale>,
+        userId: string,
+        summonerId: string,
+        region: Region,
+        queue: string | null,
+        count: number,
+        offset: number
+    ) {
+        //history;discordid;summonerid;region;queue;count;offset
+        const baseId = `history;${userId};${summonerId};${region};${queue || ''};${count};${offset}`;
+        return new ActionRowBuilder<ButtonBuilder>().addComponents([
+            new ButtonBuilder()
+                .setCustomId(`${baseId};prev`)
+                .setEmoji('⬅️')
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId(`${baseId};reload`)
+                .setEmoji('🔄')
+                .setLabel(
+                    replacePlaceholders(
+                        lang.match.buttonInfoText,
+                        offset.toString(),
+                        (offset + count).toString()
+                    )
+                )
+                .setStyle(ButtonStyle.Primary),
+            new ButtonBuilder()
+                .setCustomId(`${baseId};next`)
+                .setEmoji('➡️')
+                .setStyle(ButtonStyle.Primary)
+        ]);
     }
 
     async onMenuSelect(
@@ -102,64 +194,38 @@ export default class History extends AccountCommand {
         const count = interaction.options.getInteger('count') || 6;
         const offset = interaction.options.getInteger('offset') || 0;
 
-        const summoner = await api[region].summoner.bySummonerId(summonerId);
-        if (!summoner.status) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(lang, summoner)
-            });
-            return;
-        }
-
-        const matchIds = await api[region].match.ids(summoner.data.puuid, {
-            start: offset,
+        const result = await this.getFiles(
+            interaction.locale,
+            region,
+            summonerId,
+            queue,
             count,
-            queue: queue || undefined
-        });
-        if (!matchIds.status) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(lang, matchIds)
-            });
-            return;
-        }
-
-        if (matchIds.data.length === 0) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: lang.match.empty
-            });
-            return;
-        }
-
-        const matches = matchIds.data.map((matchId) => api[region].match.match(matchId));
-        const matchesData = await Promise.all(matches);
-        if (matchesData.some((match) => !match.status)) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(
-                    lang,
-                    matchesData.find((match) => !match.status)!
-                )
-            });
-            return;
-        }
-
-        const files = matchesData.map((match) =>
-            process.workerServer.addJobWait('match', {
-                ...(match as toValidResponse<typeof match>).data,
-                locale: interaction.locale,
-                region,
-                mySummonerId: summonerId
-            })
+            offset
         );
 
+        if (typeof result === 'string') {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: result
+            });
+            return;
+        }
+
         await interaction.deferReply();
+        const row = this.generateButtonRow(
+            lang,
+            interaction.user.id,
+            summonerId,
+            region,
+            queue,
+            count,
+            offset
+        );
 
         try {
-            const results = await Promise.all(files);
             await interaction.editReply({
-                files: results
+                files: result,
+                components: [row]
             });
         } catch (e) {
             if (e instanceof Error) {
@@ -199,5 +265,90 @@ export default class History extends AccountCommand {
             .filter((opt) => opt.name.toLowerCase().includes(option.value.toLowerCase()));
 
         await interaction.respond(options.slice(0, 25));
+    }
+
+    async onButton(interaction: Interaction) {
+        if (!interaction.isButton()) return;
+        //history;discordid;summonerid;region;queue;count;offset
+        const id = interaction.customId.split(';');
+        if (id[0] !== 'history') return;
+
+        const lang = getLocale(interaction.locale);
+
+        const discordId = id[1];
+        if (interaction.user.id !== discordId) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: lang.noPermission
+            });
+            return;
+        }
+        const summonerId = id[2];
+        const region = id[3] as Region;
+        const queue = id[4] || null;
+        const count = parseInt(id[5]);
+        let offset = parseInt(id[6]);
+        const command = id[7];
+
+        switch (command) {
+            case 'prev':
+                offset -= count;
+                break;
+            case 'next':
+                offset += count;
+                break;
+        }
+
+        const response = await this.getFiles(
+            interaction.locale,
+            region,
+            summonerId,
+            queue,
+            count,
+            offset
+        );
+        if (typeof response === 'string') {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: response
+            });
+            return;
+        }
+
+        const row = this.generateButtonRow(
+            lang,
+            discordId,
+            summonerId,
+            region,
+            queue,
+            count,
+            offset
+        );
+
+        await interaction.deferReply();
+
+        try {
+            await interaction.message.edit({
+                files: response,
+                components: [row]
+            });
+            await interaction.deleteReply();
+        } catch (e) {
+            if (e instanceof Error) {
+                l.error(e);
+                await interaction.editReply({
+                    content: replacePlaceholders(
+                        getLocale(interaction.locale).workerError,
+                        e.message
+                    )
+                });
+                return;
+            }
+
+            await interaction.editReply({
+                content: getLocale(interaction.locale).genericError
+            });
+            return;
+        }
     }
 }

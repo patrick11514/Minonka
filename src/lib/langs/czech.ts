@@ -4,6 +4,7 @@ import template from './_template';
 export default template.parse({
     genericError: 'Nastala chyba, zkus to prosím později',
     workerError: 'Nastala chyba při generaci obrázku: %1',
+    noPermission: 'Na toto nemáš práva',
     assets: {
         error: 'Nastala chyba při načítání zdrojů: %1',
         challenges: 'Challenge'
@@ -69,7 +70,8 @@ export default template.parse({
     match: {
         empty: 'Nebyl nalezený žádný zápas. Zkus upravit filtrování nebo zkusit později.',
         win: 'Výhra',
-        lose: 'Prohra'
+        lose: 'Prohra',
+        buttonInfoText: 'Zobrazuji %1-%2 posledních zápasů'
     },
     regions: {
         EUN1: 'EUNE',
