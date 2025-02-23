@@ -151,7 +151,8 @@ const ParticipantSchema = z.object({
     totalMinionsKilled: z.number(),
     visionScore: z.number(),
     win: z.boolean(),
-    summonerId: z.string()
+    summonerId: z.string(),
+    puuid: z.string()
 });
 
 const queueIds = queues.map((queue) => queue.queueId);

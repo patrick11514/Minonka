@@ -16,6 +16,10 @@ import { Text } from '$/lib/Imaging/Text';
 import { getLocale } from '$/lib/langs';
 import { Color } from '$/lib/Imaging/types';
 import { Image } from '$/lib/Imaging/Image';
+import { getMatchStatus, MatchStatus } from '$/lib/Riot/utilities';
+import { conn } from '$/types/connection';
+import api from '$/lib/Riot/api';
+import { updateLpForUser } from '$/crons/lp';
 
 export type MatchData = {
     region: Region;
@@ -94,18 +98,11 @@ export default async (data: MatchData) => {
     );
     mainLayout.addElement(Stats);
 
-    //Find my team
-    const myTeam = data.info.teams.find(
-        (team) =>
-            team.teamId ===
-            data.info.participants.find(
-                (participant) => participant.summonerId === data.mySummonerId
-            )!.teamId
-    )!;
+    const matchStatus = getMatchStatus(data, data.mySummonerId);
 
     //Victory/Loss Text
     const VictoryLoss = new Text(
-        myTeam.win ? lang.match.win : lang.match.lose,
+        lang.match.results[matchStatus],
         {
             x: 'center',
             y: 40
@@ -115,7 +112,11 @@ export default async (data: MatchData) => {
             height: 100
         },
         100,
-        myTeam.win ? Color.GREEN : Color.RED,
+        matchStatus === MatchStatus.Win
+            ? Color.GREEN
+            : matchStatus === MatchStatus.Loss
+              ? Color.RED
+              : Color.GRAY,
         'middle'
     );
     const VictorySize = await VictoryLoss.getSize();
@@ -159,7 +160,76 @@ export default async (data: MatchData) => {
     Stats.addElement(time);
 
     //LP
-    //@TODO if ranked, try to get from DB, if not presented, then enter ? LP
+    //ranked
+    if (data.info.queueId === 420 || data.info.queueId === 440) {
+        //check if db includes LP for this match
+        const lp = await conn
+            .selectFrom('match_lp')
+            .selectAll()
+            .where('matchId', '=', data.metadata.matchId)
+            .executeTakeFirst();
+        let lpGain = null as number | null;
+
+        if (lp) {
+            lpGain = lp.gain;
+        } else {
+            //check if its latest match and if yes, calculate lp for it
+            const lastMatch = await api[data.region].match.ids(
+                data.info.participants.find((p) => p.summonerId === data.mySummonerId)!
+                    .puuid,
+                {
+                    start: 0,
+                    count: 1,
+                    queue: data.info.queueId.toString()
+                }
+            );
+
+            if (lastMatch.status && lastMatch.data[0] === data.metadata.matchId) {
+                const userData = await conn
+                    .selectFrom('account')
+                    .selectAll()
+                    .where('summoner_id', '=', data.mySummonerId)
+                    .executeTakeFirst();
+                if (!userData) return;
+
+                await updateLpForUser({
+                    id: userData.id,
+                    region: userData.region,
+                    summoner_id: userData.summoner_id,
+                    puuid: userData.puuid,
+                    gameName: userData.gameName,
+                    tagLine: userData.tagLine
+                });
+
+                //check if db includes LP for this match
+                const lp = await conn
+                    .selectFrom('match_lp')
+                    .selectAll()
+                    .where('matchId', '=', data.metadata.matchId)
+                    .executeTakeFirst(); //should be there now
+                if (lp) {
+                    lpGain = lp.gain;
+                }
+            }
+        }
+
+        //LP
+        const lpText = new Text(
+            `${lpGain === null ? '?' : lpGain} LP`,
+            {
+                x: 'center',
+                y: (time.position.y as number) + otherSize + spacing
+            },
+            {
+                width: STATSWidth,
+                height: otherSize
+            },
+            otherSize,
+            Color.WHITE,
+            'middle'
+        );
+        Stats.addElement(lpText);
+    }
 
     //Initialize team blanks
     const padding = 40;

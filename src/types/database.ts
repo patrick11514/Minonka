@@ -21,6 +21,25 @@ export interface Account {
     tagLine: string;
 }
 
+export interface Lp {
+    account_id: number;
+    id: Generated<number>;
+    LP: number;
+    queue: string;
+    rank: string;
+    tier: string;
+    time: Generated<Date>;
+}
+
+export interface MatchLp {
+    gain: Generated<number | null>;
+    id: Generated<number>;
+    lp: number;
+    matchId: string;
+}
+
 export interface DB {
     account: Account;
+    lp: Lp;
+    match_lp: MatchLp;
 }

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { QueueId, queues, regions, tier } from '../Riot/types';
+import { MatchStatus } from '../Riot/utilities';
 
 const _ = z.string();
 
@@ -65,8 +66,11 @@ export default z.object({
     }),
     match: z.object({
         empty: _,
-        win: _,
-        lose: _,
+        results: z.object({
+            [MatchStatus.Win]: _,
+            [MatchStatus.Loss]: _,
+            [MatchStatus.Remake]: _
+        }),
         buttonInfoText: _
     }),
     regions: z.object(

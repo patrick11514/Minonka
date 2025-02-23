@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import template from './_template';
+import { MatchStatus } from '../Riot/utilities';
 
 export default template.parse({
     genericError: 'There was an error, please try again later',
@@ -69,8 +70,11 @@ export default template.parse({
     },
     match: {
         empty: 'No match found. Try to adjust filters, or try again later',
-        win: 'Victory',
-        lose: 'Loss',
+        results: {
+            [MatchStatus.Win]: 'Win',
+            [MatchStatus.Loss]: 'Lose',
+            [MatchStatus.Remake]: 'Remake'
+        },
         buttonInfoText: 'Showing %1-%2 last matches'
     },
     regions: {
