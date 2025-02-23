@@ -1,27 +1,3 @@
-export class RiotAccountID {
-    private _type = 'RiotAccountID';
-    constructor(public value: string) {}
-    get() {
-        return this.value;
-    }
-}
-
-export class RiotSummonerID {
-    private _type = 'RiotSummonerID';
-    constructor(public value: string) {}
-    get() {
-        return this.value;
-    }
-}
-
-export class RiotPUUID {
-    private _type = 'RiotPUUID';
-    constructor(public value: string) {}
-    get() {
-        return this.value;
-    }
-}
-
 export const regions = [
     'BR1',
     'EUN1',

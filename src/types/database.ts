@@ -3,33 +3,43 @@
  * Please do not edit it manually.
  */
 
-import type { ColumnType } from "kysely";
+import type { ColumnType } from 'kysely';
 
-export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
-  ? ColumnType<S, I | undefined, U>
-  : ColumnType<T, T | undefined, T>;
+export type Generated<T> =
+    T extends ColumnType<infer S, infer I, infer U>
+        ? ColumnType<S, I | undefined, U>
+        : ColumnType<T, T | undefined, T>;
 
 export interface Account {
-  account_id: string;
-  discord_id: string;
-  gameName: string;
-  id: Generated<number>;
-  puuid: string;
-  region: string;
-  summoner_id: string;
-  tagLine: string;
+    account_id: string;
+    discord_id: string;
+    gameName: string;
+    id: Generated<number>;
+    puuid: string;
+    region: string;
+    summoner_id: string;
+    tagLine: string;
 }
 
 export interface Lp {
-  account_id: number;
-  LP: number;
-  queue: string;
-  rank: string;
-  tier: string;
-  time: Generated<Date>;
+    account_id: number;
+    id: Generated<number>;
+    LP: number;
+    queue: string;
+    rank: string;
+    tier: string;
+    time: Generated<Date>;
+}
+
+export interface MatchLp {
+    gain: Generated<number | null>;
+    id: Generated<number>;
+    lp: number;
+    matchId: string;
 }
 
 export interface DB {
-  account: Account;
-  lp: Lp;
+    account: Account;
+    lp: Lp;
+    match_lp: MatchLp;
 }

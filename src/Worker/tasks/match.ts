@@ -16,6 +16,7 @@ import { Text } from '$/lib/Imaging/Text';
 import { getLocale } from '$/lib/langs';
 import { Color } from '$/lib/Imaging/types';
 import { Image } from '$/lib/Imaging/Image';
+import { getMatchStatus, MatchStatus } from '$/lib/Riot/utilities';
 
 export type MatchData = {
     region: Region;
@@ -94,18 +95,11 @@ export default async (data: MatchData) => {
     );
     mainLayout.addElement(Stats);
 
-    //Find my team
-    const myTeam = data.info.teams.find(
-        (team) =>
-            team.teamId ===
-            data.info.participants.find(
-                (participant) => participant.summonerId === data.mySummonerId
-            )!.teamId
-    )!;
+    const matchStatus = getMatchStatus(data, data.mySummonerId);
 
     //Victory/Loss Text
     const VictoryLoss = new Text(
-        myTeam.win ? lang.match.win : lang.match.lose,
+        lang.match.results[matchStatus],
         {
             x: 'center',
             y: 40
@@ -115,7 +109,11 @@ export default async (data: MatchData) => {
             height: 100
         },
         100,
-        myTeam.win ? Color.GREEN : Color.RED,
+        matchStatus === MatchStatus.Win
+            ? Color.GREEN
+            : matchStatus === MatchStatus.Loss
+              ? Color.RED
+              : Color.GRAY,
         'middle'
     );
     const VictorySize = await VictoryLoss.getSize();

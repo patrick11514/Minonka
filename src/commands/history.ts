@@ -128,25 +128,16 @@ export default class History extends AccountCommand {
         if (matchesData.some((match) => !match.status)) {
             return formatErrorResponse(lang, matchesData.find((match) => !match.status)!);
         }
-        try {
-            const files = matchesData.map((match) =>
+
+        return matchesData.map(
+            (match) => () =>
                 process.workerServer.addJobWait('match', {
                     ...(match as toValidResponse<typeof match>).data,
                     locale,
                     region,
                     mySummonerId: summonerId
                 })
-            );
-
-            return await Promise.all(files);
-        } catch (e) {
-            if (e instanceof Error) {
-                l.error(e);
-                return replacePlaceholders(lang.workerError, e.message);
-            }
-
-            return lang.genericError;
-        }
+        );
     }
 
     generateButtonRow(
@@ -211,7 +202,6 @@ export default class History extends AccountCommand {
             return;
         }
 
-        await interaction.deferReply();
         const row = this.generateButtonRow(
             lang,
             interaction.user.id,
@@ -224,7 +214,7 @@ export default class History extends AccountCommand {
 
         try {
             await interaction.editReply({
-                files: result,
+                files: await Promise.all(result.map((f) => f())),
                 components: [row]
             });
         } catch (e) {
@@ -298,7 +288,6 @@ export default class History extends AccountCommand {
                 offset += count;
                 break;
         }
-
         const response = await this.getFiles(
             interaction.locale,
             region,
@@ -331,7 +320,7 @@ export default class History extends AccountCommand {
 
         try {
             await interaction.message.edit({
-                files: response,
+                files: await Promise.all(response.map((f) => f())),
                 components: [row]
             });
             await interaction.deleteReply();

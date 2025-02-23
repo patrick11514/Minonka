@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import template from './_template';
+import { MatchStatus } from '../Riot/utilities';
 
 export default template.parse({
     genericError: 'Nastala chyba, zkus to prosím později',
@@ -69,8 +70,11 @@ export default template.parse({
     },
     match: {
         empty: 'Nebyl nalezený žádný zápas. Zkus upravit filtrování nebo zkusit později.',
-        win: 'Výhra',
-        lose: 'Prohra',
+        results: {
+            [MatchStatus.Win]: 'Výhra',
+            [MatchStatus.Loss]: 'Prohra',
+            [MatchStatus.Remake]: 'Remake'
+        },
         buttonInfoText: 'Zobrazuji %1-%2 posledních zápasů'
     },
     regions: {
