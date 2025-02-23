@@ -79,7 +79,12 @@ export const updateLpForUser = async (user: {
                 .selectFrom('match_lp')
                 .innerJoin('lp', 'lp.id', 'match_lp.lp')
                 .selectAll()
-                .where('matchId', 'in', matches.data)
+                .where((eb) =>
+                    eb.and([
+                        eb('matchId', 'in', matches.data),
+                        eb('accountId', '=', user.id)
+                    ])
+                )
                 .execute();
 
             if (matchesLp.length === 2) continue; //all matches have match in db
@@ -88,6 +93,7 @@ export const updateLpForUser = async (user: {
                 await conn
                     .insertInto('match_lp')
                     .values({
+                        accountId: user.id,
                         matchId: matches.data[0],
                         lp: Number(insertData.insertId)
                     })
@@ -102,6 +108,7 @@ export const updateLpForUser = async (user: {
             await conn
                 .insertInto('match_lp')
                 .values({
+                    accountId: user.id,
                     matchId: matches.data[0],
                     lp: Number(insertData.insertId),
                     //newest lp - older lp
