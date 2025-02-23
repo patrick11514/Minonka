@@ -4,6 +4,7 @@ import api from '$/lib/Riot/api';
 import { toValidResponse } from '$/lib/Riot/baseRequest';
 import { Region } from '$/lib/Riot/types';
 import { conn } from '$/types/connection';
+import { sql } from 'kysely';
 
 const l = new Logger('LP', 'magenta');
 
@@ -31,24 +32,20 @@ export default [
             const user = users[idx];
 
             const recentQueues = await conn
-                .selectFrom('lp')
-                .select(['account_id', 'LP', 'queue', 'rank', 'tier', 'time'])
-                .where((eb) =>
-                    eb.and([
-                        eb('account_id', '=', user.id),
-                        eb(
-                            'time',
-                            '=',
-                            eb
-                                .selectFrom('lp as sub')
-                                .select('time')
-                                .whereRef('sub.account_id', '=', eb.ref('lp.account_id'))
-                                .whereRef('sub.queue', '=', eb.ref('lp.queue'))
-                                .orderBy('sub.time', 'desc')
-                                .limit(1)
+                .with('Ranked', (db) =>
+                    db
+                        .selectFrom('lp')
+                        .selectAll()
+                        .select(() =>
+                            sql<number>`ROW_NUMBER() OVER(PARTITION BY account_id, queue ORDER BY time DESC)`.as(
+                                'rn'
+                            )
                         )
-                    ])
+                        .where('account_id', '=', 2)
                 )
+                .selectFrom('Ranked')
+                .select(['id', 'account_id', 'LP', 'queue', 'rank', 'tier', 'time'])
+                .where('rn', '=', 1)
                 .execute();
 
             try {
