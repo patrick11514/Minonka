@@ -212,6 +212,8 @@ export default class History extends AccountCommand {
             offset
         );
 
+        await interaction.deferReply();
+
         try {
             await interaction.editReply({
                 files: await Promise.all(result.map((f) => f())),
