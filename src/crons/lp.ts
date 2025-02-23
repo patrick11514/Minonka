@@ -41,7 +41,7 @@ export default [
                                 'rn'
                             )
                         )
-                        .where('account_id', '=', 2)
+                        .where('account_id', '=', user.id)
                 )
                 .selectFrom('Ranked')
                 .select(['id', 'account_id', 'LP', 'queue', 'rank', 'tier', 'time'])
