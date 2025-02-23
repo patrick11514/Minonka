@@ -32,6 +32,7 @@ export interface Lp {
 }
 
 export interface MatchLp {
+    accountId: number;
     gain: Generated<number | null>;
     id: Generated<number>;
     lp: number;

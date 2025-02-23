@@ -165,8 +165,14 @@ export default async (data: MatchData) => {
         //check if db includes LP for this match
         const lp = await conn
             .selectFrom('match_lp')
+            .innerJoin('account', 'account.id', 'match_lp.accountId')
             .selectAll()
-            .where('matchId', '=', data.metadata.matchId)
+            .where((eb) =>
+                eb.and([
+                    eb('matchId', '=', data.metadata.matchId),
+                    eb('account.summoner_id', '=', data.mySummonerId)
+                ])
+            )
             .executeTakeFirst();
         let lpGain = null as number | null;
 
@@ -205,7 +211,12 @@ export default async (data: MatchData) => {
                 const lp = await conn
                     .selectFrom('match_lp')
                     .selectAll()
-                    .where('matchId', '=', data.metadata.matchId)
+                    .where((eb) =>
+                        eb.and([
+                            eb('matchId', '=', data.metadata.matchId),
+                            eb('accountId', '=', userData.id)
+                        ])
+                    )
                     .executeTakeFirst(); //should be there now
                 if (lp) {
                     lpGain = lp.gain;
@@ -225,7 +236,7 @@ export default async (data: MatchData) => {
                 height: otherSize
             },
             otherSize,
-            Color.WHITE,
+            lpGain === null ? Color.WHITE : lpGain > 0 ? Color.GREEN : Color.RED,
             'middle'
         );
         Stats.addElement(lpText);
