@@ -21,9 +21,7 @@ export const registerCrons = async () => {
             d instanceof Array && typeof d[0] === 'string' && typeof d[1] === 'function'
     ) as Cron[];
     for (const arr of filter) {
-        cron.schedule(arr[0], arr[1], {
-            runOnInit: true
-        });
+        cron.schedule(arr[0], arr[1]);
     }
 
     l.stop(`Registered ${filter.length} crons`);
