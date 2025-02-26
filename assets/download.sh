@@ -1,5 +1,6 @@
 #!/bin/bash
 # DDRAGON THINGS
+cd $(dirname "$0")
 DDRAGON_VERSION=$(curl https://ddragon.leagueoflegends.com/api/versions.json | jq -r ".[0]")
 
 CURRENT_VERSION=$(cat ddragon/.version)

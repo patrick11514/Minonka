@@ -4,7 +4,9 @@ import path from 'node:path';
 import cron from 'node-cron';
 import Logger from './logger';
 
-export type Cron = [string, () => Awaitable<void>];
+export type Cron =
+    | [string, () => Awaitable<void>]
+    | [string, () => Awaitable<void>, cron.ScheduleOptions];
 
 const l = new Logger('Cron', 'blue');
 
@@ -21,7 +23,7 @@ export const registerCrons = async () => {
             d instanceof Array && typeof d[0] === 'string' && typeof d[1] === 'function'
     ) as Cron[];
     for (const arr of filter) {
-        cron.schedule(arr[0], arr[1]);
+        cron.schedule(arr[0], arr[1], arr[2] ?? {});
     }
 
     l.stop(`Registered ${filter.length} crons`);
