@@ -14,7 +14,8 @@
         "genDatabaseSchema": "kysely-codegen --out-file ./src/types/database.ts",
         "format": "prettier --write .",
         "lint": "prettier --check . && eslint src",
-        "check": "tsc --noEmit"
+        "check": "tsc --noEmit",
+        "migration:create": "./script/createMigration.sh"
     },
     "dependencies": {
         "@types/strip-color": "^0.1.2",
