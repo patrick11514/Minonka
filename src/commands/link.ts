@@ -40,18 +40,24 @@ export default class Link extends Command {
             }
             return;
         }
+
+        let exist = false;
+
         try {
             const exists = await conn
                 .selectFrom('account')
-                .select(['id'])
+                .selectAll()
                 .where('puuid', '=', userInfo.data.puuid)
                 .executeTakeFirst();
             if (exists) {
-                await interaction.reply({
-                    flags: MessageFlags.Ephemeral,
-                    content: lang.lang.alreadyConnected
-                });
-                return;
+                if (exists.discord_id !== null) {
+                    await interaction.reply({
+                        flags: MessageFlags.Ephemeral,
+                        content: lang.lang.alreadyConnected
+                    });
+                    return;
+                }
+                exist = true;
             }
         } catch (e) {
             l.error(e);
@@ -80,18 +86,33 @@ export default class Link extends Command {
         }
 
         try {
-            await conn
-                .insertInto('account')
-                .values({
-                    discord_id: interaction.user.id,
-                    puuid: userInfo.data.puuid,
-                    account_id: summoner.data.accountId,
-                    summoner_id: summoner.data.id,
-                    gameName: userInfo.data.gameName,
-                    tagLine: userInfo.data.tagLine,
-                    region: region
-                })
-                .execute();
+            if (!exist) {
+                await conn
+                    .insertInto('account')
+                    .values({
+                        discord_id: interaction.user.id,
+                        puuid: userInfo.data.puuid,
+                        account_id: summoner.data.accountId,
+                        summoner_id: summoner.data.id,
+                        gameName: userInfo.data.gameName,
+                        tagLine: userInfo.data.tagLine,
+                        region: region
+                    })
+                    .execute();
+            } else {
+                await conn
+                    .updateTable('account')
+                    .set({
+                        discord_id: interaction.user.id,
+                        puuid: userInfo.data.puuid,
+                        summoner_id: summoner.data.id,
+                        gameName: userInfo.data.gameName,
+                        tagLine: userInfo.data.tagLine,
+                        region: region
+                    })
+                    .where('puuid', '=', userInfo.data.puuid)
+                    .execute();
+            }
 
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,

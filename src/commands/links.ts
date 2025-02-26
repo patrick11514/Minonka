@@ -110,7 +110,13 @@ export default class Links extends Command {
         }
 
         try {
-            await conn.deleteFrom('account').where('id', '=', accountId).execute();
+            await conn
+                .updateTable('account')
+                .set({
+                    discord_id: null
+                })
+                .where('id', '=', accountId)
+                .execute();
 
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,

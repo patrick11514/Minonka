@@ -12,7 +12,7 @@ export type Generated<T> =
 
 export interface Account {
     account_id: string;
-    discord_id: string;
+    discord_id: Generated<string | null>;
     gameName: string;
     id: Generated<number>;
     puuid: string;
