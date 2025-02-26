@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import Path from 'node:path';
 import Logger from './logger';
 import { Command } from './Command';
+import { setStatus } from '$/crons/status';
 
 type Events = {
     login: (client: Client<true>) => void;
@@ -22,10 +23,14 @@ export class DiscordBot extends EventEmitter<Events> {
         this.client = new Client({
             intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
         });
+        process.client = this.client;
 
         this.loadCommands();
 
-        this.client.on('ready', (client) => super.emit('login', client));
+        this.client.on('ready', (client) => {
+            super.emit('login', client);
+            setStatus();
+        });
 
         this.client.login(env.CLIENT_TOKEN);
     }
