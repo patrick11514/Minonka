@@ -47,7 +47,7 @@ History command will show your game history. By default it show last 6 games, bu
 Clone repo:
 
 ```bash
-git clone https://github.com/patrick115/Minonka.git
+git clone https://github.com/patrick11514/Minonka.git
 ```
 
 Install node modules
@@ -79,6 +79,13 @@ Build bot
 ```bash
 npm run build # npm
 pnpm build    # pnpm
+```
+
+Migrate database
+
+```bash
+npm run migrate # npm
+pnpm migrate    # pnpm
 ```
 
 Run bot
