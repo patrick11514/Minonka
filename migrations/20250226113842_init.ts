@@ -35,7 +35,7 @@ export const up = async (conn: Kysely<any>) => {
             col.references('account.id').notNull()
         )
         .addColumn('matchId', 'varchar(50)', (col) => col.notNull())
-        .addColumn('lp', 'integer', (col) => col.notNull())
+        .addColumn('lp', 'integer', (col) => col.references('lp.id').notNull())
         .addColumn('gain', 'integer')
         .execute();
 };
