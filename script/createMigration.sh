@@ -12,11 +12,11 @@ cat <<EOL > "migrations/$FILENAME"
 
 import { Kysely } from 'kysely';
 
-export const up = async (db: Kysely<any>) => {
+export const up = async (conn: Kysely<any>) => {
   // Add migration logic here
 }
 
-export const down = async (db: Kysely<any>) => {
+export const down = async (conn: Kysely<any>) => {
   // Add rollback logic here
 }
 EOL

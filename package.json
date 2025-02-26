@@ -15,7 +15,8 @@
         "format": "prettier --write .",
         "lint": "prettier --check . && eslint src",
         "check": "tsc --noEmit",
-        "migration:create": "./script/createMigration.sh"
+        "migration:create": "./script/createMigration.sh",
+        "migrate": "tsx ./script/runMigration.ts"
     },
     "dependencies": {
         "@types/strip-color": "^0.1.2",
