@@ -95,6 +95,28 @@ const RiotAPIStructure = {
             endOfUrl: `/matches/${matchId}`,
             schema: MatchSchema
         })
+    }),
+    clash: new ApiSet('/lol/clash/v1', {
+        tournaments: () => ({
+            regional: true,
+            endOfUrl: '/tournaments',
+            schema: z.array(
+                z.object({
+                    id: z.number(),
+                    themeId: z.number(),
+                    nameKey: z.string(),
+                    nameKeySecondary: z.string(),
+                    schedule: z.array(
+                        z.object({
+                            id: z.number(),
+                            registrationTime: z.number(),
+                            startTime: z.number(),
+                            cancelled: z.boolean()
+                        })
+                    )
+                })
+            )
+        })
     })
 };
 

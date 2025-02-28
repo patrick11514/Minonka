@@ -29,6 +29,10 @@ export const setupRiotOptions = (instance: Command | SubCommand) => {
         },
         required: true
     });
+    addRegionOption(instance);
+};
+
+export const addRegionOption = (instance: Command | SubCommand) => {
     instance.addOption({
         type: 'STRING',
         name: 'region',
@@ -57,3 +61,5 @@ export const fromEntries = <$Key extends string | symbol | number, $Value>(
 ) => {
     return Object.fromEntries(array) as Record<$Key, $Value>;
 };
+
+export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);

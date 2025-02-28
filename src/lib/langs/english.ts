@@ -1,6 +1,12 @@
 import { z } from 'zod';
 import template from './_template';
 import { MatchStatus } from '../Riot/utilities';
+import { mapRegions } from '../Riot/types';
+import { capitalize } from '../utilities';
+
+type ClashMapInflection<$Keys extends readonly string[]> = {
+    [K in $Keys[number]]: string;
+};
 
 export default template.parse({
     genericError: 'There was an error, please try again later',
@@ -77,6 +83,16 @@ export default template.parse({
         },
         buttonInfoText: 'Showing %1-%2 last matches'
     },
+    clash: {
+        title: 'Upcoming Clash Tournaments',
+        day: 'Day',
+        cup: 'cup',
+        registration: 'Registration',
+        start: 'Start',
+        mapInflection: Object.fromEntries(
+            mapRegions.map((region) => [region, `${capitalize(region)} %1`])
+        ) as ClashMapInflection<typeof mapRegions>
+    },
     regions: {
         EUN1: 'EUNE',
         EUW1: 'EUW',
@@ -148,5 +164,17 @@ export default template.parse({
         2000: 'Tutorial 1',
         2010: 'Tutorial 2',
         2020: 'Tutorial 3'
+    },
+    mapRegions: {
+        bilgewater: 'Bilgewater',
+        demacia: 'Demacia',
+        freljord: 'Freljord',
+        ionia: 'Ionia',
+        noxus: 'Noxus',
+        piltover: 'Piltover',
+        shadowIsles: 'Shadow Isles',
+        shurima: 'Shurima',
+        targon: 'Targon',
+        zaun: 'Zaun'
     }
 } satisfies z.infer<typeof template>);

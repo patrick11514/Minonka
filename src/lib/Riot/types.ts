@@ -410,3 +410,16 @@ export const queues = [
 ] as const;
 
 export type QueueId = (typeof queues)[number]['queueId'];
+
+export const mapRegions = [
+    'noxus',
+    'demacia',
+    'targon',
+    'shurima',
+    'zaun',
+    'bilgewater',
+    'freljord',
+    'ionia',
+    'piltover',
+    'shadowIsles'
+] as const;

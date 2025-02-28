@@ -77,6 +77,25 @@ export default template.parse({
         },
         buttonInfoText: 'Zobrazuji %1-%2 posledních zápasů'
     },
+    clash: {
+        title: 'Nadcházející Clash Turnaje',
+        day: 'Den',
+        cup: 'pohár',
+        registration: 'Registrace',
+        start: 'Začátek',
+        mapInflection: {
+            demacia: 'Demácijský %1',
+            bilgewater: 'Bilgewaterský %1',
+            noxus: 'Noxijský %1',
+            targon: 'Targonský %1',
+            freljord: 'Freljordský %1',
+            shurima: 'Shurimský %1',
+            ionia: 'Ionský %1',
+            piltover: 'Piltoverský %1',
+            zaun: 'Zaunský %1',
+            shadowIsles: 'Pohár Stínových ostrovů'
+        }
+    },
     regions: {
         EUN1: 'EUNE',
         EUW1: 'EUW',
@@ -148,5 +167,17 @@ export default template.parse({
         2000: 'Tutorial 1',
         2010: 'Tutorial 2',
         2020: 'Tutorial 3'
+    },
+    mapRegions: {
+        demacia: 'Demácie',
+        noxus: 'Noxus',
+        targon: 'Targon',
+        freljord: 'Freljord',
+        shurima: 'Shurima',
+        ionia: 'Ionia',
+        piltover: 'Piltover',
+        zaun: 'Zaun',
+        bilgewater: 'Bilgewater',
+        shadowIsles: 'Stínové ostrovy'
     }
 } satisfies z.infer<typeof template>);
