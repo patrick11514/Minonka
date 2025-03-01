@@ -6,6 +6,7 @@ import {
 } from 'discord.js';
 import { constructOption, OptionType } from './types';
 import { SubCommand } from './SubCommand';
+import { SubCommandGroup } from './SubCommandGroup';
 
 export abstract class Command {
     slashCommand: SlashCommandBuilder;
@@ -29,6 +30,10 @@ export abstract class Command {
 
     public addSubCommand(subCommand: SubCommand) {
         this.slashCommand.addSubcommand(subCommand.subCommand);
+    }
+
+    public addSubCommandGroup(subCommandGroup: SubCommandGroup) {
+        this.slashCommand.addSubcommandGroup(subCommandGroup.subCommandGroup);
     }
 
     public on<$Event extends keyof ClientEvents>(
