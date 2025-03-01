@@ -9,24 +9,24 @@ import {
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder
 } from 'discord.js';
-import { Command } from './Command';
-import { Region } from './Riot/types';
 import { SubCommand } from './SubCommand';
+import { SubCommandGroup } from './SubCommandGroup';
 import { setupRiotOptions } from './utilities';
 import { getLocale, replacePlaceholders } from './langs';
+import { Region } from './Riot/types';
 import { Selectable } from 'kysely';
 import { Account } from '$/types/database';
+import Logger from './logger';
 import { conn } from '$/types/connection';
 import api from './Riot/api';
-import Logger from './logger';
 
-export abstract class AccountCommand extends Command {
+export class AccountCommandGroup extends SubCommandGroup {
     protected meSubCommand: SubCommand;
     protected nameSubCommand: SubCommand;
     protected mentionSubCommand: SubCommand;
 
     constructor(
-        name: string,
+        private name: string,
         description: string,
         subCommands: Record<
             'me' | 'name' | 'mention',
@@ -34,7 +34,12 @@ export abstract class AccountCommand extends Command {
                 description: string;
                 localizedDescription: Record<Locale.Czech, string>;
             }
-        >
+        >,
+        private handleCommand: (
+            interaction: RepliableInteraction<CacheType>,
+            summonerId: string,
+            region: Region
+        ) => Promise<void>
     ) {
         super(name, description);
 
@@ -78,8 +83,6 @@ export abstract class AccountCommand extends Command {
         }
 
         subCommandList.forEach((subCommand) => super.addSubCommand(subCommand));
-
-        super.on('interactionCreate', this.menuHandle);
     }
 
     public async sendAccountSelect(
@@ -96,11 +99,7 @@ export abstract class AccountCommand extends Command {
             accounts.map((account) => {
                 const builder = new StringSelectMenuOptionBuilder()
                     .setValue(
-                        this.slashCommand.name +
-                        '@@' +
-                        account.summoner_id +
-                        '@@' +
-                        account.region
+                        this.name + '@@' + account.summoner_id + '@@' + account.region
                     )
                     .setLabel(
                         `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`
@@ -242,7 +241,7 @@ export abstract class AccountCommand extends Command {
             return;
         }
 
-        this.onMenuSelect(
+        this.handleCommand(
             interaction,
             accounts[0].summoner_id,
             accounts[0].region as Region
@@ -253,14 +252,8 @@ export abstract class AccountCommand extends Command {
         if (!interaction.isStringSelectMenu()) return;
 
         const [commandSource, summonerId, region] = interaction.values[0].split('@@');
-        if (commandSource !== this.slashCommand.name) return;
+        if (commandSource !== this.name) return;
 
-        this.onMenuSelect(interaction, summonerId, region as Region);
+        this.handleCommand(interaction, summonerId, region as Region);
     }
-
-    abstract onMenuSelect(
-        interaction: RepliableInteraction<CacheType>,
-        summonerId: string,
-        region: Region
-    ): Promise<void>;
 }
