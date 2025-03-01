@@ -242,11 +242,7 @@ export abstract class AccountCommand extends Command {
             return;
         }
 
-        this.onMenuSelect(
-            interaction,
-            accounts[0].summoner_id,
-            accounts[0].region as Region
-        );
+        this.onMenuSelect(interaction, accounts[0], accounts[0].region as Region);
     }
 
     async menuHandle(interaction: Interaction<CacheType>) {
@@ -255,12 +251,23 @@ export abstract class AccountCommand extends Command {
         const [commandSource, summonerId, region] = interaction.values[0].split('@@');
         if (commandSource !== this.slashCommand.name) return;
 
-        this.onMenuSelect(interaction, summonerId, region as Region);
+        const account = await conn
+            .selectFrom('account')
+            .selectAll()
+            .where('summoner_id', '=', summonerId)
+            .executeTakeFirst();
+        if (!account) return;
+
+        this.onMenuSelect(interaction, account, region as Region);
     }
 
+    /**
+     * When using user parameter as User in DB, don't use id, because it will be 0, when command is
+     * used on gameName + tagLine.
+     */
     abstract onMenuSelect(
         interaction: RepliableInteraction<CacheType>,
-        summonerId: string,
+        user: Selectable<Account>,
         region: Region
     ): Promise<void>;
 }
