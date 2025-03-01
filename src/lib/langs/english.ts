@@ -2,7 +2,8 @@ import { z } from 'zod';
 import template from './_template';
 import { MatchStatus } from '../Riot/utilities';
 import { mapRegions } from '../Riot/types';
-import { capitalize } from '../utilities';
+
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 type ClashMapInflection<$Keys extends readonly string[]> = {
     [K in $Keys[number]]: string;

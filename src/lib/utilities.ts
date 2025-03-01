@@ -61,5 +61,3 @@ export const fromEntries = <$Key extends string | symbol | number, $Value>(
 ) => {
     return Object.fromEntries(array) as Record<$Key, $Value>;
 };
-
-export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
