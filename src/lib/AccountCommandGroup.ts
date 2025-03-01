@@ -35,9 +35,16 @@ export class AccountCommandGroup extends SubCommandGroup {
                 localizedDescription: Record<Locale.Czech, string>;
             }
         >,
+
+        /**
+         * When using user parameter as User in DB, don't use id, because it will be 0, when command is
+         * used on gameName + tagLine.
+         * Also discord_id in that case will be discord_id of user which used the command.
+         */
         private handleCommand: (
             interaction: RepliableInteraction<CacheType>,
-            summonerId: string,
+
+            user: Selectable<Account>,
             region: Region
         ) => Promise<void>
     ) {
@@ -241,11 +248,7 @@ export class AccountCommandGroup extends SubCommandGroup {
             return;
         }
 
-        this.handleCommand(
-            interaction,
-            accounts[0].summoner_id,
-            accounts[0].region as Region
-        );
+        this.handleCommand(interaction, accounts[0], accounts[0].region as Region);
     }
 
     async menuHandle(interaction: Interaction<CacheType>) {
@@ -254,6 +257,13 @@ export class AccountCommandGroup extends SubCommandGroup {
         const [commandSource, summonerId, region] = interaction.values[0].split('@@');
         if (commandSource !== this.name) return;
 
-        this.handleCommand(interaction, summonerId, region as Region);
+        const account = await conn
+            .selectFrom('account')
+            .selectAll()
+            .where('summoner_id', '=', summonerId)
+            .executeTakeFirst();
+        if (!account) return;
+
+        this.handleCommand(interaction, account, region as Region);
     }
 }

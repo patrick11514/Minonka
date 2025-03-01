@@ -264,6 +264,7 @@ export abstract class AccountCommand extends Command {
     /**
      * When using user parameter as User in DB, don't use id, because it will be 0, when command is
      * used on gameName + tagLine.
+     * Also discord_id in that case will be discord_id of user which used the command.
      */
     abstract onMenuSelect(
         interaction: RepliableInteraction<CacheType>,
