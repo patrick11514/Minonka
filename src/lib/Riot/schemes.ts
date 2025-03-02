@@ -91,7 +91,8 @@ const ParticipantSchema = z.object({
         .or(z.literal('JUNGLE'))
         .or(z.literal('MIDDLE'))
         .or(z.literal('BOTTOM'))
-        .or(z.literal('UTILITY')),
+        .or(z.literal('UTILITY'))
+        .or(z.literal('Invalid')),
     //item
     ...fromEntries<NumberSuffix<'item', 0 | 1 | 2 | 3 | 4 | 5 | 6>, z.ZodNumber>(
         //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -146,7 +147,8 @@ const ParticipantSchema = z.object({
         .or(z.literal('JUNGLE'))
         .or(z.literal('MIDDLE'))
         .or(z.literal('BOTTOM'))
-        .or(z.literal('UTILITY')),
+        .or(z.literal('UTILITY'))
+        .or(z.literal('')),
     totalDamageDealt: z.number(),
     totalMinionsKilled: z.number(),
     visionScore: z.number(),
