@@ -90,6 +90,16 @@ export default template.parse({
         cup: 'cup',
         registration: 'Registration',
         start: 'Start',
+        successMessage: "Here's the team id: `%1`",
+        ranks: {
+            TOP: 'Top',
+            JUNGLE: 'Jungle',
+            MIDDLE: 'Mid',
+            BOTTOM: 'ADC',
+            UTILITY: 'Support',
+            FILL: 'Fill',
+            UNSELECTED: 'Unselected'
+        },
         mapInflection: Object.fromEntries(
             mapRegions.map((region) => [region, `${capitalize(region)} %1`])
         ) as ClashMapInflection<typeof mapRegions>
@@ -177,5 +187,6 @@ export default template.parse({
         shurima: 'Shurima',
         targon: 'Targon',
         zaun: 'Zaun'
-    }
+    },
+    unranked: 'Unranked'
 } satisfies z.infer<typeof template>);

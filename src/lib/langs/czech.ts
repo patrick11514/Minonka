@@ -83,6 +83,16 @@ export default template.parse({
         cup: 'pohár',
         registration: 'Registrace',
         start: 'Začátek',
+        successMessage: 'Zde je id týmu: `%1`',
+        ranks: {
+            TOP: 'Horní',
+            JUNGLE: 'Džungle',
+            MIDDLE: 'Středová',
+            BOTTOM: 'Spodní',
+            UTILITY: 'Podpora',
+            FILL: 'Výplň',
+            UNSELECTED: 'Nevybráno'
+        },
         mapInflection: {
             demacia: 'Demácijský %1',
             bilgewater: 'Bilgewaterský %1',
@@ -179,5 +189,6 @@ export default template.parse({
         zaun: 'Zaun',
         bilgewater: 'Bilgewater',
         shadowIsles: 'Stínové ostrovy'
-    }
+    },
+    unranked: 'Nehodnocený'
 } satisfies z.infer<typeof template>);

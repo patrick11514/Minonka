@@ -1,5 +1,13 @@
 import { z } from 'zod';
-import { mapRegions, QueueId, queues, regions, tier } from '../Riot/types';
+import {
+    mapRegions,
+    Position,
+    positions,
+    QueueId,
+    queues,
+    regions,
+    tier
+} from '../Riot/types';
 import { MatchStatus } from '../Riot/utilities';
 
 const _ = z.string();
@@ -79,6 +87,13 @@ export default z.object({
         cup: _,
         registration: _,
         start: _,
+        successMessage: _,
+        ranks: z.object(
+            Object.fromEntries(positions.map((position) => [position, _])) as Record<
+                Position,
+                typeof _
+            >
+        ),
         mapInflection: z.object(
             Object.fromEntries(mapRegions.map((region) => [region, _])) as Record<
                 (typeof mapRegions)[number],
@@ -103,5 +118,6 @@ export default z.object({
             (typeof mapRegions)[number],
             typeof _
         >
-    )
+    ),
+    unranked: _
 });
