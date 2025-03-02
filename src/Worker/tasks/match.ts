@@ -28,7 +28,7 @@ export type MatchData = {
 } & z.infer<typeof MatchSchema>;
 
 export default async (data: MatchData) => {
-    const imageName = `${data.metadata.matchId}_${data.mySummonerId}.png`;
+    const imageName = `${data.metadata.matchId}_${data.mySummonerId}_${data.locale}.png`;
 
     if (persistantExists(imageName)) {
         return getPersistant(imageName);
