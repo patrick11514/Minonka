@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { fromEntries } from '../utilities';
-import { QueueId, queues } from './types';
+import { Position, positions, QueueId, queues } from './types';
 
 export const AccountSchema = z.object({
     puuid: z.string(),
@@ -216,4 +216,11 @@ export const MatchSchema = z.object({
             })
         )
     })
+});
+
+export const ClashMemberSchema = z.object({
+    summonerId: z.string(),
+    puuid: z.string(),
+    position: z.string().refine((v): v is Position => positions.includes(v as Position)),
+    role: z.literal('CAPTAIN').or(z.literal('MEMBER'))
 });

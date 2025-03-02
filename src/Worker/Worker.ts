@@ -75,6 +75,10 @@ const setupWebSocket = () => {
         } catch (e) {
             sendJobBack(jobId, e as Error, startDate);
             l.stopError('Job ' + job + ' with id ' + jobId + ' failed');
+            if (process.env.NODE_ENV === 'development') {
+                //eslint-disable-next-line no-console
+                console.error(e);
+            }
         }
     });
 

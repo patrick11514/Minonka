@@ -29,6 +29,10 @@ export const setupRiotOptions = (instance: Command | SubCommand) => {
         },
         required: true
     });
+    addRegionOption(instance);
+};
+
+export const addRegionOption = (instance: Command | SubCommand) => {
     instance.addOption({
         type: 'STRING',
         name: 'region',

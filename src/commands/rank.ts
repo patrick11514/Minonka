@@ -4,6 +4,7 @@ import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { Region } from '$/lib/Riot/types';
+import { Account } from '$/types/database';
 import { RankData } from '$/Worker/tasks/rank';
 import {
     CacheType,
@@ -12,6 +13,7 @@ import {
     MessageFlags,
     RepliableInteraction
 } from 'discord.js';
+import { Selectable } from 'kysely';
 import fs from 'node:fs';
 
 const l = new Logger('Rank', 'yellow');
@@ -47,12 +49,12 @@ export default class Rank extends AccountCommand {
 
     async onMenuSelect(
         interaction: RepliableInteraction<CacheType>,
-        summonerId: string,
+        DBaccount: Selectable<Account>,
         region: Region
     ) {
         const lang = getLocale(interaction.locale);
 
-        const league = await api[region].league.bySummonerId(summonerId);
+        const league = await api[region].league.bySummonerId(DBaccount.summoner_id);
         if (!league.status) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
@@ -61,7 +63,7 @@ export default class Rank extends AccountCommand {
             return;
         }
 
-        const summoner = await api[region].summoner.bySummonerId(summonerId);
+        const summoner = await api[region].summoner.bySummonerId(DBaccount.summoner_id);
         if (!summoner.status) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
@@ -80,7 +82,7 @@ export default class Rank extends AccountCommand {
         }
 
         const data = {
-            summonerId,
+            summonerId: DBaccount.summoner_id,
             region,
             gameName: account.data.gameName,
             tagLine: account.data.tagLine,

@@ -13,6 +13,8 @@ import { AccountCommand } from '$/lib/AccountCommand';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { SummonerData } from '$/Worker/tasks/summoner';
 import fs from 'node:fs';
+import { Selectable } from 'kysely';
+import { Account } from '$/types/database';
 
 const l = new Logger('Summoner', 'green');
 
@@ -47,12 +49,12 @@ export default class Summoner extends AccountCommand {
 
     async onMenuSelect(
         interaction: RepliableInteraction<CacheType>,
-        summonerId: string,
+        DBaccount: Selectable<Account>,
         region: Region
     ) {
         const lang = getLocale(interaction.locale);
 
-        const summoner = await api[region].summoner.bySummonerId(summonerId);
+        const summoner = await api[region].summoner.bySummonerId(DBaccount.summoner_id);
         if (!summoner.status) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,

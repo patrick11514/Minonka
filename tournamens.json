@@ -1,0 +1,16 @@
+[
+    {
+        "id": 28681,
+        "themeId": 10,
+        "nameKey": "noxus",
+        "nameKeySecondary": "day_1",
+        "schedule": [
+            {
+                "id": 28761,
+                "registrationTime": 1740930350274,
+                "startTime": 1740945650274,
+                "cancelled": false
+            }
+        ]
+    }
+]

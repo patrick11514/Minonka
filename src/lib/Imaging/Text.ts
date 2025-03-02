@@ -1,3 +1,4 @@
+import sharp from 'sharp';
 import { Composite } from './Composite';
 import { Position, Size } from './types';
 
@@ -10,7 +11,8 @@ export class Text extends Composite {
         private color: string,
         private alignment: 'start' | 'middle' | 'end' = 'start',
         private weight: 'bold' | 'normal' = 'bold',
-        private outline: boolean | string = false
+        private outline: boolean | string = false,
+        private padding: number = 10
     ) {
         super(position);
     }
@@ -19,14 +21,39 @@ export class Text extends Composite {
         return this.size;
     }
 
+    async getTextSize(): Promise<Size> {
+        const svg = `<svg>
+                    <style>
+                        .outline {
+                            paint-order: stroke;
+                            stroke: ${this.outline === true ? 'black' : this.outline};
+                            stroke-width: 6px;
+                            stroke-linecap: butt;
+                            stroke-linejoin: miter;
+                        }
+                    </style>
+                    <text class="${this.outline ? 'outline' : ''}" font-size="${this.fontSize}" fill="${this.color}"
+                        font-family="Beaufort for LOL Ja" dominant-baseline="${this.alignment}" text-anchor="${this.alignment}" font-weight="${this.weight}">
+                        ${this.text}
+                    </text>
+                </svg>`;
+
+        const size = await sharp(Buffer.from(svg)).metadata();
+
+        return {
+            width: size.width ?? 0,
+            height: size.height ?? 0
+        };
+    }
+
     async render() {
         let xPosition;
         if (this.alignment === 'middle') {
             xPosition = this.size.width / 2;
         } else if (this.alignment === 'end') {
-            xPosition = this.size.width - 10;
+            xPosition = this.size.width - this.padding;
         } else {
-            xPosition = 10;
+            xPosition = this.padding;
         }
 
         return Buffer.from(`<svg width="${this.size.width}" height="${this.size.height}">
