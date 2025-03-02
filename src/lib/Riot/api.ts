@@ -2,7 +2,13 @@ import { z } from 'zod';
 import { ApiSet } from './apiSet';
 import { Region, regions } from './types';
 import RiotAPI from './riotApi';
-import { AccountSchema, ChallengeSchema, MatchSchema, SummonerSchema } from './schemes';
+import {
+    AccountSchema,
+    ChallengeSchema,
+    ClashMemberSchema,
+    MatchSchema,
+    SummonerSchema
+} from './schemes';
 
 const BASE_ROUTING_URL = 'https://EUROPE.api.riotgames.com';
 const getBaseURL = (region: Region) => {
@@ -116,6 +122,29 @@ const RiotAPIStructure = {
                     )
                 })
             )
+        }),
+        players: (puuid: string) => ({
+            regional: true,
+            endOfUrl: `/players/by-puuid/${puuid}`,
+            schema: z.array(
+                ClashMemberSchema.extend({
+                    teamId: z.string().uuid()
+                })
+            )
+        }),
+        team: (teamId: string) => ({
+            regional: true,
+            endOfUrl: `/teams/${teamId}`,
+            schema: z.object({
+                id: z.string().uuid(),
+                tournamentId: z.number(),
+                name: z.string(),
+                abbreviation: z.string(),
+                iconId: z.number(),
+                tier: z.number(),
+                captain: z.string(),
+                players: z.array(ClashMemberSchema)
+            })
         })
     })
 };

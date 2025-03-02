@@ -423,3 +423,14 @@ export const mapRegions = [
     'piltover',
     'shadowIsles'
 ] as const;
+
+export const positions = [
+    'TOP',
+    'JUNGLE',
+    'MIDDLE',
+    'BOTTOM',
+    'UTILITY',
+    'FILL',
+    'UNSELECTED'
+] as const;
+export type Position = (typeof positions)[number];
