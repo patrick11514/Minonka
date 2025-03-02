@@ -222,6 +222,12 @@ export const queues = [
         notes: null
     },
     {
+        queueId: 740,
+        map: "Summoner's Rift",
+        description: "ARURF Clash games",
+        notes: null
+    },
+    {
         queueId: 870,
         map: "Summoner's Rift",
         description: 'Co-op vs. AI Intro Bot games',
