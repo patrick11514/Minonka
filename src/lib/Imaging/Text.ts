@@ -11,7 +11,8 @@ export class Text extends Composite {
         private color: string,
         private alignment: 'start' | 'middle' | 'end' = 'start',
         private weight: 'bold' | 'normal' = 'bold',
-        private outline: boolean | string = false
+        private outline: boolean | string = false,
+        private padding: number = 10
     ) {
         super(position);
     }
@@ -50,9 +51,9 @@ export class Text extends Composite {
         if (this.alignment === 'middle') {
             xPosition = this.size.width / 2;
         } else if (this.alignment === 'end') {
-            xPosition = this.size.width - 10;
+            xPosition = this.size.width - this.padding;
         } else {
-            xPosition = 10;
+            xPosition = this.padding;
         }
 
         return Buffer.from(`<svg width="${this.size.width}" height="${this.size.height}">
