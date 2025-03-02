@@ -6,6 +6,7 @@ import Logger from './logger';
 import { EventEmitter } from './EventEmitter';
 import { RankData } from '$/Worker/tasks/rank';
 import { MatchData } from '$/Worker/tasks/match';
+import { TeamData } from '$/Worker/tasks/team';
 
 enum WorkerState {
     FREE,
@@ -24,6 +25,7 @@ type Jobs = {
     summoner: SummonerData;
     rank: RankData;
     match: MatchData;
+    team: TeamData;
 };
 
 const l = new Logger('WorkerServer', 'magenta');

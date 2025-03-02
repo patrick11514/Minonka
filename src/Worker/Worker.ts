@@ -75,6 +75,7 @@ const setupWebSocket = () => {
         } catch (e) {
             sendJobBack(jobId, e as Error, startDate);
             l.stopError('Job ' + job + ' with id ' + jobId + ' failed');
+            console.error(e);
         }
     });
 
