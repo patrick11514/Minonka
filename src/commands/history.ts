@@ -142,14 +142,13 @@ export default class History extends AccountCommand {
         lang: ReturnType<typeof getLocale>,
         userId: string,
         summonerId: string,
-        puuid: string,
         region: Region,
         queue: string | null,
         count: number,
         offset: number
     ) {
-        //history;discordid;summonerid;puuid;region;queue;count;offset
-        const baseId = `history;${userId};${summonerId};${puuid};${region};${queue || ''};${count};${offset}`;
+        //history;discordid;summonerid;region;queue;count;offset
+        const baseId = `history;${userId};${summonerId};${region};${queue || ''};${count};${offset}`;
         return new ActionRowBuilder<ButtonBuilder>().addComponents([
             new ButtonBuilder()
                 .setCustomId(`${baseId};prev`)
@@ -206,7 +205,6 @@ export default class History extends AccountCommand {
             lang,
             interaction.user.id,
             account.summoner_id,
-            account.puuid,
             region,
             queue,
             count,
@@ -277,12 +275,11 @@ export default class History extends AccountCommand {
             return;
         }
         const summonerId = id[2];
-        const puuid = id[3];
-        const region = id[4] as Region;
-        const queue = id[5] || null;
-        const count = parseInt(id[6]);
-        let offset = parseInt(id[7]);
-        const command = id[8];
+        const region = id[3] as Region;
+        const queue = id[4] || null;
+        const count = parseInt(id[5]);
+        let offset = parseInt(id[6]);
+        const command = id[7];
 
         switch (command) {
             case 'prev':
@@ -292,11 +289,15 @@ export default class History extends AccountCommand {
                 offset += count;
                 break;
         }
+
+        const account = await api[region].summoner.bySummonerId(summonerId);
+        if (!account.status) return;
+
         const response = await this.getFiles(
             interaction.locale,
             region,
             summonerId,
-            puuid,
+            account.data.puuid,
             queue,
             count,
             offset
@@ -313,7 +314,6 @@ export default class History extends AccountCommand {
             lang,
             discordId,
             summonerId,
-            puuid,
             region,
             queue,
             count,
