@@ -133,7 +133,7 @@ export default class Clash extends Command {
                 const registration = Math.floor(activity.registrationTime / 1000);
                 const start = Math.floor(activity.startTime / 1000);
 
-                return `## ${name} - ${lang.clash.day} ${tournament.nameKeySecondary.split('_')[1]}
+                return `## ${activity.cancelled ? '~~' : ''}${name} - ${lang.clash.day} ${tournament.nameKeySecondary.split('_')[1]} ${activity.cancelled ? `~~ (${lang.clash.canceled})` : ''}
 **🆔 Id:** ${tournament.id}
 **📅 ${lang.clash.registration}:** <t:${registration}:F> (<t:${registration}:R>)
 **🏆 ${lang.clash.start}:** <t:${start}:F> (<t:${start}:R>)`;

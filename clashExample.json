@@ -1,0 +1,29 @@
+{
+    "id": "10d95a0c-18ba-45ea-93b1-bf21a7037e3f",
+    "tournamentId": 28661,
+    "name": "GDE HEXTECH CHESTKY",
+    "iconId": 4,
+    "tier": 2,
+    "captain": "jwAUVCrZNEBsk8n0IMAJLdIk2hiigBK6oyuA68a25EPLxJs",
+    "abbreviation": "GHC",
+    "players": [
+        {
+            "summonerId": "apes-FPc1eim3Zj_5YjU6MxoAf3rOILns3sBevyVmAmvsX8",
+            "puuid": "MQ_nvh7VvoOaLx8Cw9hOqp33IeZg73fwLsD6Bl3M6z9ZGe5lnroGisVubzEYDIP-dmJoIRI3eMK_sw",
+            "position": "BOTTOM",
+            "role": "MEMBER"
+        },
+        {
+            "summonerId": "N-JqhTGGAiqVT0sTUmE-hFzONe3O8qACPVOHxfbILnvzz70",
+            "puuid": "UCPRVVCOW29SducUaGXDqN1WYNBTgwYXiJAKNrRY7CgE1ZGOK7njye2RGeerAoOtRuXB76xD5XS97Q",
+            "position": "FILL",
+            "role": "MEMBER"
+        },
+        {
+            "summonerId": "jwAUVCrZNEBsk8n0IMAJLdIk2hiigBK6oyuA68a25EPLxJs",
+            "puuid": "qVMjop4aosgqXgK2B9hwCa5wRBeB1nnmWxvSN4qaHVrYWSZMWyEyxghWmieNny83HJrOUroXQowTug",
+            "position": "MIDDLE",
+            "role": "CAPTAIN"
+        }
+    ]
+}
