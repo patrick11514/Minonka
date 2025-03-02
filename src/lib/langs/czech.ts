@@ -147,6 +147,7 @@ export default template.parse({
         610: 'Dark Star: Singularity',
         700: 'Clash',
         720: 'Aram Clash',
+        740: 'ARURF Clash',
         870: 'Coop vs AI Intro',
         880: 'Coop vs AI Beginner',
         890: 'Coop vs AI Intermediate',
