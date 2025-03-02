@@ -91,7 +91,7 @@ export default template.parse({
         registration: 'Registration',
         start: 'Start',
         successMessage: "Here's the team id: `%1`",
-        ranks: {
+        positions: {
             TOP: 'Top',
             JUNGLE: 'Jungle',
             MIDDLE: 'Mid',

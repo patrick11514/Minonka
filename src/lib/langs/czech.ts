@@ -84,7 +84,7 @@ export default template.parse({
         registration: 'Registrace',
         start: 'Začátek',
         successMessage: 'Zde je id týmu: `%1`',
-        ranks: {
+        positions: {
             TOP: 'Horní',
             JUNGLE: 'Džungle',
             MIDDLE: 'Středová',
