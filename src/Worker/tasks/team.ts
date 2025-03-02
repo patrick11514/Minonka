@@ -218,16 +218,17 @@ export default async (data: TeamData) => {
     const beginY = 200;
 
     const nonCaptainPlayers = data.players.filter((p) => p.role === 'MEMBER');
+    const maxHeight = backgroundSize.height - beginY - /*padding from bottom*/ 100;
 
     for (let i = 0; i < nonCaptainPlayers.length; ++i) {
         const blank = new Blank(
             {
                 x: Math.floor(((i % 2) * backgroundSize.width) / 2),
-                y: Math.floor(beginY + ((i > 1 ? 1 : 0) * backgroundSize.height) / 2)
+                y: Math.floor(beginY + ((i > 1 ? 1 : 0) * maxHeight) / 2)
             },
             {
                 width: Math.floor(backgroundSize.width / 2),
-                height: Math.floor((backgroundSize.height - beginY) / 2)
+                height: Math.floor(maxHeight / 2)
             }
         );
         await renderPlayer(blank, nonCaptainPlayers[i], { x: 'center', y: 40 });
