@@ -97,10 +97,10 @@ export abstract class AccountCommand extends Command {
                 const builder = new StringSelectMenuOptionBuilder()
                     .setValue(
                         this.slashCommand.name +
-                        '@@' +
-                        account.summoner_id +
-                        '@@' +
-                        account.region
+                            '@@' +
+                            account.summoner_id +
+                            '@@' +
+                            account.region
                     )
                     .setLabel(
                         `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`

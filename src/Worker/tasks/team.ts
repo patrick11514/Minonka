@@ -1,14 +1,13 @@
 import { AssetType, getAsset } from '$/lib/Assets';
 import { Background } from '$/lib/Imaging/Background';
 import { Text } from '$/lib/Imaging/Text';
-import { _Rank, _Tier, Rank } from '$/lib/Riot/types';
+import { _Rank, _Tier } from '$/lib/Riot/types';
 import { save } from '../utilities';
 import { Color, Position } from '$/lib/Imaging/types';
 import { Image } from '$/lib/Imaging/Image';
 import { Blank } from '$/lib/Imaging/Blank';
 import { Locale } from 'discord.js';
 import { getLocale } from '$/lib/langs';
-import { Composite } from '$/lib/Imaging/Composite';
 
 export type TeamData = {
     abbreviation: string;
