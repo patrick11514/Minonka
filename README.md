@@ -7,6 +7,7 @@ It is written in discord.js and uses [Riot API](https://developer.riotgames.com/
 
 - [Features](#features)
 - [Installation](#installation)
+- [Env file](#env)
 
 ## Features
 
@@ -93,4 +94,42 @@ Run bot
 ```bash
 npm start  # npm
 pnpm start # pnpm
+```
+
+Because generating images is quite heavy operation, for single process NodeApp, the images are distributed across `Workers`. Worker can be run using:
+
+```bash
+npm run start:worker # npm
+pnpm start:worker    # pnpm
+```
+
+The bot logs all info into logs folder, the worker logs can be separated by setting `INSTANCE_ID` environment variable, so it's better to run worker with their specific id, eg.:
+
+```bash
+INSTANCE_ID=1 npm run start:worker # npm
+INSTANCE_ID=1 pnpm start:worker    # pnpm
+```
+
+## Env
+
+```env
+#database connection
+DATABASE_IP=10.10.10.223
+DATABASE_PORT=3306
+DATABASE_USER=superclovek
+DATABASE_PASSWORD=tajnyheslo123456
+DATABASE_NAME=db
+#database url don't need to be filled, because its used only using genDatabaseSchema script while developing
+DATABASE_URL=mysql://superclovek:tajnyheslo123456@10.10.10.223:3306/db
+#riotgames
+RIOT_API_KEY=RGAPI-123
+#discordjs
+CLIENT_ID=651515615616511645156
+CLIENT_TOKEN=4561651651516556156165
+#WORKER config
+#this is websocket, via which the worker communicates with main process
+WEBSOCKET_PORT=8080
+WEBSOCKET_HOST=localhost
+CACHE_PATH=/tmp # this is the cache path, it is ment to be temporarily, so you can use /tmp if mounted in memory, or for example /dev/shm instead
+PERSISTANT_CACHE_PATH=cache # this is persistant cache path, it is ment to be used for storing images, which will be used multiple times, eg. match history images, because its unlike, that data from past match will be modified
 ```
