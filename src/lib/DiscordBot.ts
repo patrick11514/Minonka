@@ -81,8 +81,10 @@ export class DiscordBot extends EventEmitter<Events> {
         });
 
         for (const instance of instances) {
-            for (const [event, callback] of Object.entries(instance.events)) {
-                this.client.on(event, callback.bind(instance));
+            for (const [event, callbacks] of Object.entries(instance.events)) {
+                for (const callback of callbacks) {
+                    this.client.on(event, callback.bind(instance));
+                }
             }
         }
 

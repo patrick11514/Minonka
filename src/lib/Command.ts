@@ -11,7 +11,7 @@ import { SubCommandGroup } from './SubCommandGroup';
 export abstract class Command {
     slashCommand: SlashCommandBuilder;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    events: Record<string, (...args: any[]) => void> = {};
+    events: Record<string, ((...args: any[]) => void)[]> = {};
 
     constructor(name: string, description: string) {
         this.slashCommand = new SlashCommandBuilder()
@@ -40,7 +40,8 @@ export abstract class Command {
         event: $Event,
         listener: (...args: ClientEvents[$Event]) => void
     ) {
-        this.events[event] = listener;
+        if (!this.events[event]) this.events[event] = [];
+        this.events[event].push(listener);
     }
 
     abstract handler(interaction: ChatInputCommandInteraction): Promise<void>;
