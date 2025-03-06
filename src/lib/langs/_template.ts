@@ -89,6 +89,7 @@ export default z.object({
         start: _,
         successMessage: _,
         canceled: _,
+        noTeam: _,
         positions: z.object(
             Object.fromEntries(positions.map((position) => [position, _])) as Record<
                 Position,

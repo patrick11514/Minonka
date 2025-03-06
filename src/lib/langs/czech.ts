@@ -85,6 +85,7 @@ export default template.parse({
         start: 'Začátek',
         successMessage: 'Zde je id týmu: `%1`',
         canceled: 'Zrušený',
+        noTeam: 'Tento hráč není v žádném týmu',
         positions: {
             TOP: 'Horní',
             JUNGLE: 'Džungle',

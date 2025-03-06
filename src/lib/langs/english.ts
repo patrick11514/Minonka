@@ -92,6 +92,7 @@ export default template.parse({
         start: 'Start',
         successMessage: "Here's the team id: `%1`",
         canceled: 'Canceled',
+        noTeam: "This player isn't in any team",
         positions: {
             TOP: 'Top',
             JUNGLE: 'Jungle',

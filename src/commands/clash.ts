@@ -157,6 +157,14 @@ export default class Clash extends Command {
             return;
         }
 
+        if (team.data.length === 0) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: getLocale(interaction.locale).clash.noTeam
+            });
+            return;
+        }
+
         this.handleTeam(interaction, team.data[0].teamId, region);
     }
 
