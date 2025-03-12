@@ -30,7 +30,7 @@ type Jobs = {
 
 const l = new Logger('WorkerServer', 'magenta');
 
-const TIMEOUT = 20 * 1000; // 20s
+const TIMEOUT = 40 * 1000; // 40s
 
 type JobResult = {
     data: unknown;
