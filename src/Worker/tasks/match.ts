@@ -10,7 +10,14 @@ import { RegularMatchSchema } from '$/lib/Riot/schemes';
 import { Region } from '$/lib/Riot/types';
 import { Locale } from 'discord.js';
 import { z } from 'zod';
-import { getPersistant, persistantExists, savePersistant, toMMSS } from '../utilities';
+import {
+    getPersistant,
+    persistantExists,
+    putItems,
+    putSumms,
+    savePersistant,
+    toMMSS
+} from '../utilities';
 import { Blank } from '$/lib/Imaging/Blank';
 import { Text } from '$/lib/Imaging/Text';
 import { getLocale } from '$/lib/langs';
@@ -115,8 +122,8 @@ export default async (data: MatchData) => {
         matchStatus === MatchStatus.Win
             ? Color.GREEN
             : matchStatus === MatchStatus.Loss
-              ? Color.RED
-              : Color.GRAY,
+                ? Color.RED
+                : Color.GRAY,
         'middle'
     );
     const VictorySize = await VictoryLoss.getSize();
@@ -266,7 +273,7 @@ export default async (data: MatchData) => {
     const playerHeight = 110;
     const space = Math.floor(
         (teamHeight - DateHeight - (playerCount / 2) * playerHeight) /
-            (playerCount / 2 - 1)
+        (playerCount / 2 - 1)
     );
 
     const riotLocale = getRiotLanguageFromDiscordLocale(data.locale);
@@ -452,38 +459,18 @@ export default async (data: MatchData) => {
         RuneSumms.addElement(secondary);
 
         //Summs
-        [player.summoner1Id, player.summoner2Id].forEach(async (summKey, idx) => {
-            const summoner = Object.values(summoners.data).find(
-                (summ) => summ.key === summKey
-            )!;
-            const summ = new Image(
-                (await getAsset(AssetType.DDRAGON_SPELL, summoner.image.full))!,
-                {
-                    x: playerHeight / 2 + imageSpacing,
-                    y: idx * (playerHeight / 2 + imageSpacing)
-                }
-            );
-            await summ.resize({
-                width: Math.floor(playerHeight / 2) - imageSpacing
-            });
-            RuneSumms.addElement(summ);
-        });
+        putSumms(player, summoners, playerHeight, imageSpacing, RuneSumms);
 
         //items
-        const items = new Blank(
-            {
-                x: begin,
-                y: 0
-            },
-            {
-                width: imageWidth * 7 + imageSpacing * 6,
-                height: imageWidth
-            }
+        putItems(
+            player,
+            begin,
+            imageWidth,
+            imageSpacing,
+            playerBlank,
+            teamIdx > 0,
+            itemBackground
         );
-        playerBlank.addElement(items);
-        if (teamIdx > 0) {
-            items.setReverse();
-        }
 
         //stats
         const stats = new Blank(
@@ -503,58 +490,6 @@ export default async (data: MatchData) => {
             stats.setReverse();
         }
 
-        //items
-        for (let i = 0 as 0 | 1 | 2 | 3 | 4 | 5 | 6; i < 7; ++i) {
-            const item = player[`item${i}`];
-            const background = new Image(itemBackground, {
-                x: i * (imageWidth + imageSpacing),
-                y: 0
-            });
-            await background.resize({
-                width: imageWidth,
-                height: imageWidth
-            });
-            items.addElement(background);
-
-            if (item === 0) continue;
-            const imageBorder = 4;
-
-            const itemImage = new Image(
-                (await getAsset(AssetType.DDRAGON_ITEM, item + '.png'))!,
-                {
-                    x: i * (imageWidth + imageSpacing) + imageBorder,
-                    y: imageBorder
-                }
-            );
-            await itemImage.resize({
-                width: imageWidth - imageBorder * 2,
-                height: imageWidth - imageBorder * 2
-            });
-            items.addElement(itemImage);
-
-            //add vision score
-            if (i === 6) {
-                const vision = new Text(
-                    player.visionScore.toString(),
-                    {
-                        x: i * (imageWidth + imageSpacing),
-                        y: 0
-                    },
-                    {
-                        width: imageWidth,
-                        height: imageWidth
-                    },
-                    30,
-                    Color.WHITE,
-                    'middle',
-                    'bold',
-                    true
-                );
-                items.addElement(vision);
-            }
-        }
-
-        //stats
         const statList = [
             [minion, player.totalMinionsKilled],
             [sword, player.totalDamageDealt],
