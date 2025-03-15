@@ -135,6 +135,7 @@ export const getAssetPath = async (
     if (type === AssetType.COMMUNITY_DDRAGON) {
         //we need to download file from the internet into cache folder
         const path = Path.join(env.PERSISTANT_CACHE_PATH, name);
+
         if (fs.existsSync(path)) {
             return path;
         }
@@ -301,6 +302,38 @@ export const getSummonerSpells = async (lang: RiotLanguage) => {
             )
         );
         return spells;
+    } catch (e) {
+        l.error(e);
+        return null;
+    }
+};
+
+export const getAugments = async (lang: RiotLanguage) => {
+    const schema = z.object({
+        augments: z.array(
+            z.object({
+                apiName: z.string(),
+                id: z.number(),
+                name: z.string(),
+                rarity: z.number(),
+                iconLarge: z.string(),
+                iconSmall: z.string(),
+                desc: z.string()
+            })
+        )
+    });
+
+    try {
+        const augments = schema.parse(
+            JSON.parse(
+                (await getAsset(
+                    AssetType.COMMUNITY_DDRAGON,
+                    `cdragon/arena/${lang.toLowerCase()}.json`,
+                    lang
+                ))!.toString()
+            )
+        );
+        return augments;
     } catch (e) {
         l.error(e);
         return null;
