@@ -220,7 +220,16 @@ export default async (data: CherryMatchData) => {
         teams[participant.playerSubteamId - 1].push(participant);
     }
 
-    teams.sort((a, b) => a[0].subteamPlacement - b[0].subteamPlacement);
+    teams.sort((a, b) => {
+        if (a.length === 0) {
+            return 1;
+        }
+        if (b.length === 0) {
+            return -1;
+        }
+
+        return a[0].subteamPlacement - b[0].subteamPlacement;
+    });
 
     const padding = 20;
     const teamBlankWidth = Math.floor((backgroundSize.width - STATSWidth) / 2 - padding);
@@ -257,6 +266,10 @@ export default async (data: CherryMatchData) => {
         const teamIdx = parseInt(_teamIdx);
         const team = teams[teamIdx];
         const blank = teamBlanks[teamIdx];
+
+        if (team.length === 0) {
+            continue;
+        }
 
         const playerHeight = Math.floor(teamHeight / 2) - playerPadding;
 

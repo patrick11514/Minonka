@@ -163,7 +163,7 @@ const cherryParticipantSchema = ParticipantSchema.extend({
     ...fromEntries<NumberSuffix<'playerAugment', 1 | 2 | 3 | 4 | 5 | 6>, z.ZodNumber>(
         Array.from({ length: 6 }).map((_, id) => [
             `playerAugment${id + 1}`,
-            z.number()
+            id > 3 ? z.number().optional() : z.number()
             //eslint-disable-next-line @typescript-eslint/no-explicit-any
         ]) as any
     )
@@ -178,7 +178,6 @@ export const RegularMatchSchema = z.object({
         participants: z.array(z.string())
     }),
     info: z.object({
-        endOfGameResult: z.string(),
         gameCreation: z.number(),
         gameDuration: z.number(),
         gameStartTimestamp: z.number(),
