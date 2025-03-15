@@ -4,6 +4,7 @@ import { Locale } from 'discord.js';
 import Logger from './logger';
 import { z } from 'zod';
 import { ChallengeTier } from './Riot/schemes';
+import { env } from '$/types/env';
 
 const l = new Logger('Assets', 'blue');
 
@@ -22,7 +23,9 @@ export enum AssetType {
     DDRAGON_CHAMPION,
     DDRAGON_IMG,
     DDRAGON_SPELL,
-    DDRAGON_ITEM
+    DDRAGON_ITEM,
+    //COMMUNITY DDRAGON,
+    COMMUNITY_DDRAGON
 }
 
 const ROOT = 'assets';
@@ -39,7 +42,8 @@ const ASSET_PATHS = {
     [AssetType.DDRAGON_CHAMPION]: '/ddragon/_ROOT_/img/champion',
     [AssetType.DDRAGON_IMG]: '/ddragon/img',
     [AssetType.DDRAGON_SPELL]: '/ddragon/_ROOT_/img/spell',
-    [AssetType.DDRAGON_ITEM]: '/ddragon/_ROOT_/img/item'
+    [AssetType.DDRAGON_ITEM]: '/ddragon/_ROOT_/img/item',
+    [AssetType.COMMUNITY_DDRAGON]: 'https://raw.communitydragon.org'
 } satisfies Record<AssetType, string>;
 
 export type RiotLanguage =
@@ -123,15 +127,47 @@ export const getRiotLanguageFromDiscordLocale = (locale: Locale): RiotLanguage =
     }
 };
 
-export const getAssetPath = (type: AssetType, name: string, language?: RiotLanguage) => {
-    return Path.join(ROOT, ASSET_PATHS[type], name).replace(
-        '%%LANGUAGE%%',
-        language ?? 'en_US'
-    );
+export const getAssetPath = async (
+    type: AssetType,
+    name: string,
+    language?: RiotLanguage
+) => {
+    if (type === AssetType.COMMUNITY_DDRAGON) {
+        //we need to download file from the internet into cache folder
+        const path = Path.join(env.PERSISTANT_CACHE_PATH, name);
+
+        if (fs.existsSync(path)) {
+            return path;
+        }
+
+        const href = new URL(`latest/${name}`, ASSET_PATHS[type]).href;
+
+        const response = await fetch(href);
+        const buffer = await response.arrayBuffer();
+
+        //create folder structure
+        const folder = Path.dirname(path);
+        if (!fs.existsSync(folder)) {
+            fs.mkdirSync(folder, { recursive: true });
+        }
+
+        fs.writeFileSync(path, Buffer.from(buffer));
+
+        return path;
+    } else {
+        return Path.join(ROOT, ASSET_PATHS[type], name).replace(
+            '%%LANGUAGE%%',
+            language ?? 'en_US'
+        );
+    }
 };
 
-export const checkAsset = (type: AssetType, name: string, language?: RiotLanguage) => {
-    const path = getAssetPath(type, name, language);
+export const checkAsset = async (
+    type: AssetType,
+    name: string,
+    language?: RiotLanguage
+) => {
+    const path = await getAssetPath(type, name, language);
 
     if (!fs.existsSync(path)) {
         return false;
@@ -140,8 +176,12 @@ export const checkAsset = (type: AssetType, name: string, language?: RiotLanguag
     return path;
 };
 
-export const getAsset = (type: AssetType, name: string, language?: RiotLanguage) => {
-    const path = getAssetPath(type, name, language);
+export const getAsset = async (
+    type: AssetType,
+    name: string,
+    language?: RiotLanguage
+) => {
+    const path = await getAssetPath(type, name, language);
 
     if (!fs.existsSync(path)) {
         return null;
@@ -150,7 +190,7 @@ export const getAsset = (type: AssetType, name: string, language?: RiotLanguage)
     return fs.readFileSync(path);
 };
 
-export const getChallenges = (lang: RiotLanguage) => {
+export const getChallenges = async (lang: RiotLanguage) => {
     const schema = z.array(
         z.object({
             id: z.number(),
@@ -179,7 +219,11 @@ export const getChallenges = (lang: RiotLanguage) => {
     try {
         const challenges = schema.parse(
             JSON.parse(
-                getAsset(AssetType.DDRAGON_DATA, 'challenges.json', lang)!.toString()
+                (await getAsset(
+                    AssetType.DDRAGON_DATA,
+                    'challenges.json',
+                    lang
+                ))!.toString()
             )
         );
         return challenges;
@@ -189,7 +233,7 @@ export const getChallenges = (lang: RiotLanguage) => {
     }
 };
 
-export const getRunesReforged = (lang: RiotLanguage) => {
+export const getRunesReforged = async (lang: RiotLanguage) => {
     const BaseRune = z.object({
         id: z.number(),
         key: z.string(),
@@ -219,7 +263,11 @@ export const getRunesReforged = (lang: RiotLanguage) => {
     try {
         const runes = schema.parse(
             JSON.parse(
-                getAsset(AssetType.DDRAGON_DATA, 'runesReforged.json', lang)!.toString()
+                (await getAsset(
+                    AssetType.DDRAGON_DATA,
+                    'runesReforged.json',
+                    lang
+                ))!.toString()
             )
         );
         return runes;
@@ -229,7 +277,7 @@ export const getRunesReforged = (lang: RiotLanguage) => {
     }
 };
 
-export const getSummonerSpells = (lang: RiotLanguage) => {
+export const getSummonerSpells = async (lang: RiotLanguage) => {
     const schema = z.object({
         type: z.literal('summoner'),
         data: z.record(
@@ -246,10 +294,46 @@ export const getSummonerSpells = (lang: RiotLanguage) => {
     try {
         const spells = schema.parse(
             JSON.parse(
-                getAsset(AssetType.DDRAGON_DATA, 'summoner.json', lang)!.toString()
+                (await getAsset(
+                    AssetType.DDRAGON_DATA,
+                    'summoner.json',
+                    lang
+                ))!.toString()
             )
         );
         return spells;
+    } catch (e) {
+        l.error(e);
+        return null;
+    }
+};
+
+export const getAugments = async (lang: RiotLanguage) => {
+    const schema = z.object({
+        augments: z.array(
+            z.object({
+                apiName: z.string(),
+                id: z.number(),
+                name: z.string(),
+                rarity: z.number(),
+                iconLarge: z.string(),
+                iconSmall: z.string(),
+                desc: z.string()
+            })
+        )
+    });
+
+    try {
+        const augments = schema.parse(
+            JSON.parse(
+                (await getAsset(
+                    AssetType.COMMUNITY_DDRAGON,
+                    `cdragon/arena/${lang.toLowerCase()}.json`,
+                    lang
+                ))!.toString()
+            )
+        );
+        return augments;
     } catch (e) {
         l.error(e);
         return null;

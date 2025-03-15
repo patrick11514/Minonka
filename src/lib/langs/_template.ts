@@ -9,6 +9,7 @@ import {
     tier
 } from '../Riot/types';
 import { MatchStatus } from '../Riot/utilities';
+import { subTeamMap } from '$/Worker/tasks/cherryMatch';
 
 const _ = z.string();
 
@@ -79,7 +80,19 @@ export default z.object({
             [MatchStatus.Loss]: _,
             [MatchStatus.Remake]: _
         }),
-        buttonInfoText: _
+        buttonInfoText: _,
+        place: _,
+        team: _,
+        subTeam: z.object({
+            poros: _,
+            minions: _,
+            scuttles: _,
+            krugs: _,
+            raptors: _,
+            sentinel: _,
+            wolves: _,
+            gromp: _
+        } satisfies Record<(typeof subTeamMap)[keyof typeof subTeamMap], typeof _>)
     }),
     clash: z.object({
         title: _,
@@ -89,6 +102,7 @@ export default z.object({
         start: _,
         successMessage: _,
         canceled: _,
+        noTeam: _,
         positions: z.object(
             Object.fromEntries(positions.map((position) => [position, _])) as Record<
                 Position,

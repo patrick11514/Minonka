@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { MatchSchema } from './schemes';
+import { CherryMatchSchema, MatchSchema } from './schemes';
 
 export enum MatchStatus {
     Win,
@@ -28,4 +28,17 @@ export const getMatchStatus = (
     }
 
     return meTeam.win ? MatchStatus.Win : MatchStatus.Loss;
+};
+
+export const getArenaSubTeamPosition = (
+    data: z.infer<typeof CherryMatchSchema>,
+    meSummonerId: string
+) => {
+    const me = data.info.participants.find((p) => p.summonerId === meSummonerId);
+
+    if (!me) {
+        throw new Error('Participant not found');
+    }
+
+    return me.subteamPlacement;
 };

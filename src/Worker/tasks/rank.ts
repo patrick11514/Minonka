@@ -28,7 +28,9 @@ const Sort = {
 export default async (data: RankData) => {
     const lang = getLocale(data.locale);
 
-    const background = new Background(getAsset(AssetType.OTHER, 'background.png')!);
+    const background = new Background(
+        (await getAsset(AssetType.OTHER, 'background.png'))!
+    );
     const backgroundSize = await background.getSize();
 
     const profilePart = new Blank(
@@ -64,7 +66,7 @@ export default async (data: RankData) => {
     profilePart.addElement(region);
 
     //LEVEL
-    const levelBackground = new Image(getAsset(AssetType.OTHER, 'level.png')!, {
+    const levelBackground = new Image((await getAsset(AssetType.OTHER, 'level.png'))!, {
         x: 'center',
         y: 100
     });
@@ -92,7 +94,7 @@ export default async (data: RankData) => {
 
     //PROFILE PICTURE
     const profile = new Image(
-        getAsset(AssetType.DDRAGON_PROFILEICON, data.profileIconId + '.png')!,
+        (await getAsset(AssetType.DDRAGON_PROFILEICON, data.profileIconId + '.png'))!,
         {
             x: 'center',
             y: 'center'
@@ -181,7 +183,7 @@ export default async (data: RankData) => {
 
         //rank icon
         const rankIcon = new Image(
-            getAsset(AssetType.RANK, 'Rank=' + deCapitalize(rank.tier) + '.png')!,
+            (await getAsset(AssetType.RANK, 'Rank=' + deCapitalize(rank.tier) + '.png'))!,
             {
                 x: 'center',
                 y: 180

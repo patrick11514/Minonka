@@ -6,11 +6,19 @@ import {
     getSummonerSpells
 } from '$/lib/Assets';
 import { Background } from '$/lib/Imaging/Background';
-import { MatchSchema } from '$/lib/Riot/schemes';
+import { RegularMatchSchema } from '$/lib/Riot/schemes';
 import { Region } from '$/lib/Riot/types';
 import { Locale } from 'discord.js';
 import { z } from 'zod';
-import { getPersistant, persistantExists, savePersistant, toMMSS } from '../utilities';
+import {
+    fixChampName,
+    getPersistant,
+    persistantExists,
+    putItems,
+    putSumms,
+    savePersistant,
+    toMMSS
+} from '../utilities';
 import { Blank } from '$/lib/Imaging/Blank';
 import { Text } from '$/lib/Imaging/Text';
 import { getLocale } from '$/lib/langs';
@@ -25,7 +33,7 @@ export type MatchData = {
     region: Region;
     locale: Locale;
     mySummonerId: string;
-} & z.infer<typeof MatchSchema>;
+} & z.infer<typeof RegularMatchSchema>;
 
 export default async (data: MatchData) => {
     const imageName = `${data.metadata.matchId}_${data.mySummonerId}_${data.locale}.png`;
@@ -36,7 +44,9 @@ export default async (data: MatchData) => {
 
     const lang = getLocale(data.locale);
 
-    const background = new Background(getAsset(AssetType.OTHER, 'background.png')!);
+    const background = new Background(
+        (await getAsset(AssetType.OTHER, 'background.png'))!
+    );
     const backgroundSize = await background.getSize();
     //MAIN LAYOUT have date at the bottom
     const DateHeight = 80;
@@ -69,8 +79,6 @@ export default async (data: MatchData) => {
         'middle'
     );
     background.addElement(date);
-
-    //@TODO MAKE LAYOUT FOR ARENAS AND ALSO CHANGE SCHEMA FOR THEM, BECAUSE MORE TEAMS, AND NO POSITIONS LIKE UTILITY, TOP....
 
     //Main layout
     // TEAM 1 | STATS | TEAM 2 (IN REVERSE)
@@ -196,30 +204,30 @@ export default async (data: MatchData) => {
                     .selectAll()
                     .where('summoner_id', '=', data.mySummonerId)
                     .executeTakeFirst();
-                if (!userData) return;
+                if (userData) {
+                    await updateLpForUser({
+                        id: userData.id,
+                        region: userData.region,
+                        summoner_id: userData.summoner_id,
+                        puuid: userData.puuid,
+                        gameName: userData.gameName,
+                        tagLine: userData.tagLine
+                    });
 
-                await updateLpForUser({
-                    id: userData.id,
-                    region: userData.region,
-                    summoner_id: userData.summoner_id,
-                    puuid: userData.puuid,
-                    gameName: userData.gameName,
-                    tagLine: userData.tagLine
-                });
-
-                //check if db includes LP for this match
-                const lp = await conn
-                    .selectFrom('match_lp')
-                    .selectAll()
-                    .where((eb) =>
-                        eb.and([
-                            eb('matchId', '=', data.metadata.matchId),
-                            eb('accountId', '=', userData.id)
-                        ])
-                    )
-                    .executeTakeFirst(); //should be there now
-                if (lp) {
-                    lpGain = lp.gain;
+                    //check if db includes LP for this match
+                    const lp = await conn
+                        .selectFrom('match_lp')
+                        .selectAll()
+                        .where((eb) =>
+                            eb.and([
+                                eb('matchId', '=', data.metadata.matchId),
+                                eb('accountId', '=', userData.id)
+                            ])
+                        )
+                        .executeTakeFirst(); //should be there now
+                    if (lp) {
+                        lpGain = lp.gain;
+                    }
                 }
             }
         }
@@ -271,13 +279,13 @@ export default async (data: MatchData) => {
 
     const riotLocale = getRiotLanguageFromDiscordLocale(data.locale);
 
-    const runesReforged = getRunesReforged(riotLocale)!;
-    const summoners = getSummonerSpells(riotLocale)!;
-    const itemBackground = getAsset(AssetType.OTHER, 'itemBackground.png')!;
+    const runesReforged = (await getRunesReforged(riotLocale))!;
+    const summoners = (await getSummonerSpells(riotLocale))!;
+    const itemBackground = (await getAsset(AssetType.OTHER, 'itemBackground.png'))!;
 
-    const minion = getAsset(AssetType.OTHER, 'minion.png')!;
-    const sword = getAsset(AssetType.OTHER, 'sword.png')!;
-    const coins = getAsset(AssetType.OTHER, 'coins.png')!;
+    const minion = (await getAsset(AssetType.OTHER, 'minion.png'))!;
+    const sword = (await getAsset(AssetType.OTHER, 'sword.png'))!;
+    const coins = (await getAsset(AssetType.OTHER, 'coins.png'))!;
 
     for (let i = 0; i < playerCount; ++i) {
         const player = data.info.participants[i];
@@ -314,7 +322,10 @@ export default async (data: MatchData) => {
 
         //champion
         const champion = new Image(
-            getAsset(AssetType.DDRAGON_CHAMPION, player.championName + '.png')!,
+            (await getAsset(
+                AssetType.DDRAGON_CHAMPION,
+                fixChampName(player.championName) + '.png'
+            ))!,
             {
                 x: 0,
                 y: (playerHeight * 0.2) / 2
@@ -423,10 +434,13 @@ export default async (data: MatchData) => {
         const mainRune = tree.slots[0].runes.find(
             (rune) => rune.id === player.perks.styles[0].selections[0].perk
         )!;
-        const primary = new Image(getAsset(AssetType.DDRAGON_IMG, mainRune.icon)!, {
-            x: 0,
-            y: 0
-        });
+        const primary = new Image(
+            (await getAsset(AssetType.DDRAGON_IMG, mainRune.icon))!,
+            {
+                x: 0,
+                y: 0
+            }
+        );
         await primary.resize({
             width: Math.floor(playerHeight / 2) - imageSpacing
         });
@@ -437,7 +451,7 @@ export default async (data: MatchData) => {
             (tree) => tree.id == player.perks.styles[1].style
         )!;
         const secondary = new Image(
-            getAsset(AssetType.DDRAGON_IMG, secondaryTree.icon)!,
+            (await getAsset(AssetType.DDRAGON_IMG, secondaryTree.icon))!,
             {
                 x: imageSpacing * 2,
                 y: Math.floor(playerHeight / 2) + imageSpacing * 3
@@ -449,38 +463,26 @@ export default async (data: MatchData) => {
         RuneSumms.addElement(secondary);
 
         //Summs
-        [player.summoner1Id, player.summoner2Id].forEach(async (summKey, idx) => {
-            const summoner = Object.values(summoners.data).find(
-                (summ) => summ.key === summKey
-            )!;
-            const summ = new Image(
-                getAsset(AssetType.DDRAGON_SPELL, summoner.image.full)!,
-                {
-                    x: playerHeight / 2 + imageSpacing,
-                    y: idx * (playerHeight / 2 + imageSpacing)
-                }
-            );
-            await summ.resize({
-                width: Math.floor(playerHeight / 2) - imageSpacing
-            });
-            RuneSumms.addElement(summ);
-        });
+        await putSumms(
+            player,
+            summoners,
+            playerHeight,
+            imageSpacing,
+            RuneSumms,
+            playerHeight / 2 + imageSpacing
+        );
 
         //items
-        const items = new Blank(
-            {
-                x: begin,
-                y: 0
-            },
-            {
-                width: imageWidth * 7 + imageSpacing * 6,
-                height: imageWidth
-            }
+        await putItems(
+            player,
+            begin,
+            imageWidth,
+            imageSpacing,
+            playerBlank,
+            teamIdx > 0,
+            itemBackground,
+            4
         );
-        playerBlank.addElement(items);
-        if (teamIdx > 0) {
-            items.setReverse();
-        }
 
         //stats
         const stats = new Blank(
@@ -500,58 +502,6 @@ export default async (data: MatchData) => {
             stats.setReverse();
         }
 
-        //items
-        for (let i = 0 as 0 | 1 | 2 | 3 | 4 | 5 | 6; i < 7; ++i) {
-            const item = player[`item${i}`];
-            const background = new Image(itemBackground, {
-                x: i * (imageWidth + imageSpacing),
-                y: 0
-            });
-            await background.resize({
-                width: imageWidth,
-                height: imageWidth
-            });
-            items.addElement(background);
-
-            if (item === 0) continue;
-            const imageBorder = 4;
-
-            const itemImage = new Image(
-                getAsset(AssetType.DDRAGON_ITEM, item + '.png')!,
-                {
-                    x: i * (imageWidth + imageSpacing) + imageBorder,
-                    y: imageBorder
-                }
-            );
-            await itemImage.resize({
-                width: imageWidth - imageBorder * 2,
-                height: imageWidth - imageBorder * 2
-            });
-            items.addElement(itemImage);
-
-            //add vision score
-            if (i === 6) {
-                const vision = new Text(
-                    player.visionScore.toString(),
-                    {
-                        x: i * (imageWidth + imageSpacing),
-                        y: 0
-                    },
-                    {
-                        width: imageWidth,
-                        height: imageWidth
-                    },
-                    30,
-                    Color.WHITE,
-                    'middle',
-                    'bold',
-                    true
-                );
-                items.addElement(vision);
-            }
-        }
-
-        //stats
         const statList = [
             [minion, player.totalMinionsKilled],
             [sword, player.totalDamageDealt],

@@ -12,31 +12,34 @@ export class Image extends Composite {
     }
 
     async resize(size: Partial<Size>) {
-        let width: undefined | number;
-        if (size.width) {
-            const origSize = await this.getSize();
-            if (!Number.isInteger(size.width)) {
-                width = Math.ceil(origSize.width * size.width);
-            } else {
-                width = size.width;
-            }
+        const origSize = await this.getSize();
+        let width: number | undefined;
+        let height: number | undefined;
+
+        if (typeof size.width === 'number') {
+            width = Number.isInteger(size.width)
+                ? size.width
+                : Math.ceil(origSize.width * size.width);
         }
 
-        let height: undefined | number;
-        if (size.height) {
-            const origSize = await this.getSize();
-            if (!Number.isInteger(origSize.height)) {
-                height = Math.ceil(origSize.height * size.height);
-            } else {
-                height = size.height;
-            }
+        if (typeof size.height === 'number') {
+            height = Number.isInteger(size.height)
+                ? size.height
+                : Math.ceil(origSize.height * size.height);
+        }
+
+        // Maintain aspect ratio if only one dimension is provided
+        if (width && !height) {
+            height = Math.round((width / origSize.width) * origSize.height);
+        } else if (height && !width) {
+            width = Math.round((height / origSize.height) * origSize.width);
         }
 
         this.image = this.image.resize(width, height);
-        const { info } = await this.image.png().toBuffer({ resolveWithObject: true });
+
         this.size = {
-            width: info.width ?? 0,
-            height: info.height ?? 0
+            width: width ?? origSize.width,
+            height: height ?? origSize.height
         };
     }
 

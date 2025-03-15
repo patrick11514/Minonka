@@ -42,7 +42,9 @@ export type TeamData = {
 export default async (data: TeamData) => {
     const lang = getLocale(data.locale);
 
-    const background = new Background(getAsset(AssetType.OTHER, 'background.png')!);
+    const background = new Background(
+        (await getAsset(AssetType.OTHER, 'background.png'))!
+    );
     const backgroundSize = await background.getSize();
 
     const text = `${data.abbreviation} | ${data.name}`.toUpperCase();
@@ -65,10 +67,13 @@ export default async (data: TeamData) => {
     //NAME + ICON
     const nameSize = await name.getTextSize();
 
-    const icon = new Image(getAsset(AssetType.OTHER, `clash/${data.iconId}.png`)!, {
-        x: backgroundSize.width / 2 - nameSize.width / 2 - /*spacing*/ (100 + 20),
-        y: 30
-    });
+    const icon = new Image(
+        (await getAsset(AssetType.OTHER, `clash/${data.iconId}.png`))!,
+        {
+            x: backgroundSize.width / 2 - nameSize.width / 2 - /*spacing*/ (100 + 20),
+            y: 30
+        }
+    );
     await icon.resize({
         height: 100
     });
@@ -121,7 +126,10 @@ export default async (data: TeamData) => {
         container.addElement(iconBox);
 
         const icon = new Image(
-            getAsset(AssetType.DDRAGON_PROFILEICON, `${player.profileIconId}.png`)!,
+            (await getAsset(
+                AssetType.DDRAGON_PROFILEICON,
+                `${player.profileIconId}.png`
+            ))!,
             {
                 x: 15,
                 y: 30
@@ -132,7 +140,7 @@ export default async (data: TeamData) => {
         });
         iconBox.addElement(icon);
 
-        const lvlBackground = new Image(getAsset(AssetType.OTHER, 'level.png')!, {
+        const lvlBackground = new Image((await getAsset(AssetType.OTHER, 'level.png'))!, {
             x: 'center',
             y: 30 - 26 / 2
         });
@@ -158,10 +166,13 @@ export default async (data: TeamData) => {
         iconBox.addElement(lvl);
 
         if (player.role === 'CAPTAIN') {
-            const captainIcon = new Image(getAsset(AssetType.OTHER, 'crown.png')!, {
-                x: 'center',
-                y: 0
-            });
+            const captainIcon = new Image(
+                (await getAsset(AssetType.OTHER, 'crown.png'))!,
+                {
+                    x: 'center',
+                    y: 0
+                }
+            );
             await captainIcon.resize({
                 width: 26
             });

@@ -44,7 +44,7 @@ crests:
 
 */
 
-const banners = fs.readdirSync(getAssetPath(AssetType.BANNER, ''));
+const banners = fs.readdirSync(await getAssetPath(AssetType.BANNER, ''));
 
 export default async (data: SummonerData) => {
     const lang = getLocale(data.locale);
@@ -71,28 +71,28 @@ export default async (data: SummonerData) => {
     let banner: Buffer<ArrayBufferLike>;
 
     if (data.banner == 2) {
-        const asset = getAsset(
+        const asset = await getAsset(
             AssetType.BANNER,
             highestRank!.getTier().toLowerCase() + '_banner.png'
         );
         if (!asset) {
-            banner = getAsset(AssetType.BANNER, '1_unranked_banner.png')!;
+            banner = (await getAsset(AssetType.BANNER, '1_unranked_banner.png'))!;
         } else {
             banner = asset;
         }
     } else {
         const bannerName = banners.find((b) => b.startsWith(data.banner.toString()))!;
         if (!bannerName) {
-            banner = getAsset(AssetType.BANNER, '1_unranked_banner.png')!;
+            banner = (await getAsset(AssetType.BANNER, '1_unranked_banner.png'))!;
         } else {
-            banner = getAsset(AssetType.BANNER, bannerName)!;
+            banner = (await getAsset(AssetType.BANNER, bannerName))!;
         }
     }
 
     ///BACKGROUND
     const background = new Background(banner);
     const backgroundSize = await background.getSize();
-    const levelBackground = new Image(getAsset(AssetType.OTHER, 'level.png')!, {
+    const levelBackground = new Image((await getAsset(AssetType.OTHER, 'level.png'))!, {
         x: 'center',
         y: 50
     });
@@ -138,7 +138,7 @@ export default async (data: SummonerData) => {
 
     //PROFILE PICTURE
     const profileIcon = new Image(
-        getAsset(AssetType.DDRAGON_PROFILEICON, data.profileIconId + '.png')!,
+        (await getAsset(AssetType.DDRAGON_PROFILEICON, data.profileIconId + '.png'))!,
         {
             x: 'center',
             y: 120
@@ -153,10 +153,10 @@ export default async (data: SummonerData) => {
     //CREST
     if (data.crest === 2 || (data.crest == 1 && data.prestigeCrest == 0)) {
         const crest = new Image(
-            getAsset(
+            (await getAsset(
                 AssetType.CREST,
                 `${highestRank!.getTier().toLowerCase()}_base.png`
-            )!,
+            ))!,
             {
                 x: 'center',
                 y: -40
@@ -190,10 +190,10 @@ export default async (data: SummonerData) => {
         }
     } else {
         const crest = new Image(
-            getAsset(
+            (await getAsset(
                 AssetType.CREST,
                 `prestige_crest_lvl_${data.prestigeCrest.toString().padStart(3, '0')}.png`
-            )!,
+            ))!,
             {
                 x: 'center',
                 y: 45
@@ -225,7 +225,7 @@ export default async (data: SummonerData) => {
     //title
     if (data.titleId !== undefined && !isNaN(parseInt(data.titleId))) {
         const lolLang = getRiotLanguageFromDiscordLocale(data.locale);
-        const challenges = getChallenges(lolLang);
+        const challenges = await getChallenges(lolLang);
 
         if (!challenges) {
             throw new Error(
@@ -283,10 +283,13 @@ export default async (data: SummonerData) => {
                     return `${challengeId}-${challenge.level}.png`;
                 })
                 .filter((ch) => ch !== undefined)
-                .map((challenge) => getAsset(AssetType.DDRAGON_CHALLENGES, challenge!))
+                .map(
+                    async (challenge) =>
+                        await getAsset(AssetType.DDRAGON_CHALLENGES, challenge)
+                )
                 .filter((ch) => ch !== null)
                 .map(async (ch, i) => {
-                    const img = new Image(ch, {
+                    const img = new Image((await ch)!, {
                         y: Math.floor(backgroundSize.height / 2 + 60),
                         x: challengeBegin + (challengeWidth + challengeSpace) * i
                     });

@@ -157,16 +157,27 @@ const ParticipantSchema = z.object({
     puuid: z.string()
 });
 
+const cherryParticipantSchema = ParticipantSchema.extend({
+    playerSubteamId: z.number(),
+    subteamPlacement: z.number(),
+    ...fromEntries<NumberSuffix<'playerAugment', 1 | 2 | 3 | 4 | 5 | 6>, z.ZodNumber>(
+        Array.from({ length: 6 }).map((_, id) => [
+            `playerAugment${id + 1}`,
+            id > 3 ? z.number().optional() : z.number()
+            //eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ]) as any
+    )
+});
+
 const queueIds = queues.map((queue) => queue.queueId);
 
-export const MatchSchema = z.object({
+export const RegularMatchSchema = z.object({
     metadata: z.object({
         dataVersion: z.string(),
         matchId: z.string(),
         participants: z.array(z.string())
     }),
     info: z.object({
-        endOfGameResult: z.string(),
         gameCreation: z.number(),
         gameDuration: z.number(),
         gameStartTimestamp: z.number(),
@@ -219,6 +230,22 @@ export const MatchSchema = z.object({
         )
     })
 });
+
+export const CherryMatchSchema = RegularMatchSchema.extend({
+    info: RegularMatchSchema.shape.info.extend({
+        participants: z.array(cherryParticipantSchema),
+        teams: z.array(
+            RegularMatchSchema.shape.info.shape.teams.element.extend({
+                /* in cherry games, all players are in same team, so second team have just id 0*/
+                teamId: RegularMatchSchema.shape.info.shape.teams.element.shape.teamId.or(
+                    z.literal(0)
+                )
+            })
+        )
+    })
+});
+
+export const MatchSchema = z.union([RegularMatchSchema, CherryMatchSchema]);
 
 export const ClashMemberSchema = z.object({
     summonerId: z.string(),
