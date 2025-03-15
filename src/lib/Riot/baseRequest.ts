@@ -4,7 +4,6 @@ import Logger from '../logger';
 import fetch from 'node-fetch';
 import template from '$/lib/langs/_template';
 import { replacePlaceholders } from '../langs';
-import { writeFileSync } from 'node:fs';
 
 type StatusCode = 400 | 401 | 403 | 404 | 405 | 415 | 429 | 500 | 502 | 503 | 504;
 
@@ -56,7 +55,6 @@ export const baseRequest = async <$ResponseData>(
         if (!parse.success) {
             l.error(`Failed to parse response from ${url}`);
             l.error(parse.error);
-            writeFileSync('error.json', JSON.stringify(data, null, 2));
             return {
                 status: false,
                 code: 500,
