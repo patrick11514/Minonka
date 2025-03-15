@@ -15,16 +15,16 @@ type RiotErrorResponse = {
 
 export type Response<$Data> =
     | {
-          status: true;
-          data: $Data;
-      }
+        status: true;
+        data: $Data;
+    }
     | RiotErrorResponse;
 
 export type toValidResponse<$Type> = $Type extends { status: true; data: infer $Inner }
     ? {
-          status: true;
-          data: $Inner;
-      }
+        status: true;
+        data: $Inner;
+    }
     : never;
 
 const l = new Logger('RiotAPI', 'magenta');
@@ -55,6 +55,7 @@ export const baseRequest = async <$ResponseData>(
         if (!parse.success) {
             l.error(`Failed to parse response from ${url}`);
             l.error(parse.error);
+            writeFileSync('error.json', JSON.stringify(data, null, 2));
             return {
                 status: false,
                 code: 500,

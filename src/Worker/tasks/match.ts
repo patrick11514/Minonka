@@ -6,7 +6,7 @@ import {
     getSummonerSpells
 } from '$/lib/Assets';
 import { Background } from '$/lib/Imaging/Background';
-import { MatchSchema } from '$/lib/Riot/schemes';
+import { RegularMatchSchema } from '$/lib/Riot/schemes';
 import { Region } from '$/lib/Riot/types';
 import { Locale } from 'discord.js';
 import { z } from 'zod';
@@ -25,7 +25,7 @@ export type MatchData = {
     region: Region;
     locale: Locale;
     mySummonerId: string;
-} & z.infer<typeof MatchSchema>;
+} & z.infer<typeof RegularMatchSchema>;
 
 export default async (data: MatchData) => {
     const imageName = `${data.metadata.matchId}_${data.mySummonerId}_${data.locale}.png`;
@@ -36,7 +36,9 @@ export default async (data: MatchData) => {
 
     const lang = getLocale(data.locale);
 
-    const background = new Background(getAsset(AssetType.OTHER, 'background.png')!);
+    const background = new Background(
+        (await getAsset(AssetType.OTHER, 'background.png'))!
+    );
     const backgroundSize = await background.getSize();
     //MAIN LAYOUT have date at the bottom
     const DateHeight = 80;
@@ -69,8 +71,6 @@ export default async (data: MatchData) => {
         'middle'
     );
     background.addElement(date);
-
-    //@TODO MAKE LAYOUT FOR ARENAS AND ALSO CHANGE SCHEMA FOR THEM, BECAUSE MORE TEAMS, AND NO POSITIONS LIKE UTILITY, TOP....
 
     //Main layout
     // TEAM 1 | STATS | TEAM 2 (IN REVERSE)
@@ -271,13 +271,13 @@ export default async (data: MatchData) => {
 
     const riotLocale = getRiotLanguageFromDiscordLocale(data.locale);
 
-    const runesReforged = getRunesReforged(riotLocale)!;
-    const summoners = getSummonerSpells(riotLocale)!;
-    const itemBackground = getAsset(AssetType.OTHER, 'itemBackground.png')!;
+    const runesReforged = (await getRunesReforged(riotLocale))!;
+    const summoners = (await getSummonerSpells(riotLocale))!;
+    const itemBackground = (await getAsset(AssetType.OTHER, 'itemBackground.png'))!;
 
-    const minion = getAsset(AssetType.OTHER, 'minion.png')!;
-    const sword = getAsset(AssetType.OTHER, 'sword.png')!;
-    const coins = getAsset(AssetType.OTHER, 'coins.png')!;
+    const minion = (await getAsset(AssetType.OTHER, 'minion.png'))!;
+    const sword = (await getAsset(AssetType.OTHER, 'sword.png'))!;
+    const coins = (await getAsset(AssetType.OTHER, 'coins.png'))!;
 
     for (let i = 0; i < playerCount; ++i) {
         const player = data.info.participants[i];
@@ -314,7 +314,7 @@ export default async (data: MatchData) => {
 
         //champion
         const champion = new Image(
-            getAsset(AssetType.DDRAGON_CHAMPION, player.championName + '.png')!,
+            (await getAsset(AssetType.DDRAGON_CHAMPION, player.championName + '.png'))!,
             {
                 x: 0,
                 y: (playerHeight * 0.2) / 2
@@ -423,10 +423,13 @@ export default async (data: MatchData) => {
         const mainRune = tree.slots[0].runes.find(
             (rune) => rune.id === player.perks.styles[0].selections[0].perk
         )!;
-        const primary = new Image(getAsset(AssetType.DDRAGON_IMG, mainRune.icon)!, {
-            x: 0,
-            y: 0
-        });
+        const primary = new Image(
+            (await getAsset(AssetType.DDRAGON_IMG, mainRune.icon))!,
+            {
+                x: 0,
+                y: 0
+            }
+        );
         await primary.resize({
             width: Math.floor(playerHeight / 2) - imageSpacing
         });
@@ -437,7 +440,7 @@ export default async (data: MatchData) => {
             (tree) => tree.id == player.perks.styles[1].style
         )!;
         const secondary = new Image(
-            getAsset(AssetType.DDRAGON_IMG, secondaryTree.icon)!,
+            (await getAsset(AssetType.DDRAGON_IMG, secondaryTree.icon))!,
             {
                 x: imageSpacing * 2,
                 y: Math.floor(playerHeight / 2) + imageSpacing * 3
@@ -454,7 +457,7 @@ export default async (data: MatchData) => {
                 (summ) => summ.key === summKey
             )!;
             const summ = new Image(
-                getAsset(AssetType.DDRAGON_SPELL, summoner.image.full)!,
+                (await getAsset(AssetType.DDRAGON_SPELL, summoner.image.full))!,
                 {
                     x: playerHeight / 2 + imageSpacing,
                     y: idx * (playerHeight / 2 + imageSpacing)
@@ -517,7 +520,7 @@ export default async (data: MatchData) => {
             const imageBorder = 4;
 
             const itemImage = new Image(
-                getAsset(AssetType.DDRAGON_ITEM, item + '.png')!,
+                (await getAsset(AssetType.DDRAGON_ITEM, item + '.png'))!,
                 {
                     x: i * (imageWidth + imageSpacing) + imageBorder,
                     y: imageBorder

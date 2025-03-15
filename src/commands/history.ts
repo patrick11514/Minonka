@@ -17,6 +17,7 @@ import {
     ButtonStyle
 } from 'discord.js';
 import { Selectable } from 'kysely';
+import { z } from 'zod';
 
 const l = new Logger('History', 'white');
 
