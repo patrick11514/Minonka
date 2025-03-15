@@ -3,6 +3,7 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse, toValidResponse } from '$/lib/Riot/baseRequest';
+import { CherryMatchSchema, RegularMatchSchema } from '$/lib/Riot/schemes';
 import { queues, Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
 import {
@@ -128,15 +129,24 @@ export default class History extends AccountCommand {
             return formatErrorResponse(lang, matchesData.find((match) => !match.status)!);
         }
 
-        return matchesData.map(
-            (match) => () =>
-                process.workerServer.addJobWait('match', {
-                    ...(match as toValidResponse<typeof match>).data,
+        return matchesData.map((match) => () => {
+            const _match = match as toValidResponse<typeof match>;
+            if (_match.data.info.gameMode === 'CHERRY') {
+                return process.workerServer.addJobWait('cherryMatch', {
+                    ...(_match.data as z.infer<typeof CherryMatchSchema>),
                     locale,
                     region,
                     mySummonerId: summonerId
-                })
-        );
+                });
+            } else {
+                return process.workerServer.addJobWait('match', {
+                    ...(_match.data as z.infer<typeof RegularMatchSchema>),
+                    locale,
+                    region,
+                    mySummonerId: summonerId
+                });
+            }
+        });
     }
 
     generateButtonRow(
