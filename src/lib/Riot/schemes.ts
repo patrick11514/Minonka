@@ -161,7 +161,7 @@ const cherryParticipantSchema = ParticipantSchema.extend({
     playerSubteamId: z.number(),
     subteamPlacement: z.number(),
     ...fromEntries<NumberSuffix<'playerAugment', 1 | 2 | 3 | 4 | 5 | 6>, z.ZodNumber>(
-        Array.from({ length: 5 }).map((_, id) => [
+        Array.from({ length: 6 }).map((_, id) => [
             `playerAugment${id + 1}`,
             z.number()
             //eslint-disable-next-line @typescript-eslint/no-explicit-any
