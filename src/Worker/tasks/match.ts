@@ -123,8 +123,8 @@ export default async (data: MatchData) => {
         matchStatus === MatchStatus.Win
             ? Color.GREEN
             : matchStatus === MatchStatus.Loss
-                ? Color.RED
-                : Color.GRAY,
+              ? Color.RED
+              : Color.GRAY,
         'middle'
     );
     const VictorySize = await VictoryLoss.getSize();
@@ -274,7 +274,7 @@ export default async (data: MatchData) => {
     const playerHeight = 110;
     const space = Math.floor(
         (teamHeight - DateHeight - (playerCount / 2) * playerHeight) /
-        (playerCount / 2 - 1)
+            (playerCount / 2 - 1)
     );
 
     const riotLocale = getRiotLanguageFromDiscordLocale(data.locale);

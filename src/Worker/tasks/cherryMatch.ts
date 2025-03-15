@@ -3,7 +3,6 @@ import {
     getAsset,
     getAugments,
     getRiotLanguageFromDiscordLocale,
-    getRunesReforged,
     getSummonerSpells
 } from '$/lib/Assets';
 import { Background } from '$/lib/Imaging/Background';
@@ -17,7 +16,6 @@ import {
     persistantExists,
     putItems,
     putSumms,
-    save,
     savePersistant,
     toMMSS
 } from '../utilities';
@@ -26,15 +24,7 @@ import { Text } from '$/lib/Imaging/Text';
 import { getLocale } from '$/lib/langs';
 import { Color } from '$/lib/Imaging/types';
 import { Image } from '$/lib/Imaging/Image';
-import {
-    getArenaSubTeamPosition,
-    getMatchStatus,
-    MatchStatus
-} from '$/lib/Riot/utilities';
-import { conn } from '$/types/connection';
-import api from '$/lib/Riot/api';
-import { updateLpForUser } from '$/crons/lp';
-import { text } from 'stream/consumers';
+import { getArenaSubTeamPosition } from '$/lib/Riot/utilities';
 
 export type CherryMatchData = {
     region: Region;
@@ -94,9 +84,9 @@ const MapSubTeamToName = (subteam: SubTeam) => {
 export default async (data: CherryMatchData) => {
     const imageName = `${data.metadata.matchId}_${data.mySummonerId}_${data.locale}.png`;
 
-    /*if (persistantExists(imageName)) {
+    if (persistantExists(imageName)) {
         return getPersistant(imageName);
-    }*/
+    }
 
     const lang = getLocale(data.locale);
 
@@ -231,10 +221,6 @@ export default async (data: CherryMatchData) => {
     }
 
     teams.sort((a, b) => a[0].subteamPlacement - b[0].subteamPlacement);
-
-    console.log(
-        teams.map((t) => [t[0].subteamPlacement, TeamIdToName(t[0].playerSubteamId)])
-    );
 
     const padding = 20;
     const teamBlankWidth = Math.floor((backgroundSize.width - STATSWidth) / 2 - padding);
@@ -653,5 +639,5 @@ export default async (data: CherryMatchData) => {
         }
     }
 
-    return save(background);
+    return savePersistant(background, imageName);
 };
