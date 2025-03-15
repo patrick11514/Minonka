@@ -52,7 +52,8 @@ export const putSumms = async (
     summoners: ExtractAssetResult<typeof getSummonerSpells>,
     playerHeight: number,
     imageSpacing: number,
-    blank: Blank
+    blank: Blank,
+    xOffset: number
 ) => {
     [player.summoner1Id, player.summoner2Id].forEach(async (summKey, idx) => {
         const summoner = Object.values(summoners.data).find(
@@ -61,7 +62,7 @@ export const putSumms = async (
         const summ = new Image(
             (await getAsset(AssetType.DDRAGON_SPELL, summoner.image.full))!,
             {
-                x: playerHeight / 2 + imageSpacing,
+                x: xOffset,
                 y: idx * (playerHeight / 2 + imageSpacing)
             }
         );
