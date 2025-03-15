@@ -19,13 +19,13 @@ export type TeamData = {
         summonerId: string;
         puuid: string;
         position:
-        | 'UNSELECTED'
-        | 'FILL'
-        | 'TOP'
-        | 'JUNGLE'
-        | 'MIDDLE'
-        | 'BOTTOM'
-        | 'UTILITY';
+            | 'UNSELECTED'
+            | 'FILL'
+            | 'TOP'
+            | 'JUNGLE'
+            | 'MIDDLE'
+            | 'BOTTOM'
+            | 'UTILITY';
         role: 'CAPTAIN' | 'MEMBER';
         profileIconId: number;
         level: number;
@@ -184,8 +184,8 @@ export default async (data: TeamData) => {
             player.highestRank === null
                 ? lang.unranked
                 : lang.rank.tiers[player.highestRank.tier] +
-                ' ' +
-                player.highestRank.rank,
+                  ' ' +
+                  player.highestRank.rank,
             {
                 x: textStart,
                 y: (position.y as number) + 40

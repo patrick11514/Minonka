@@ -11,6 +11,7 @@ import { Region } from '$/lib/Riot/types';
 import { Locale } from 'discord.js';
 import { z } from 'zod';
 import {
+    fixChampName,
     getPersistant,
     persistantExists,
     putItems,
@@ -203,30 +204,30 @@ export default async (data: MatchData) => {
                     .selectAll()
                     .where('summoner_id', '=', data.mySummonerId)
                     .executeTakeFirst();
-                if (!userData) return;
+                if (userData) {
+                    await updateLpForUser({
+                        id: userData.id,
+                        region: userData.region,
+                        summoner_id: userData.summoner_id,
+                        puuid: userData.puuid,
+                        gameName: userData.gameName,
+                        tagLine: userData.tagLine
+                    });
 
-                await updateLpForUser({
-                    id: userData.id,
-                    region: userData.region,
-                    summoner_id: userData.summoner_id,
-                    puuid: userData.puuid,
-                    gameName: userData.gameName,
-                    tagLine: userData.tagLine
-                });
-
-                //check if db includes LP for this match
-                const lp = await conn
-                    .selectFrom('match_lp')
-                    .selectAll()
-                    .where((eb) =>
-                        eb.and([
-                            eb('matchId', '=', data.metadata.matchId),
-                            eb('accountId', '=', userData.id)
-                        ])
-                    )
-                    .executeTakeFirst(); //should be there now
-                if (lp) {
-                    lpGain = lp.gain;
+                    //check if db includes LP for this match
+                    const lp = await conn
+                        .selectFrom('match_lp')
+                        .selectAll()
+                        .where((eb) =>
+                            eb.and([
+                                eb('matchId', '=', data.metadata.matchId),
+                                eb('accountId', '=', userData.id)
+                            ])
+                        )
+                        .executeTakeFirst(); //should be there now
+                    if (lp) {
+                        lpGain = lp.gain;
+                    }
                 }
             }
         }
@@ -321,7 +322,10 @@ export default async (data: MatchData) => {
 
         //champion
         const champion = new Image(
-            (await getAsset(AssetType.DDRAGON_CHAMPION, player.championName + '.png'))!,
+            (await getAsset(
+                AssetType.DDRAGON_CHAMPION,
+                fixChampName(player.championName) + '.png'
+            ))!,
             {
                 x: 0,
                 y: (playerHeight * 0.2) / 2
@@ -469,7 +473,7 @@ export default async (data: MatchData) => {
         );
 
         //items
-        putItems(
+        await putItems(
             player,
             begin,
             imageWidth,

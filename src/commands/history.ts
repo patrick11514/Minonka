@@ -115,6 +115,7 @@ export default class History extends AccountCommand {
             count,
             queue: queue || undefined
         });
+
         if (!matchIds.status) {
             return formatErrorResponse(lang, matchIds);
         }

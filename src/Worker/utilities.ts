@@ -148,3 +148,11 @@ export const putItems = async (
         }
     }
 };
+
+export const fixChampName = (champName: string) => {
+    //because FiddleSticks is written with capital S, but in files it's lowercase
+    if (champName === 'FiddleSticks') {
+        return 'Fiddlesticks';
+    }
+    return champName;
+};
