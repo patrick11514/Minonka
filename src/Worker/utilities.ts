@@ -55,22 +55,24 @@ export const putSumms = async (
     blank: Blank,
     xOffset: number
 ) => {
-    [player.summoner1Id, player.summoner2Id].forEach(async (summKey, idx) => {
-        const summoner = Object.values(summoners.data).find(
-            (summ) => summ.key === summKey
-        )!;
-        const summ = new Image(
-            (await getAsset(AssetType.DDRAGON_SPELL, summoner.image.full))!,
-            {
-                x: xOffset,
-                y: idx * (playerHeight / 2 + imageSpacing)
-            }
-        );
-        await summ.resize({
-            width: Math.floor(playerHeight / 2) - imageSpacing
-        });
-        blank.addElement(summ);
-    });
+    await Promise.all(
+        [player.summoner1Id, player.summoner2Id].map(async (summKey, idx) => {
+            const summoner = Object.values(summoners.data).find(
+                (summ) => summ.key === summKey
+            )!;
+            const summ = new Image(
+                (await getAsset(AssetType.DDRAGON_SPELL, summoner.image.full))!,
+                {
+                    x: xOffset,
+                    y: Math.floor(idx * (playerHeight / 2 + imageSpacing))
+                }
+            );
+            await summ.resize({
+                width: Math.floor(playerHeight / 2) - imageSpacing
+            });
+            blank.addElement(summ);
+        })
+    );
 };
 
 export const putItems = async (
