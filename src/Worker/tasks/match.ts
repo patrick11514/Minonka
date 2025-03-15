@@ -476,7 +476,8 @@ export default async (data: MatchData) => {
             imageSpacing,
             playerBlank,
             teamIdx > 0,
-            itemBackground
+            itemBackground,
+            4
         );
 
         //stats

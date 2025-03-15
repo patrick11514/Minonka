@@ -80,7 +80,8 @@ export const putItems = async (
     imageSpacing: number,
     playerBlank: Blank,
     reverse: boolean,
-    itemBackground: ExtractAssetResult<typeof getAsset>
+    itemBackground: ExtractAssetResult<typeof getAsset>,
+    imageBorder: number
 ) => {
     const items = new Blank(
         {
@@ -111,7 +112,6 @@ export const putItems = async (
         items.addElement(background);
 
         if (item === 0) continue;
-        const imageBorder = 4;
 
         const itemImage = new Image(
             (await getAsset(AssetType.DDRAGON_ITEM, item + '.png'))!,
