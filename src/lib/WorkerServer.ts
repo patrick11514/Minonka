@@ -124,12 +124,12 @@ export class WorkerServer extends EventEmitter<Events> {
 
             freeWorker.socket.send(
                 job.name +
-                ';' +
-                job.id +
-                ';' +
-                Date.now() +
-                ';' +
-                JSON.stringify(job.data)
+                    ';' +
+                    job.id +
+                    ';' +
+                    Date.now() +
+                    ';' +
+                    JSON.stringify(job.data)
             );
             freeWorker.state = WorkerState.BUSY;
             return false;
