@@ -13,22 +13,33 @@ export class Image extends Composite {
 
     async resize(size: Partial<Size>) {
         const origSize = await this.getSize();
+        let width: number | undefined;
+        let height: number | undefined;
 
-        let width: number | undefined = size.width;
-        let height: number | undefined = size.height;
-
-        if (typeof size.width === 'number' && !Number.isInteger(size.width)) {
-            width = Math.ceil(origSize.width * size.width);
+        if (typeof size.width === 'number') {
+            width = Number.isInteger(size.width)
+                ? size.width
+                : Math.ceil(origSize.width * size.width);
         }
 
-        if (typeof size.height === 'number' && !Number.isInteger(size.height)) {
-            height = Math.ceil(origSize.height * size.height);
+        if (typeof size.height === 'number') {
+            height = Number.isInteger(size.height)
+                ? size.height
+                : Math.ceil(origSize.height * size.height);
+        }
+
+        // Maintain aspect ratio if only one dimension is provided
+        if (width && !height) {
+            height = Math.round((width / origSize.width) * origSize.height);
+        } else if (height && !width) {
+            width = Math.round((height / origSize.height) * origSize.width);
         }
 
         this.image = this.image.resize(width, height);
+
         this.size = {
-            width: width ?? 0,
-            height: height ?? 0
+            width: width ?? origSize.width,
+            height: height ?? origSize.height
         };
     }
 
