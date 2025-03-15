@@ -75,7 +75,19 @@ export default template.parse({
             [MatchStatus.Loss]: 'Prohra',
             [MatchStatus.Remake]: 'Remake'
         },
-        buttonInfoText: 'Zobrazuji %1-%2 posledních zápasů'
+        buttonInfoText: 'Zobrazuji %1-%2 posledních zápasů',
+        place: 'Místo',
+        team: 'Tým',
+        subTeam: {
+            wolves: 'Vlk',
+            gromp: 'Ropušák',
+            krugs: 'Kameňák',
+            minions: 'Poskok',
+            poros: 'Poro',
+            raptors: 'Raptor',
+            scuttles: 'Krab',
+            sentinel: 'Strážce'
+        }
     },
     clash: {
         title: 'Nadcházející Clash Turnaje',

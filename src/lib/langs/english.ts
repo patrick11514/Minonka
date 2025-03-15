@@ -82,7 +82,19 @@ export default template.parse({
             [MatchStatus.Loss]: 'Lose',
             [MatchStatus.Remake]: 'Remake'
         },
-        buttonInfoText: 'Showing %1-%2 last matches'
+        buttonInfoText: 'Showing %1-%2 last matches',
+        place: 'Place',
+        team: 'Team',
+        subTeam: {
+            sentinel: 'Sentinel',
+            minions: 'Minion',
+            scuttles: 'Scuttle',
+            krugs: 'Krug',
+            raptors: 'Raptor',
+            poros: 'Poro',
+            wolves: 'Wolf',
+            gromp: 'Gromp'
+        }
     },
     clash: {
         title: 'Upcoming Clash Tournaments',
