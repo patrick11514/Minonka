@@ -16,9 +16,15 @@ export class Blank extends Composite {
     addElement(element: Composite) {
         this.children.push(element);
     }
+
+    addElements(element: Composite[]) {
+        this.children.push(...element);
+    }
+
     debugMode() {
         this.debug = 1;
     }
+
     setReverse() {
         this.reverse = true;
     }
