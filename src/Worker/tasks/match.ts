@@ -463,7 +463,7 @@ export default async (data: MatchData) => {
         RuneSumms.addElement(secondary);
 
         //Summs
-        putSumms(
+        await putSumms(
             player,
             summoners,
             playerHeight,
