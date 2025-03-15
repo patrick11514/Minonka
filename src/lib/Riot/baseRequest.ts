@@ -16,16 +16,16 @@ type RiotErrorResponse = {
 
 export type Response<$Data> =
     | {
-        status: true;
-        data: $Data;
-    }
+          status: true;
+          data: $Data;
+      }
     | RiotErrorResponse;
 
 export type toValidResponse<$Type> = $Type extends { status: true; data: infer $Inner }
     ? {
-        status: true;
-        data: $Inner;
-    }
+          status: true;
+          data: $Inner;
+      }
     : never;
 
 const l = new Logger('RiotAPI', 'magenta');

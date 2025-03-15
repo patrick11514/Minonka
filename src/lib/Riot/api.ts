@@ -10,7 +10,37 @@ import {
     SummonerSchema
 } from './schemes';
 
-const BASE_ROUTING_URL = 'https://EUROPE.api.riotgames.com';
+const getBaseRoutingURL = (region: Region) => {
+    let prefix = '';
+    switch (region) {
+        case 'EUN1':
+        case 'EUW1':
+        case 'ME1':
+        case 'TR1':
+        case 'RU':
+            prefix = 'EUROPE';
+            break;
+        case 'NA1':
+        case 'BR1':
+        case 'LA1':
+        case 'LA2':
+            prefix = 'AMERICAS';
+            break;
+        case 'KR':
+        case 'JP1':
+            prefix = 'ASIA';
+            break;
+        case 'OC1':
+        case 'SG2':
+        case 'TW2':
+        case 'VN2':
+            prefix = 'SEA';
+            break;
+    }
+
+    return `https://${prefix}.api.riotgames.com`;
+};
+
 const getBaseURL = (region: Region) => {
     return `https://${region}.api.riotgames.com`;
 };
@@ -150,7 +180,7 @@ const RiotAPIStructure = {
 };
 
 const createForRegion = (region: Region) =>
-    RiotAPI(RiotAPIStructure, getBaseURL(region), BASE_ROUTING_URL);
+    RiotAPI(RiotAPIStructure, getBaseURL(region), getBaseRoutingURL(region));
 
 export default Object.fromEntries(
     regions.map((region) => [region, createForRegion(region)])
