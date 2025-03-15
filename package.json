@@ -4,9 +4,9 @@
     "main": "build/index.js",
     "type": "module",
     "scripts": {
-        "dev": "tsx watch ./src/index.ts",
-        "dev:worker": "tsx watch ./src/Worker/Worker.ts",
-        "dev:register": "tsx ./src/index.ts --register",
+        "dev": "NODE_ENV=development tsx watch ./src/index.ts",
+        "dev:worker": "NODE_ENV=development tsx watch ./src/Worker/Worker.ts",
+        "dev:register": "NODE_ENV=development tsx ./src/index.ts --register",
         "build": "mkdir -p build && tsc && tsc-alias",
         "start": "node ./build/index.js",
         "start:register": "node ./build/index.js --register",
