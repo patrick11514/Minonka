@@ -7,6 +7,7 @@ import { EventEmitter } from './EventEmitter';
 import { RankData } from '$/Worker/tasks/rank';
 import { MatchData } from '$/Worker/tasks/match';
 import { TeamData } from '$/Worker/tasks/team';
+import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
 
 enum WorkerState {
     FREE,
@@ -25,6 +26,7 @@ type Jobs = {
     summoner: SummonerData;
     rank: RankData;
     match: MatchData;
+    cherryMatch: CherryMatchData;
     team: TeamData;
 };
 

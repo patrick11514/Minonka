@@ -4,6 +4,7 @@ import Logger from '../logger';
 import fetch from 'node-fetch';
 import template from '$/lib/langs/_template';
 import { replacePlaceholders } from '../langs';
+import { writeFileSync } from 'node:fs';
 
 type StatusCode = 400 | 401 | 403 | 404 | 405 | 415 | 429 | 500 | 502 | 503 | 504;
 
