@@ -83,6 +83,8 @@ export default z.object({
         buttonInfoText: _,
         place: _,
         team: _,
+        loading: _,
+        uploading: _,
         subTeam: z.object({
             poros: _,
             minions: _,

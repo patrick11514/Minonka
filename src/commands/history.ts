@@ -226,8 +226,29 @@ export default class History extends AccountCommand {
         await interaction.deferReply();
 
         try {
+            let progress = 0;
+            const max = result.length;
+
+            const files = await Promise.all(
+                result.map(async (f) => {
+                    const path = await f();
+                    await interaction.editReply({
+                        content: replacePlaceholders(
+                            lang.match.loading,
+                            (++progress).toString(),
+                            max.toString()
+                        )
+                    });
+                    return path;
+                })
+            );
             await interaction.editReply({
-                files: await Promise.all(result.map((f) => f())),
+                content: lang.match.uploading
+            });
+
+            await interaction.editReply({
+                content: '',
+                files,
                 components: [row]
             });
         } catch (e) {
@@ -337,8 +358,27 @@ export default class History extends AccountCommand {
         });
 
         try {
+            let progress = 0;
+            const max = response.length;
+            const files = await Promise.all(
+                response.map(async (f) => {
+                    const path = await f();
+                    await interaction.editReply({
+                        content: replacePlaceholders(
+                            lang.match.loading,
+                            (++progress).toString(),
+                            max.toString()
+                        )
+                    });
+                    return path;
+                })
+            );
+            await interaction.editReply({
+                content: lang.match.uploading
+            });
             await interaction.message.edit({
-                files: await Promise.all(response.map((f) => f())),
+                content: '',
+                files,
                 components: [row]
             });
             await interaction.deleteReply();
