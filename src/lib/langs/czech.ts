@@ -70,6 +70,8 @@ export default template.parse({
     },
     match: {
         empty: 'Nebyl nalezený žádný zápas. Zkus upravit filtrování nebo zkusit později.',
+        loading: 'Načítám zápasy... %1/%2',
+        uploading: 'Nahrávám...',
         results: {
             [MatchStatus.Win]: 'Výhra',
             [MatchStatus.Loss]: 'Prohra',

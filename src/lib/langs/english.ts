@@ -77,6 +77,8 @@ export default template.parse({
     },
     match: {
         empty: 'No match found. Try to adjust filters, or try again later',
+        loading: 'Loading matches... %1/%2',
+        uploading: 'Uploading...',
         results: {
             [MatchStatus.Win]: 'Win',
             [MatchStatus.Loss]: 'Lose',
