@@ -157,7 +157,8 @@ export default class History extends AccountCommand {
         region: Region,
         queue: string | null,
         count: number,
-        offset: number
+        offset: number,
+        promiseCount: number
     ) {
         //history;discordid;summonerid;region;queue;count;offset
         const baseId = `history;${userId};${summonerId};${region};${queue || ''};${count};${offset}`;
@@ -165,7 +166,8 @@ export default class History extends AccountCommand {
             new ButtonBuilder()
                 .setCustomId(`${baseId};prev`)
                 .setEmoji('⬅️')
-                .setStyle(ButtonStyle.Primary),
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(offset === 0),
             new ButtonBuilder()
                 .setCustomId(`${baseId};reload`)
                 .setEmoji('🔄')
@@ -181,6 +183,7 @@ export default class History extends AccountCommand {
                 .setCustomId(`${baseId};next`)
                 .setEmoji('➡️')
                 .setStyle(ButtonStyle.Primary)
+                .setDisabled(promiseCount < count) // I am at the end
         ]);
     }
 
@@ -220,10 +223,13 @@ export default class History extends AccountCommand {
             region,
             queue,
             count,
-            offset
+            offset,
+            result.length
         );
 
         await interaction.deferReply();
+
+        let dontUpdate = false;
 
         try {
             let progress = 0;
@@ -232,13 +238,14 @@ export default class History extends AccountCommand {
             const files = await Promise.all(
                 result.map(async (f) => {
                     const path = await f();
-                    await interaction.editReply({
-                        content: replacePlaceholders(
-                            lang.match.loading,
-                            (++progress).toString(),
-                            max.toString()
-                        )
-                    });
+                    if (!dontUpdate)
+                        await interaction.editReply({
+                            content: replacePlaceholders(
+                                lang.match.loading,
+                                (++progress).toString(),
+                                max.toString()
+                            )
+                        });
                     return path;
                 })
             );
@@ -252,6 +259,7 @@ export default class History extends AccountCommand {
                 components: [row]
             });
         } catch (e) {
+            dontUpdate = true;
             if (e instanceof Error) {
                 l.error(e);
                 await interaction.editReply({
@@ -323,10 +331,13 @@ export default class History extends AccountCommand {
                 break;
         }
 
+        //clamp offset to 0
+        offset = Math.max(0, offset);
+
         const account = await api[region].summoner.bySummonerId(summonerId);
         if (!account.status) return;
 
-        const response = await this.getFiles(
+        const result = await this.getFiles(
             interaction.locale,
             region,
             summonerId,
@@ -335,10 +346,10 @@ export default class History extends AccountCommand {
             count,
             offset
         );
-        if (typeof response === 'string') {
+        if (typeof result === 'string') {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
-                content: response
+                content: result
             });
             return;
         }
@@ -350,26 +361,29 @@ export default class History extends AccountCommand {
             region,
             queue,
             count,
-            offset
+            offset,
+            result.length
         );
 
         await interaction.deferReply({
             flags: MessageFlags.Ephemeral
         });
+        let dontUpdate = false;
 
         try {
             let progress = 0;
-            const max = response.length;
+            const max = result.length;
             const files = await Promise.all(
-                response.map(async (f) => {
+                result.map(async (f) => {
                     const path = await f();
-                    await interaction.editReply({
-                        content: replacePlaceholders(
-                            lang.match.loading,
-                            (++progress).toString(),
-                            max.toString()
-                        )
-                    });
+                    if (!dontUpdate)
+                        await interaction.editReply({
+                            content: replacePlaceholders(
+                                lang.match.loading,
+                                (++progress).toString(),
+                                max.toString()
+                            )
+                        });
                     return path;
                 })
             );
@@ -383,6 +397,7 @@ export default class History extends AccountCommand {
             });
             await interaction.deleteReply();
         } catch (e) {
+            dontUpdate = true;
             if (e instanceof Error) {
                 l.error(e);
                 await interaction.editReply({
