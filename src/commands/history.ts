@@ -321,6 +321,7 @@ export default class History extends AccountCommand {
         const count = parseInt(id[5]);
         let offset = parseInt(id[6]);
         const command = id[7];
+        const originalOffset = offset;
 
         switch (command) {
             case 'prev':
@@ -347,6 +348,24 @@ export default class History extends AccountCommand {
             offset
         );
         if (typeof result === 'string') {
+            if (result === lang.match.empty) {
+                //update buttons, so the next button is disabled
+                const row = this.generateButtonRow(
+                    lang,
+                    discordId,
+                    summonerId,
+                    region,
+                    queue,
+                    count,
+                    originalOffset,
+                    0
+                );
+
+                await interaction.message.edit({
+                    components: [row]
+                });
+            }
+
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
                 content: result
