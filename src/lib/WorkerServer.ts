@@ -158,7 +158,7 @@ export class WorkerServer extends EventEmitter<Events> {
             this.jobResults.delete(jobId);
 
             if (result.data instanceof Error) {
-                throw result;
+                throw result.data;
             }
 
             return result.data as string;

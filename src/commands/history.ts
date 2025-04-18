@@ -195,7 +195,7 @@ export default class History extends AccountCommand {
     private async handleMessages(
         editMessage: Message<boolean> | ChatInputCommandInteraction,
         interaction: RepliableInteraction<CacheType>,
-        jobs: OmitUnion<DePromise<ReturnType<typeof this.getFiles>>, string>,
+        jobIds: OmitUnion<DePromise<ReturnType<typeof this.getFiles>>, string>,
         row: ActionRowBuilder<ButtonBuilder>,
         lang: ReturnType<typeof getLocale>
     ) {
@@ -205,10 +205,10 @@ export default class History extends AccountCommand {
 
         try {
             let progress = 0;
-            const max = jobs.length;
+            const max = jobIds.length;
 
             const files = await Promise.all(
-                jobs.map(async (jobId) => {
+                jobIds.map(async (jobId) => {
                     const path = await process.workerServer.wait(jobId);
                     if (!dontUpdate)
                         await interaction.editReply({
@@ -243,7 +243,7 @@ export default class History extends AccountCommand {
         } catch (e) {
             dontUpdate = true;
             //cancel all jobs
-            jobs.forEach((jobId) => process.workerServer.removeJob(jobId));
+            jobIds.forEach((jobId) => process.workerServer.removeJob(jobId));
 
             if (e instanceof Error) {
                 l.error(e);
