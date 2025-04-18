@@ -21,6 +21,11 @@ export interface Account {
     tagLine: string;
 }
 
+export interface InMemory {
+    key: string;
+    value: string;
+}
+
 export interface Lp {
     account_id: number;
     id: Generated<number>;
@@ -41,6 +46,7 @@ export interface MatchLp {
 
 export interface DB {
     account: Account;
+    in_memory: InMemory;
     lp: Lp;
     match_lp: MatchLp;
 }

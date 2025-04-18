@@ -1,5 +1,6 @@
 import { AccountCommand } from '$/lib/AccountCommand';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
+import crypto from 'node:crypto';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse, toValidResponse } from '$/lib/Riot/baseRequest';
@@ -23,6 +24,15 @@ import { Selectable } from 'kysely';
 import { z } from 'zod';
 
 const l = new Logger('History', 'white');
+
+type ButtonData = {
+    discordId: string;
+    summonerId: string;
+    region: Region;
+    queue: string | null;
+    count: number;
+    offset: number;
+};
 
 export default class History extends AccountCommand {
     constructor() {
@@ -157,24 +167,19 @@ export default class History extends AccountCommand {
 
     generateButtonRow(
         lang: ReturnType<typeof getLocale>,
-        userId: string,
-        summonerId: string,
-        region: Region,
-        queue: string | null,
+        key: string,
         count: number,
         offset: number,
         promiseCount: number
     ) {
-        //history;discordid;summonerid;region;queue;count;offset
-        const baseId = `history;${userId};${summonerId};${region};${queue || ''};${count};${offset}`;
         return new ActionRowBuilder<ButtonBuilder>().addComponents([
             new ButtonBuilder()
-                .setCustomId(`${baseId};prev`)
+                .setCustomId(`history;${key};prev`)
                 .setEmoji('⬅️')
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(offset === 0),
             new ButtonBuilder()
-                .setCustomId(`${baseId};reload`)
+                .setCustomId(`history;${key};reload`)
                 .setEmoji('🔄')
                 .setLabel(
                     replacePlaceholders(
@@ -185,7 +190,7 @@ export default class History extends AccountCommand {
                 )
                 .setStyle(ButtonStyle.Primary),
             new ButtonBuilder()
-                .setCustomId(`${baseId};next`)
+                .setCustomId(`history;${key};next`)
                 .setEmoji('➡️')
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(promiseCount < count) // I am at the end
@@ -209,8 +214,9 @@ export default class History extends AccountCommand {
 
             const files = await Promise.all(
                 jobIds.map(async (jobId) => {
+                    const start = Date.now();
                     const path = await process.workerServer.wait(jobId);
-                    if (!dontUpdate)
+                    if (!dontUpdate && Date.now() - start > 100)
                         await interaction.editReply({
                             content: replacePlaceholders(
                                 lang.match.loading,
@@ -289,16 +295,19 @@ export default class History extends AccountCommand {
             return;
         }
 
-        const row = this.generateButtonRow(
-            lang,
-            interaction.user.id,
-            account.summoner_id,
+        const key = crypto.randomBytes(16).toString('hex');
+
+        const inMemory = process.inMemory.getInstance<ButtonData>();
+        inMemory.set(key, {
+            discordId: interaction.user.id,
+            summonerId: account.summoner_id,
             region,
-            queue,
+            queue: queue || '',
             count,
-            offset,
-            result.length
-        );
+            offset
+        });
+
+        const row = this.generateButtonRow(lang, key, count, offset, result.length);
 
         await this.handleMessages(interaction, interaction, result, row, lang);
     }
@@ -334,21 +343,31 @@ export default class History extends AccountCommand {
         if (id[0] !== 'history') return;
 
         const lang = getLocale(interaction.locale);
+        const key = id[1];
 
-        const discordId = id[1];
-        if (interaction.user.id !== discordId) {
+        const inMemory = process.inMemory.getInstance<ButtonData>();
+        const data = await inMemory.get(key);
+
+        if (!data) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: lang.genericError
+            });
+            return;
+        }
+
+        if (interaction.user.id !== data.discordId) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
                 content: lang.noPermission
             });
             return;
         }
-        const summonerId = id[2];
-        const region = id[3] as Region;
-        const queue = id[4] || null;
-        const count = parseInt(id[5]);
-        let offset = parseInt(id[6]);
-        const command = id[7];
+
+        let { offset } = data;
+        const { count, summonerId, region, queue } = data;
+
+        const command = id[2];
         const originalOffset = offset;
 
         switch (command) {
@@ -378,16 +397,7 @@ export default class History extends AccountCommand {
         if (typeof result === 'string') {
             if (result === lang.match.empty) {
                 //update buttons, so the next button is disabled
-                const row = this.generateButtonRow(
-                    lang,
-                    discordId,
-                    summonerId,
-                    region,
-                    queue,
-                    count,
-                    originalOffset,
-                    0
-                );
+                const row = this.generateButtonRow(lang, key, count, originalOffset, 0);
 
                 await interaction.message.edit({
                     components: [row]
@@ -401,16 +411,7 @@ export default class History extends AccountCommand {
             return;
         }
 
-        const row = this.generateButtonRow(
-            lang,
-            discordId,
-            summonerId,
-            region,
-            queue,
-            count,
-            offset,
-            result.length
-        );
+        const row = this.generateButtonRow(lang, key, count, offset, result.length);
 
         await this.handleMessages(interaction.message, interaction, result, row, lang);
     }

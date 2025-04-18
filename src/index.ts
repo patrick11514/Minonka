@@ -9,6 +9,7 @@ import { DiscordBot } from './lib/DiscordBot';
 import Logger from './lib/logger';
 import { WorkerServer } from './lib/WorkerServer';
 import { registerCrons } from './lib/cron';
+import { InMemory } from './lib/InMemory';
 
 if (process.argv.includes('--register')) {
     const l = new Logger('CommandRegister', 'cyan');
@@ -29,6 +30,7 @@ if (process.argv.includes('--register')) {
     const l = new Logger('DiscordBot', 'yellow');
     const workerServer = new WorkerServer();
     process.workerServer = workerServer;
+    process.inMemory = new InMemory();
     registerCrons();
 
     l.start('Starting Discord Bot...');
