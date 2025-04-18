@@ -8,6 +8,7 @@ import { RankData } from '$/Worker/tasks/rank';
 import { MatchData } from '$/Worker/tasks/match';
 import { TeamData } from '$/Worker/tasks/team';
 import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
+import { kill } from 'node:process';
 
 enum WorkerState {
     FREE,
@@ -157,7 +158,7 @@ export class WorkerServer extends EventEmitter<Events> {
             //remove, since we got it
             this.jobResults.delete(jobId);
 
-            if (result instanceof Error) {
+            if (result.data instanceof Error) {
                 throw result;
             }
 
@@ -197,5 +198,11 @@ export class WorkerServer extends EventEmitter<Events> {
         const jobId = this.addJob(jobName, data);
 
         return this.wait(jobId);
+    }
+
+    removeJob(jobId: string) {
+        l.log('Removing job ' + jobId);
+        this.jobs = this.jobs.filter((job) => job.id !== jobId);
+        this.jobResults.delete(jobId);
     }
 }
