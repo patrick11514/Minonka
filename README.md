@@ -46,7 +46,7 @@ History command will show your game history. By default it show last 6 games, bu
 Clash command will show information about upcomming clash tournaments. Also you can scout teams, by searching by member of team, or team id, if you used command previously.
 
 ![clash schedule](https://upload.patrick115.eu/screenshot/0469e98338.png)
-![clash team](https://upload.patrick115.eu/screenshot/a029d635d0.png)
+![clash team](https://upload.patrick115.eu/screenshot/Sn%C3%ADmek%20obrazovky%202025-04-18%20122319.png)
 
 - /clash schedule \<region\> - shows scheduled clash tournaments for specific region
 - /clash team id \<id\> \<region\> - shows team based of their id (its showed /clash team)
