@@ -214,8 +214,9 @@ export default class History extends AccountCommand {
 
             const files = await Promise.all(
                 jobIds.map(async (jobId) => {
+                    const start = Date.now();
                     const path = await process.workerServer.wait(jobId);
-                    if (!dontUpdate)
+                    if (!dontUpdate && Date.now() - start > 100)
                         await interaction.editReply({
                             content: replacePlaceholders(
                                 lang.match.loading,
