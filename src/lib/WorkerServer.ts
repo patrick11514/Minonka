@@ -8,7 +8,6 @@ import { RankData } from '$/Worker/tasks/rank';
 import { MatchData } from '$/Worker/tasks/match';
 import { TeamData } from '$/Worker/tasks/team';
 import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
-import { kill } from 'node:process';
 
 enum WorkerState {
     FREE,
