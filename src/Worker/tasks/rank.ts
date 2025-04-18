@@ -101,7 +101,7 @@ export default async (data: RankData) => {
         }
     );
     await profile.resize({
-        width: 1.2
+        width: 360
     });
     profilePart.addElement(profile);
 

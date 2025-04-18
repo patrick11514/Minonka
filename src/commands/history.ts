@@ -6,6 +6,7 @@ import { formatErrorResponse, toValidResponse } from '$/lib/Riot/baseRequest';
 import { CherryMatchSchema, RegularMatchSchema } from '$/lib/Riot/schemes';
 import { queues, Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
+import { DePromise, OmitUnion } from '$/types/types';
 import {
     RepliableInteraction,
     CacheType,
@@ -15,7 +16,8 @@ import {
     MessageFlags,
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonStyle
+    ButtonStyle,
+    Message
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import { z } from 'zod';
@@ -130,23 +132,26 @@ export default class History extends AccountCommand {
             return formatErrorResponse(lang, matchesData.find((match) => !match.status)!);
         }
 
-        return matchesData.map((match) => () => {
+        return matchesData.map((match) => {
             const _match = match as toValidResponse<typeof match>;
+            let jobId: string;
             if (_match.data.info.gameMode === 'CHERRY') {
-                return process.workerServer.addJobWait('cherryMatch', {
+                jobId = process.workerServer.addJob('cherryMatch', {
                     ...(_match.data as z.infer<typeof CherryMatchSchema>),
                     locale,
                     region,
                     mySummonerId: summonerId
                 });
             } else {
-                return process.workerServer.addJobWait('match', {
+                jobId = process.workerServer.addJob('match', {
                     ...(_match.data as z.infer<typeof RegularMatchSchema>),
                     locale,
                     region,
                     mySummonerId: summonerId
                 });
             }
+
+            return jobId;
         });
     }
 
@@ -185,6 +190,74 @@ export default class History extends AccountCommand {
                 .setStyle(ButtonStyle.Primary)
                 .setDisabled(promiseCount < count) // I am at the end
         ]);
+    }
+
+    private async handleMessages(
+        editMessage: Message<boolean> | ChatInputCommandInteraction,
+        interaction: RepliableInteraction<CacheType>,
+        jobIds: OmitUnion<DePromise<ReturnType<typeof this.getFiles>>, string>,
+        row: ActionRowBuilder<ButtonBuilder>,
+        lang: ReturnType<typeof getLocale>
+    ) {
+        await interaction.deferReply();
+
+        let dontUpdate = false;
+
+        try {
+            let progress = 0;
+            const max = jobIds.length;
+
+            const files = await Promise.all(
+                jobIds.map(async (jobId) => {
+                    const path = await process.workerServer.wait(jobId);
+                    if (!dontUpdate)
+                        await interaction.editReply({
+                            content: replacePlaceholders(
+                                lang.match.loading,
+                                (++progress).toString(),
+                                max.toString()
+                            )
+                        });
+                    return path;
+                })
+            );
+
+            await interaction.editReply({
+                content: lang.match.uploading
+            });
+
+            if (editMessage instanceof Message) {
+                await editMessage.edit({
+                    content: '',
+                    files,
+                    components: [row]
+                });
+                await interaction.deleteReply();
+            } else {
+                await editMessage.editReply({
+                    content: '',
+                    files,
+                    components: [row]
+                });
+            }
+        } catch (e) {
+            dontUpdate = true;
+            //cancel all jobs
+            jobIds.forEach((jobId) => process.workerServer.removeJob(jobId));
+
+            if (e instanceof Error) {
+                l.error(e);
+                await interaction.editReply({
+                    content: replacePlaceholders(lang.workerError, e.message)
+                });
+                return;
+            }
+
+            await interaction.editReply({
+                content: lang.genericError
+            });
+            return;
+        }
     }
 
     async onMenuSelect(
@@ -227,52 +300,7 @@ export default class History extends AccountCommand {
             result.length
         );
 
-        await interaction.deferReply();
-
-        let dontUpdate = false;
-
-        try {
-            let progress = 0;
-            const max = result.length;
-
-            const files = await Promise.all(
-                result.map(async (f) => {
-                    const path = await f();
-                    if (!dontUpdate)
-                        await interaction.editReply({
-                            content: replacePlaceholders(
-                                lang.match.loading,
-                                (++progress).toString(),
-                                max.toString()
-                            )
-                        });
-                    return path;
-                })
-            );
-            await interaction.editReply({
-                content: lang.match.uploading
-            });
-
-            await interaction.editReply({
-                content: '',
-                files,
-                components: [row]
-            });
-        } catch (e) {
-            dontUpdate = true;
-            if (e instanceof Error) {
-                l.error(e);
-                await interaction.editReply({
-                    content: replacePlaceholders(lang.workerError, e.message)
-                });
-                return;
-            }
-
-            await interaction.editReply({
-                content: lang.genericError
-            });
-            return;
-        }
+        await this.handleMessages(interaction, interaction, result, row, lang);
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
@@ -384,54 +412,6 @@ export default class History extends AccountCommand {
             result.length
         );
 
-        await interaction.deferReply({
-            flags: MessageFlags.Ephemeral
-        });
-        let dontUpdate = false;
-
-        try {
-            let progress = 0;
-            const max = result.length;
-            const files = await Promise.all(
-                result.map(async (f) => {
-                    const path = await f();
-                    if (!dontUpdate)
-                        await interaction.editReply({
-                            content: replacePlaceholders(
-                                lang.match.loading,
-                                (++progress).toString(),
-                                max.toString()
-                            )
-                        });
-                    return path;
-                })
-            );
-            await interaction.editReply({
-                content: lang.match.uploading
-            });
-            await interaction.message.edit({
-                content: '',
-                files,
-                components: [row]
-            });
-            await interaction.deleteReply();
-        } catch (e) {
-            dontUpdate = true;
-            if (e instanceof Error) {
-                l.error(e);
-                await interaction.editReply({
-                    content: replacePlaceholders(
-                        getLocale(interaction.locale).workerError,
-                        e.message
-                    )
-                });
-                return;
-            }
-
-            await interaction.editReply({
-                content: getLocale(interaction.locale).genericError
-            });
-            return;
-        }
+        await this.handleMessages(interaction.message, interaction, result, row, lang);
     }
 }

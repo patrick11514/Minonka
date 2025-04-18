@@ -157,8 +157,8 @@ export class WorkerServer extends EventEmitter<Events> {
             //remove, since we got it
             this.jobResults.delete(jobId);
 
-            if (result instanceof Error) {
-                throw result;
+            if (result.data instanceof Error) {
+                throw result.data;
             }
 
             return result.data as string;
@@ -197,5 +197,11 @@ export class WorkerServer extends EventEmitter<Events> {
         const jobId = this.addJob(jobName, data);
 
         return this.wait(jobId);
+    }
+
+    removeJob(jobId: string) {
+        l.log('Removing job ' + jobId);
+        this.jobs = this.jobs.filter((job) => job.id !== jobId);
+        this.jobResults.delete(jobId);
     }
 }
