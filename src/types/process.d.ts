@@ -1,3 +1,4 @@
+import { InMemory } from '$/lib/InMemory';
 import { WorkerServer } from '$/lib/WorkerServer';
 import { Client } from 'discord.js';
 
@@ -7,6 +8,7 @@ declare global {
             workerServer: WorkerServer;
             client: Client;
             lolPatch: string;
+            inMemory: InMemory;
         }
     }
 }
