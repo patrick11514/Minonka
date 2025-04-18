@@ -144,8 +144,9 @@ export default async (data: SummonerData) => {
             y: 120
         }
     );
+
     await profileIcon.resize({
-        width: 0.3
+        width: 100
     });
     await profileIcon.roundify();
     background.addElement(profileIcon);
