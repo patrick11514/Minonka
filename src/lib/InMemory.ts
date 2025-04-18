@@ -34,11 +34,11 @@ export class InMemory<$Value = unknown> {
         }
     }
 
-    set(key: string, value: $Value) {
+    async set(key: string, value: $Value) {
         this.memory.set(key, value);
 
         //save to db
-        this.write(key, value);
+        await this.write(key, value);
     }
 
     async get(key: string) {
