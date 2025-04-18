@@ -49,7 +49,7 @@ Clash command will show information about upcomming clash tournaments. Also you 
 ![clash team](https://upload.patrick115.eu/screenshot/Sn%C3%ADmek%20obrazovky%202025-04-18%20122319.png)
 
 - /clash schedule \<region\> - shows scheduled clash tournaments for specific region
-- /clash team id \<id\> \<region\> - shows team based of their id (its showed /clash team)
+- /clash team id \<id\> \<region\> - shows team based of their id (its showed /clash team NOTE: the id can change, so don't always depends on it. Usually before the team enter clash its UUID and after team star playing is usually number)
 - /clash team me - shows team in which are you
 - /clash team other - \<riot-username\> \<riot-tag\> \<region\> - shows team in which are user joined
 - /clash team mention \<mention\> - shows team in which mentioned user is joined
