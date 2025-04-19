@@ -248,7 +248,6 @@ export const CherryMatchSchema = RegularMatchSchema.extend({
 export const MatchSchema = z.union([RegularMatchSchema, CherryMatchSchema]);
 
 export const ClashMemberSchema = z.object({
-    summonerId: z.string(),
     puuid: z.string(),
     position: z.string().refine((v): v is Position => positions.includes(v as Position)),
     role: z.literal('CAPTAIN').or(z.literal('MEMBER'))

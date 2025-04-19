@@ -189,9 +189,7 @@ export default class Clash extends Command {
         try {
             newPlayers = await Promise.all(
                 team.data.players.map(async (player) => {
-                    const summoner = await api[region].summoner.bySummonerId(
-                        player.summonerId
-                    );
+                    const summoner = await api[region].summoner.byPuuid(player.puuid);
                     if (!summoner.status) {
                         throw new Error(formatErrorResponse(lang, summoner));
                     }
@@ -201,9 +199,7 @@ export default class Clash extends Command {
                         throw new Error(formatErrorResponse(lang, account));
                     }
 
-                    const ranks = await api[region].league.bySummonerId(
-                        player.summonerId
-                    );
+                    const ranks = await api[region].league.bySummonerId(summoner.data.id);
                     if (!ranks.status) {
                         throw new Error(formatErrorResponse(lang, ranks));
                     }
@@ -213,7 +209,7 @@ export default class Clash extends Command {
                     );
 
                     return {
-                        summonerId: player.summonerId,
+                        summonerId: summoner.data.id,
                         puuid: player.puuid,
                         position: player.position,
                         role: player.role,
