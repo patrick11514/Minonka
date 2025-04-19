@@ -70,7 +70,9 @@ export default async (data: TeamData) => {
     const icon = new Image(
         (await getAsset(AssetType.OTHER, `clash/${data.iconId}.png`))!,
         {
-            x: backgroundSize.width / 2 - nameSize.width / 2 - /*spacing*/ (100 + 20),
+            x: Math.floor(
+                backgroundSize.width / 2 - nameSize.width / 2 - /*spacing*/ (100 + 20)
+            ),
             y: 30
         }
     );
@@ -81,7 +83,7 @@ export default async (data: TeamData) => {
 
     //CAPTAIN
     const captain = data.players.find(
-        (player) => player.role === 'CAPTAIN' && data.captain === player.summonerId
+        (player) => player.role === 'CAPTAIN' && data.captain === player.puuid
     )!;
 
     const renderPlayer = async (
