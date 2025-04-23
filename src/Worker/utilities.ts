@@ -169,9 +169,9 @@ export const getRuneTree = (
 ) => {
     const root = player.perks.styles[idx];
 
-    let tree = runesReforged.find((rune) => rune.id === root.style);
-    if (!tree) {
-        tree = runesReforged.find((rune) =>
+    const tree = runesReforged.find(
+        (rune) =>
+            rune.id === root.style ||
             root.selections
                 .map((selection) => selection.perk)
                 .some((perkId) =>
@@ -180,8 +180,7 @@ export const getRuneTree = (
                         .flat()
                         .includes(perkId)
                 )
-        )!;
-    }
+    );
 
     if (!tree) {
         throw new Error('Failed to find tree');
