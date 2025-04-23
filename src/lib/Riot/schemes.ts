@@ -71,7 +71,7 @@ export type ChallengeData = z.infer<typeof ChallengeSchema>;
 
 type NumberSuffix<$Prefix extends string, $Num extends number> = `${$Prefix}${$Num}`;
 
-const ParticipantSchema = z.object({
+export const ParticipantSchema = z.object({
     champExperience: z.number(),
     champLevel: z.number(),
     championId: z.number(),
