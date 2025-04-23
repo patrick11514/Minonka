@@ -5,11 +5,14 @@ import fs from 'node:fs';
 import { CherryMatchData } from './tasks/cherryMatch';
 import { MatchData } from './tasks/match';
 import { ExtractAssetResult } from './types';
-import { AssetType, getAsset, getSummonerSpells } from '$/lib/Assets';
+import { AssetType, getAsset, getRunesReforged, getSummonerSpells } from '$/lib/Assets';
 import { Image } from '$/lib/Imaging/Image';
 import { Blank } from '$/lib/Imaging/Blank';
 import { Text } from '$/lib/Imaging/Text';
 import { Color } from '$/lib/Imaging/types';
+import { DePromise, OmitUnion } from '$/types/types';
+import { ParticipantSchema } from '$/lib/Riot/schemes';
+import { z } from 'zod';
 
 export const save = async (image: Background) => {
     if (!fs.existsSync(env.CACHE_PATH)) {
@@ -157,4 +160,43 @@ export const fixChampName = (champName: string) => {
         return 'Fiddlesticks';
     }
     return champName;
+};
+
+export const getRuneTree = (
+    runesReforged: OmitUnion<DePromise<ReturnType<typeof getRunesReforged>>, null>,
+    player: z.infer<typeof ParticipantSchema>,
+    idx: number
+) => {
+    const root = player.perks.styles[idx];
+
+    let tree = runesReforged.find((rune) => rune.id === root.style);
+    if (!tree) {
+        tree = runesReforged.find((rune) =>
+            root.selections
+                .map((selection) => selection.perk)
+                .some((perkId) =>
+                    rune.slots
+                        .map((slot) => slot.runes.map((rune) => rune.id))
+                        .flat()
+                        .includes(perkId)
+                )
+        )!;
+    }
+
+    if (!tree) {
+        throw new Error('Failed to find tree');
+    }
+
+    return tree;
+};
+
+export const getRune = (
+    tree: ReturnType<typeof getRuneTree>,
+    player: z.infer<typeof ParticipantSchema>,
+    idx: number,
+    selection: number
+) => {
+    return tree.slots[0].runes.find(
+        (rune) => rune.id === player.perks.styles[idx].selections[selection].perk
+    )!;
 };

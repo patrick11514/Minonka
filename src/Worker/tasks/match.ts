@@ -13,6 +13,8 @@ import { z } from 'zod';
 import {
     fixChampName,
     getPersistant,
+    getRune,
+    getRuneTree,
     persistantExists,
     putItems,
     putSumms,
@@ -428,12 +430,8 @@ export default async (data: MatchData) => {
 
         //Runes
         //Primary
-        const tree = runesReforged.find(
-            (tree) => tree.id == player.perks.styles[0].style
-        )!;
-        const mainRune = tree.slots[0].runes.find(
-            (rune) => rune.id === player.perks.styles[0].selections[0].perk
-        )!;
+        const tree = getRuneTree(runesReforged, player, 0);
+        const mainRune = getRune(tree, player, 0, 0);
         const primary = new Image(
             (await getAsset(AssetType.DDRAGON_IMG, mainRune.icon))!,
             {
@@ -447,9 +445,8 @@ export default async (data: MatchData) => {
         RuneSumms.addElement(primary);
 
         //Secondary
-        const secondaryTree = runesReforged.find(
-            (tree) => tree.id == player.perks.styles[1].style
-        )!;
+        const secondaryTree = getRuneTree(runesReforged, player, 1);
+
         const secondary = new Image(
             (await getAsset(AssetType.DDRAGON_IMG, secondaryTree.icon))!,
             {

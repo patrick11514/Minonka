@@ -204,7 +204,9 @@ export default class History extends AccountCommand {
         row: ActionRowBuilder<ButtonBuilder>,
         lang: ReturnType<typeof getLocale>
     ) {
-        await interaction.deferReply();
+        await interaction.deferReply({
+            flags: editMessage instanceof Message ? MessageFlags.Ephemeral : undefined
+        });
 
         let dontUpdate = false;
 
