@@ -209,7 +209,6 @@ export default class Clash extends Command {
                     );
 
                     return {
-                        summonerId: summoner.data.id,
                         puuid: player.puuid,
                         position: player.position,
                         role: player.role,

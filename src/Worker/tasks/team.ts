@@ -16,7 +16,6 @@ export type TeamData = {
     tier: number;
     captain: string;
     players: {
-        summonerId: string;
         puuid: string;
         position:
             | 'UNSELECTED'
