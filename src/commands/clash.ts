@@ -29,7 +29,7 @@ export default class Clash extends Command {
     constructor() {
         super('clash', 'Show information about clash', {
             exampleUsage: {
-                default: `- /clash schedule - Shows the schedule for upcomming clashes
+                default: `- /clash schedule - Shows the schedule for upcoming clashes
 - /clash team me - Shows clash team by user
 - /clash team id id:456 region:EUNE - Shows clash team by id`,
                 locales: {
