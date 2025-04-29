@@ -7,13 +7,28 @@ import {
 import { constructOption, OptionType } from './types';
 import { SubCommand } from './SubCommand';
 import { SubCommandGroup } from './SubCommandGroup';
+import { DiscordBot } from './DiscordBot';
+
+type HelpMessage = {
+    default: string;
+    locales: Partial<Record<Locale, string>>;
+};
+
+export type HelpParameter = Partial<{
+    exampleUsage: HelpMessage;
+    extendedHelp: HelpMessage;
+}>;
 
 export abstract class Command {
     slashCommand: SlashCommandBuilder;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     events: Record<string, ((...args: any[]) => void)[]> = {};
 
-    constructor(name: string, description: string) {
+    constructor(
+        name: string,
+        description: string,
+        public help?: HelpParameter
+    ) {
         this.slashCommand = new SlashCommandBuilder()
             .setName(name)
             .setDescription(description);
@@ -43,6 +58,9 @@ export abstract class Command {
         if (!this.events[event]) this.events[event] = [];
         this.events[event].push(listener);
     }
+
+    //eslint-disable-next-line @typescript-eslint/no-unused-vars
+    public async onBotLoad(client: DiscordBot) {}
 
     abstract handler(interaction: ChatInputCommandInteraction): Promise<void>;
 }

@@ -9,7 +9,7 @@ import {
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder
 } from 'discord.js';
-import { Command } from './Command';
+import { Command, HelpParameter } from './Command';
 import { Region } from './Riot/types';
 import { SubCommand } from './SubCommand';
 import { setupRiotOptions } from './utilities';
@@ -34,9 +34,10 @@ export abstract class AccountCommand extends Command {
                 description: string;
                 localizedDescription: Record<Locale.Czech, string>;
             }
-        >
+        >,
+        help?: HelpParameter
     ) {
-        super(name, description);
+        super(name, description, help);
 
         const names = [['já'], ['jméno'], ['zmínka']] as const;
 
