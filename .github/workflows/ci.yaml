@@ -19,6 +19,14 @@ jobs:
             - name: Install pnpm
               run: npm install -g pnpm
 
+            - name: Cache node_modules
+              uses: actions/cache@v3
+              with:
+                  path: node_modules
+                  key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pnpm-store-
+
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
