@@ -27,7 +27,24 @@ export default class Clash extends Command {
     private teamId: SubCommand;
 
     constructor() {
-        super('clash', 'Show information about clash');
+        super('clash', 'Show information about clash', {
+            exampleUsage: {
+                default: `- /clash schedule - Shows the schedule for upcomming clashes
+- /clash team me - Shows clash team by user
+- /clash team id id:456 region:EUNE - Shows clash team by id`,
+                locales: {
+                    [Locale.Czech]: `- /clash rozpis - Zobrazí rozpis nadcházejících clashů
+- /clash tým já - Zobrazí clash tým podle uživatele
+- /clash tým id id:456 region:EUNE - Zobrazí clash tým podle id`
+                }
+            },
+            extendedHelp: {
+                default: `This command is used to show information about clash. You can use it to get the schedule for upcomming clashes or to get information about your/other players clash team.`,
+                locales: {
+                    [Locale.Czech]: `Tento příkaz se používá k zobrazení informací o clashi. Můžeš jej použít k získání rozpisu nadcházejících clashů nebo k získání informací o tvém/ostatních hráčských clash týmu.`
+                }
+            }
+        });
         super.addLocalization(Locale.Czech, 'clash', 'Zobrazí informace o clashech');
 
         this.schedule = new SubCommand(

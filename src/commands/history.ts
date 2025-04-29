@@ -36,30 +36,43 @@ type ButtonData = {
 
 export default class History extends AccountCommand {
     constructor() {
-        super('history', 'Show you match history of last 6 games', {
-            me: {
-                description: 'Show your match history of last 6 games',
-                localizedDescription: {
-                    [Locale.Czech]: 'Zobrazí tvou historii posledních 6 her'
+        super(
+            'history',
+            'Show you match history of last 6 games',
+            {
+                me: {
+                    description: 'Show your match history of last 6 games',
+                    localizedDescription: {
+                        [Locale.Czech]: 'Zobrazí tvou historii posledních 6 her'
+                    }
+                },
+                name: {
+                    description: 'Show match history of another player',
+                    localizedDescription: {
+                        [Locale.Czech]: 'Zobrazí historii her jiného hráče'
+                    }
+                },
+                mention: {
+                    description: 'Show match history of mentioned player',
+                    localizedDescription: {
+                        [Locale.Czech]: 'Zobrazí historii her zmíněného hráče'
+                    }
                 }
             },
-            name: {
-                description: 'Show match history of another player',
-                localizedDescription: {
-                    [Locale.Czech]: 'Zobrazí historii her jiného hráče'
-                }
-            },
-            mention: {
-                description: 'Show match history of mentioned player',
-                localizedDescription: {
-                    [Locale.Czech]: 'Zobrazí historii her zmíněného hráče'
+            {
+                exampleUsage: {
+                    default: '/history me - show your match history',
+                    locales: {
+                        [Locale.Czech]:
+                            '/historie já - zobrazí tvou historii posledních 6 her'
+                    }
                 }
             }
-        });
+        );
         super.addLocalization(
             Locale.Czech,
             'historie',
-            'Zobrazí tvou historii posledních 5 her'
+            'Zobrazí tvou historii posledních 6 her'
         );
         for (const subCommand of [
             this.meSubCommand,
@@ -73,7 +86,7 @@ export default class History extends AccountCommand {
                     [Locale.Czech]: 'fronta'
                 },
                 localizedDescription: {
-                    [Locale.Czech]: 'Vyber fronty pro filtrování'
+                    [Locale.Czech]: 'Vyběr fronty pro filtrování'
                 },
                 type: 'STRING',
                 required: false,
