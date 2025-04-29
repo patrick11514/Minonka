@@ -86,7 +86,7 @@ export default class History extends AccountCommand {
                     [Locale.Czech]: 'fronta'
                 },
                 localizedDescription: {
-                    [Locale.Czech]: 'Vyběr fronty pro filtrování'
+                    [Locale.Czech]: 'Výběr fronty pro filtrování'
                 },
                 type: 'STRING',
                 required: false,
