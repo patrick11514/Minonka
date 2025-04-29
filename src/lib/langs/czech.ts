@@ -207,5 +207,14 @@ export default template.parse({
         bilgewater: 'Bilgewater',
         shadowIsles: 'Stínové ostrovy'
     },
-    unranked: 'Nehodnocený'
+    unranked: 'Nehodnocený',
+    help: {
+        title: 'Nápověda pro příkaz %1',
+        description: 'Popisek',
+        exampleUsage: 'Příklad použití',
+        extendedDescription: 'Rozšířený popis',
+        parameters: 'Parametry',
+        subcommands: 'Podpříkazy',
+        select: 'Vyber příkaz pro jeho nápovědu'
+    }
 } satisfies z.infer<typeof template>);

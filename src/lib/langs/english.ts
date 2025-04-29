@@ -205,5 +205,14 @@ export default template.parse({
         targon: 'Targon',
         zaun: 'Zaun'
     },
-    unranked: 'Unranked'
+    unranked: 'Unranked',
+    help: {
+        title: 'Help for command %1',
+        description: 'Description',
+        exampleUsage: 'Example usage',
+        extendedDescription: 'Extended description',
+        parameters: 'Parameters',
+        subcommands: 'Subcommands',
+        select: 'Select command for help'
+    }
 } satisfies z.infer<typeof template>);

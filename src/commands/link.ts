@@ -12,7 +12,14 @@ const l = new Logger('Link', 'white');
 
 export default class Link extends Command {
     constructor() {
-        super('link', 'Link your Riot Account');
+        super('link', 'Link your Riot Account', {
+            exampleUsage: {
+                default: '/link name:patrick115 tag:Czech region:EUNE',
+                locales: {
+                    [Locale.Czech]: '/propojit jméno:patrik115 tag:Czech region:EUNE'
+                }
+            }
+        });
         this.addLocalization(Locale.Czech, 'propojit', 'Propojí tvůj Riot Účet');
         setupRiotOptions(this);
     }

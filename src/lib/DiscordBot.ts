@@ -30,6 +30,8 @@ export class DiscordBot extends EventEmitter<Events> {
         this.client.on('ready', (client) => {
             super.emit('login', client);
             setStatus();
+
+            this.commands.forEach((command) => command.onBotLoad(this));
         });
 
         this.client.login(env.CLIENT_TOKEN);
@@ -113,5 +115,9 @@ export class DiscordBot extends EventEmitter<Events> {
             console.error(e);
             return [];
         }
+    }
+
+    getCommand(name: string) {
+        return this.commands.find((c) => c.slashCommand.name === name);
     }
 }

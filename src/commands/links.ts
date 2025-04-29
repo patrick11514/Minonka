@@ -18,7 +18,16 @@ const l = new Logger('Links', 'red');
 
 export default class Links extends Command {
     constructor() {
-        super('links', 'Get all your linked accounts');
+        super('links', 'Get all your linked accounts', {
+            extendedHelp: {
+                default:
+                    'After showing all liked accounts, you can unlink them by selecting the account from the list.',
+                locales: {
+                    [Locale.Czech]:
+                        'Po zobrazení všech propojených účtů je můžeš odpojit výběrem účtu ze seznamu.'
+                }
+            }
+        });
 
         super.addLocalization(
             Locale.Czech,
