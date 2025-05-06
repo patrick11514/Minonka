@@ -55,9 +55,3 @@ export const addRegionOption = (instance: Command | SubCommand) => {
         })
     });
 };
-
-export const fromEntries = <$Key extends string | symbol | number, $Value>(
-    array: [$Key, $Value][]
-) => {
-    return Object.fromEntries(array) as Record<$Key, $Value>;
-};

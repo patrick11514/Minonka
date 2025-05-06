@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { fromEntries } from '../utilities';
 import { Position, positions, QueueId, queues } from './types';
 
 export const AccountSchema = z.object({
@@ -77,6 +76,7 @@ export const ParticipantSchema = z.object({
     championId: z.number(),
     championName: z.string(),
     deaths: z.number(),
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     doubleKills: z.number(),
     tripleKills: z.number(),
     quadraKills: z.number(),
@@ -94,9 +94,11 @@ export const ParticipantSchema = z.object({
         .or(z.literal('UTILITY'))
         .or(z.literal('Invalid')),
     //item
-    ...fromEntries<NumberSuffix<'item', 0 | 1 | 2 | 3 | 4 | 5 | 6>, z.ZodNumber>(
-        //eslint-disable-next-line @typescript-eslint/no-explicit-any
-        Array.from({ length: 7 }).map((_, id) => [`item${id}`, z.number()]) as any
+    ...Object.fromEntries(
+        Array.from({ length: 7 }).map((_, id) => [
+            `item${id}` as NumberSuffix<'item', 0 | 1 | 2 | 3 | 4 | 5 | 6>,
+            z.number()
+        ])
     ),
     kills: z.number(),
     assists: z.number(),
@@ -160,12 +162,14 @@ export const ParticipantSchema = z.object({
 const cherryParticipantSchema = ParticipantSchema.extend({
     playerSubteamId: z.number(),
     subteamPlacement: z.number(),
-    ...fromEntries<NumberSuffix<'playerAugment', 1 | 2 | 3 | 4 | 5 | 6>, z.ZodNumber>(
+    ...Object.fromEntries(
         Array.from({ length: 6 }).map((_, id) => [
-            `playerAugment${id + 1}`,
+            `playerAugment${id + 1}` as NumberSuffix<
+                'playerAugment',
+                1 | 2 | 3 | 4 | 5 | 6
+            >,
             id > 3 ? z.number().optional() : z.number()
-            //eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ]) as any
+        ])
     )
 });
 
@@ -251,4 +255,11 @@ export const ClashMemberSchema = z.object({
     puuid: z.string(),
     position: z.string().refine((v): v is Position => positions.includes(v as Position)),
     role: z.literal('CAPTAIN').or(z.literal('MEMBER'))
+});
+
+export const MasterySchema = z.object({
+    puuid: z.string(),
+    championId: z.number(),
+    championLevel: z.number(),
+    championPoints: z.number()
 });
