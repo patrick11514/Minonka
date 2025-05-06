@@ -10,6 +10,8 @@ import Logger from './lib/logger';
 import { WorkerServer } from './lib/WorkerServer';
 import { registerCrons } from './lib/cron';
 import { InMemory } from './lib/InMemory';
+import { EmojiManager } from './lib/EmojiManager';
+import './lib/pollyfill';
 
 if (process.argv.includes('--register')) {
     const l = new Logger('CommandRegister', 'cyan');
@@ -31,6 +33,10 @@ if (process.argv.includes('--register')) {
     const workerServer = new WorkerServer();
     process.workerServer = workerServer;
     process.inMemory = new InMemory();
+
+    const emoji = new EmojiManager();
+    process.emoji = emoji;
+
     registerCrons();
 
     l.start('Starting Discord Bot...');
@@ -39,5 +45,7 @@ if (process.argv.includes('--register')) {
 
     discordBot.on('login', (client) => {
         l.stop('Connected to discord as ' + client.user.tag);
+
+        emoji.sync();
     });
 }

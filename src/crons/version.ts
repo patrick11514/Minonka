@@ -33,6 +33,8 @@ export default [
                     } else {
                         l.stop('Patch updated');
                         process.lolPatch = newest;
+                        //sync emojis
+                        process.emoji.sync();
                     }
                 });
             } else {
