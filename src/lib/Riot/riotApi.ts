@@ -32,7 +32,7 @@ const transform = <$Data extends DataObject>(
 
     const resultObject = {} as UnknownHell;
 
-    for (const [key, value] of Object.entries(data)) {
+    for (const [key, value] of Object.entries(data as UnknownHell)) {
         if (!(value instanceof ApiSet)) {
             resultObject[key] = transform(
                 value as DataObject,
