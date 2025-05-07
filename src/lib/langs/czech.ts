@@ -216,5 +216,14 @@ export default template.parse({
         parameters: 'Parametry',
         subcommands: 'Podpříkazy',
         select: 'Vyber příkaz pro jeho nápovědu'
+    },
+    mastery: {
+        select: 'Vyber postavu pro zobrazení specifické mastery',
+        points: 'Bodů',
+        level: 'Úroveň',
+        next: 'Další stránka',
+        prev: 'Předchozí stránka',
+        lastPlayed: 'Naposledy hrán',
+        atTime: 'v'
     }
 } satisfies z.infer<typeof template>);

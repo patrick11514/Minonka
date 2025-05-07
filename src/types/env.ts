@@ -14,7 +14,10 @@ const schema = z.object({
     WEBSOCKET_PORT: z.coerce.number(),
     WEBSOCKET_HOST: z.string(),
     CACHE_PATH: z.string(),
-    PERSISTANT_CACHE_PATH: z.string()
+    PERSISTANT_CACHE_PATH: z.string(),
+    EMOJI_GUILD_CHAMPIONS: z.string(),
+    EMOJI_GUILD_ITEMS: z.string(),
+    EMOJI_GUILD_MISC: z.string()
 });
 
 export const env = schema.parse(process.env);

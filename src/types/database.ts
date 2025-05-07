@@ -21,6 +21,13 @@ export interface Account {
     tagLine: string;
 }
 
+export interface Emoji {
+    emoji_id: string;
+    guild: string;
+    id: Generated<number>;
+    name: string;
+}
+
 export interface InMemory {
     key: string;
     value: string;
@@ -46,6 +53,7 @@ export interface MatchLp {
 
 export interface DB {
     account: Account;
+    emoji: Emoji;
     in_memory: InMemory;
     lp: Lp;
     match_lp: MatchLp;

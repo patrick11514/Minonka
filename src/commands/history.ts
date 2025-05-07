@@ -400,6 +400,16 @@ export default class History extends AccountCommand {
         const account = await api[region].summoner.bySummonerId(summonerId);
         if (!account.status) return;
 
+        //update in memory
+        await inMemory.set(key, {
+            discordId: interaction.user.id,
+            summonerId: account.data.id,
+            region,
+            queue: queue || '',
+            count,
+            offset
+        });
+
         const result = await this.getFiles(
             interaction.locale,
             region,

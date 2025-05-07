@@ -50,6 +50,42 @@ export const updateLpForUser = async (user: {
                 exists.LP !== league.leaguePoints
             ) {
                 insert = true;
+            } else {
+                //here we should check, if the newest game is connected, because user
+                //might not lose any LP, but still lose (when he have 0 LP, and he
+                //have demote protection)
+                const matches = await api[user.region as Region].match.ids(user.puuid, {
+                    count: 1,
+                    start: 0,
+                    queue: league.queueType === 'RANKED_SOLO_5x5' ? '420' : '440'
+                });
+
+                if (!matches.status) continue;
+
+                const matchesLp = await conn
+                    .selectFrom('match_lp')
+                    .innerJoin('lp', 'lp.id', 'match_lp.lp')
+                    .selectAll()
+                    .where((eb) =>
+                        eb.and([
+                            eb('matchId', 'in', matches.data),
+                            eb('accountId', '=', user.id)
+                        ])
+                    )
+                    .execute();
+
+                if (matchesLp.length === 0) {
+                    //no matches in db, so connect last one with currentLp
+                    await conn
+                        .insertInto('match_lp')
+                        .values({
+                            accountId: user.id,
+                            matchId: matches.data[0],
+                            lp: exists.id,
+                            gain: 0
+                        })
+                        .execute();
+                }
             }
 
             if (!insert) continue;

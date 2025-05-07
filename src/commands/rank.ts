@@ -1,5 +1,5 @@
 import { AccountCommand } from '$/lib/AccountCommand';
-import { getLocale } from '$/lib/langs';
+import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
@@ -104,7 +104,19 @@ export default class Rank extends AccountCommand {
         } catch (e) {
             l.log(e);
 
-            //@TODO
+            if (e instanceof Error) {
+                l.error(e);
+                await interaction.reply({
+                    flags: MessageFlags.Ephemeral,
+                    content: replacePlaceholders(lang.workerError, e.message)
+                });
+                return;
+            }
+
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: lang.genericError
+            });
         }
     }
 }

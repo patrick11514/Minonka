@@ -214,5 +214,14 @@ export default template.parse({
         parameters: 'Parameters',
         subcommands: 'Subcommands',
         select: 'Select command for help'
+    },
+    mastery: {
+        select: 'Select champion to display mastery',
+        points: 'Points',
+        level: 'Level',
+        next: 'Next level',
+        prev: 'Previous level',
+        lastPlayed: 'Last played',
+        atTime: 'at'
     }
 } satisfies z.infer<typeof template>);
