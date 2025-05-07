@@ -54,6 +54,15 @@ Clash command will show information about upcomming clash tournaments. Also you 
 - /clash team other - \<riot-username\> \<riot-tag\> \<region\> - shows team in which are user joined
 - /clash team mention \<mention\> - shows team in which mentioned user is joined
 
+Master command will show you information about user's masteries.
+![mastery command first](https://upload.patrick115.eu/screenshot/73db893067.png)
+![mastery command select](https://upload.patrick115.eu/screenshot/22dbf9e0e8.png)
+![mastery command listing](https://upload.patrick115.eu/screenshot/425cc310ea.png)
+
+- /mastery me - shows select for your masteries
+- /mastery other \<riot-username\> \<riot-tag\> \<region\> - shows select for provided account
+- /mastery mention \<mention\> - shows select for mentioned user
+
 ## Installation
 
 Clone repo:
@@ -143,4 +152,8 @@ WEBSOCKET_PORT=8080
 WEBSOCKET_HOST=localhost
 CACHE_PATH=/tmp # this is the cache path, it is ment to be temporarily, so you can use /tmp if mounted in memory, or for example /dev/shm instead
 PERSISTANT_CACHE_PATH=cache # this is persistant cache path, it is ment to be used for storing images, which will be used multiple times, eg. match history images, because its unlike, that data from past match will be modified
+#Emoji settings
+EMOJI_GUILD_CHAMPIONS=955054979192881162,955053883103780894
+EMOJI_GUILD_ITEMS=973334813467611146
+EMOJI_GUILD_MISC=967816629557817354
 ```
