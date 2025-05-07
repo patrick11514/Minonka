@@ -159,7 +159,7 @@ const RiotAPIStructure = {
         }),
         players: (puuid: string) => ({
             regional: true,
-            endOfUrl: `/ players / by - puuid / ${puuid} `,
+            endOfUrl: `/players/by-puuid/${puuid}`,
             schema: z.array(
                 ClashMemberSchema.extend({
                     teamId: z.string()
@@ -168,7 +168,7 @@ const RiotAPIStructure = {
         }),
         team: (teamId: string) => ({
             regional: true,
-            endOfUrl: `/ teams / ${teamId} `,
+            endOfUrl: `/teams/${teamId}`,
             schema: z.object({
                 id: z.string(),
                 tournamentId: z.number(),
