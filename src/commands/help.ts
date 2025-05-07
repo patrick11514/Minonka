@@ -51,7 +51,7 @@ export default class Help extends Command {
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
             new StringSelectMenuBuilder()
-                .setCustomId('help')
+                .setCustomId(`help;${interaction.user.id}`)
                 .setPlaceholder(lang.help.select)
                 .addOptions(
                     this.slashCommands
@@ -73,7 +73,20 @@ export default class Help extends Command {
     private async onMenuSelect(interaction: Interaction) {
         if (!interaction.isStringSelectMenu()) return;
 
+        const id = interaction.customId.split(';');
+        if (id[0] !== 'help') return;
+        const discordId = id[1];
+
         const lang = getLocale(interaction.locale);
+
+        if (discordId !== interaction.user.id) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: lang.noPermission
+            });
+            return;
+        }
+
         const value = interaction.values[0];
 
         const defaultName = <
