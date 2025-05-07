@@ -132,7 +132,7 @@ const RiotAPIStructure = {
         }),
         match: (matchId: string) => ({
             regional: false,
-            endOfUrl: `/ matches / ${matchId} `,
+            endOfUrl: `/matches/${matchId}`,
             schema: MatchSchema
         })
     }),
