@@ -262,12 +262,15 @@ export class EmojiManager {
             guild = await process.client.guilds.fetch(emoji.guild);
         }
 
-        const emojis = await guild.emojis.fetch();
-        const foundEmoji = emojis.get(emoji.emoji_id);
-        if (!foundEmoji) {
+        let _emoji = guild.emojis.cache.get(emoji.emoji_id);
+        if (!_emoji) {
+            _emoji = await guild.emojis.fetch(emoji.emoji_id);
+        }
+
+        if (!_emoji) {
             return null;
         }
 
-        return foundEmoji;
+        return _emoji;
     }
 }
