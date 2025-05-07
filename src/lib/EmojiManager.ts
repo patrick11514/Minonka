@@ -1,7 +1,11 @@
 import { env } from '$/types/env';
 import { GuildEmoji, Locale } from 'discord.js';
-import { AssetType, getAsset, getRiotLanguageFromDiscordLocale } from './Assets';
-import { z } from 'zod';
+import {
+    AssetType,
+    getAsset,
+    getChampions,
+    getRiotLanguageFromDiscordLocale
+} from './Assets';
 import Logger from './logger';
 import { conn } from '$/types/connection';
 import fs from 'node:fs/promises';
@@ -37,36 +41,11 @@ export class EmojiManager {
     }
 
     private async getChampions() {
-        const champions = await getAsset(
-            AssetType.DDRAGON_DATA,
-            'champion.json',
+        const champions = await getChampions(
             getRiotLanguageFromDiscordLocale(Locale.EnglishUS)
         );
-        if (!champions) return null;
 
-        const championSchema = z.object({
-            data: z.record(
-                z.string(),
-                z.object({
-                    id: z.string(),
-                    name: z.string(),
-                    image: z.object({
-                        full: z.string()
-                    })
-                })
-            )
-        });
-
-        try {
-            const champs = JSON.parse(champions.toString());
-            const parsed = championSchema.parse(champs);
-
-            return Object.values(parsed.data);
-        } catch (error) {
-            l.error('Failed to parse champions');
-            l.error(error);
-            return null;
-        }
+        return champions ? Object.values(champions.data) : champions;
     }
 
     private async getMiscEmojis() {

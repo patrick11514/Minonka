@@ -339,3 +339,49 @@ export const getAugments = async (lang: RiotLanguage) => {
         return null;
     }
 };
+
+export const getChampions = async (lang: RiotLanguage) => {
+    const schema = z.object({
+        type: z.literal('champion'),
+        data: z.record(
+            z.string(),
+            z.object({
+                id: z.string(),
+                key: z.coerce.number(),
+                name: z.string(),
+                blurb: z.string(),
+                info: z.object({
+                    attack: z.number(),
+                    defense: z.number(),
+                    magic: z.number(),
+                    difficulty: z.number()
+                }),
+                image: z.object({
+                    full: z.string(),
+                    sprite: z.string(),
+                    group: z.string(),
+                    x: z.number(),
+                    y: z.number(),
+                    w: z.number(),
+                    h: z.number()
+                })
+            })
+        )
+    });
+
+    try {
+        const champions = schema.parse(
+            JSON.parse(
+                (await getAsset(
+                    AssetType.DDRAGON_DATA,
+                    'champion.json',
+                    lang
+                ))!.toString()
+            )
+        );
+        return champions;
+    } catch (e) {
+        l.error(e);
+        return null;
+    }
+};
