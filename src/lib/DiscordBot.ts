@@ -23,6 +23,7 @@ export class DiscordBot extends EventEmitter<Events> {
         this.client = new Client({
             intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages]
         });
+        this.client.setMaxListeners(0);
         process.client = this.client;
 
         this.loadCommands();
