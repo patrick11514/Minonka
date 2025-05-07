@@ -55,3 +55,72 @@ export const addRegionOption = (instance: Command | SubCommand) => {
         })
     });
 };
+
+export const discordLocaleToJSLocale = (locale: Locale) => {
+    switch (locale) {
+        case Locale.EnglishUS:
+            return 'en-US';
+        case Locale.Czech:
+            return 'cs-CZ';
+        case Locale.German:
+            return 'de-DE';
+        case Locale.French:
+            return 'fr-FR';
+        case Locale.Italian:
+            return 'it-IT';
+        case Locale.Polish:
+            return 'pl-PL';
+        case Locale.Russian:
+            return 'ru-RU';
+        case Locale.SpanishES:
+            return 'es-ES';
+        case Locale.SpanishLATAM:
+            return 'es-MX';
+        case Locale.PortugueseBR:
+            return 'pt-BR';
+        case Locale.Turkish:
+            return 'tr-TR';
+        case Locale.Vietnamese:
+            return 'vi-VN';
+        case Locale.Thai:
+            return 'th-TH';
+        case Locale.Japanese:
+            return 'ja-JP';
+        case Locale.Dutch:
+            return 'nl-NL';
+        case Locale.Korean:
+            return 'ko-KR';
+        case Locale.Indonesian:
+            return 'id-ID';
+        case Locale.Hungarian:
+            return 'hu-HU';
+        case Locale.Bulgarian:
+            return 'bg-BG';
+        case Locale.Greek:
+            return 'el-GR';
+        case Locale.Hindi:
+            return 'hi-IN';
+        case Locale.Swedish:
+            return 'sv-SE';
+        case Locale.Danish:
+            return 'da-DK';
+        case Locale.Norwegian:
+            return 'no-NO';
+        case Locale.Finnish:
+            return 'fi-FI';
+        case Locale.Croatian:
+            return 'hr-HR';
+        case Locale.Romanian:
+            return 'ro-RO';
+        case Locale.ChineseCN:
+            return 'zh-CN';
+        case Locale.ChineseTW:
+            return 'zh-TW';
+        case Locale.EnglishGB:
+            return 'en-GB';
+        case Locale.Ukrainian:
+            return 'uk-UA';
+        case Locale.Lithuanian:
+            return 'lt-LT';
+    }
+};

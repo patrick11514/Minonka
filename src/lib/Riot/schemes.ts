@@ -76,7 +76,6 @@ export const ParticipantSchema = z.object({
     championId: z.number(),
     championName: z.string(),
     deaths: z.number(),
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
     doubleKills: z.number(),
     tripleKills: z.number(),
     quadraKills: z.number(),
@@ -261,5 +260,6 @@ export const MasterySchema = z.object({
     puuid: z.string(),
     championId: z.number(),
     championLevel: z.number(),
-    championPoints: z.number()
+    championPoints: z.number(),
+    lastPlayTime: z.number()
 });

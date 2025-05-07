@@ -146,5 +146,14 @@ export default o({
         parameters: _,
         subcommands: _,
         select: _
+    }),
+    mastery: o({
+        select: _,
+        points: _,
+        level: _,
+        next: _,
+        prev: _,
+        lastPlayed: _,
+        atTime: _
     })
 });

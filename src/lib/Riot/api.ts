@@ -7,7 +7,8 @@ import {
     ChallengeSchema,
     ClashMemberSchema,
     MatchSchema,
-    SummonerSchema
+    SummonerSchema,
+    MasterySchema
 } from './schemes';
 
 const getBaseRoutingURL = (region: Region) => {
@@ -116,19 +117,22 @@ const RiotAPIStructure = {
         ) => ({
             regional: false,
             endOfUrl: `/matches/by-puuid/${puuid}/ids?${new URLSearchParams({
-                start: '0',
-                count: '20',
+                ...{
+                    start: '0',
+                    count: '20'
+                },
                 ...Object.fromEntries(
                     Object.entries(query)
+                        .filter((value) => value !== undefined)
                         .filter(([, value]) => value !== undefined && value !== null)
-                        .map(([key, value]) => [key, value.toString()])
+                        .map(([key, value]) => [key, (value ?? '').toString()])
                 )
             }).toString()}`,
             schema: z.array(z.string())
         }),
         match: (matchId: string) => ({
             regional: false,
-            endOfUrl: `/matches/${matchId}`,
+            endOfUrl: `/ matches / ${matchId} `,
             schema: MatchSchema
         })
     }),
@@ -155,7 +159,7 @@ const RiotAPIStructure = {
         }),
         players: (puuid: string) => ({
             regional: true,
-            endOfUrl: `/players/by-puuid/${puuid}`,
+            endOfUrl: `/ players / by - puuid / ${puuid} `,
             schema: z.array(
                 ClashMemberSchema.extend({
                     teamId: z.string()
@@ -164,7 +168,7 @@ const RiotAPIStructure = {
         }),
         team: (teamId: string) => ({
             regional: true,
-            endOfUrl: `/teams/${teamId}`,
+            endOfUrl: `/ teams / ${teamId} `,
             schema: z.object({
                 id: z.string(),
                 tournamentId: z.number(),
@@ -175,6 +179,23 @@ const RiotAPIStructure = {
                 captain: z.string(),
                 players: z.array(ClashMemberSchema)
             })
+        })
+    }),
+    mastery: new ApiSet('/lol/champion-mastery/v4', {
+        byPuuid: (puuid: string) => ({
+            endOfUrl: `/ champion - masteries / by - puuid / ${puuid} `,
+            regional: true,
+            schema: z.array(MasterySchema)
+        }),
+        top: (puuid: string, count = 3) => ({
+            endOfUrl: `/ champion - masteries / by - puuid / ${puuid}/top?count=${count}`,
+            regional: true,
+            schema: z.array(MasterySchema)
+        }),
+        byChampionId: (puuid: string, championId: number) => ({
+            endOfUrl: `/champion-masteries/by-puuid/${puuid}/by-champion/${championId}`,
+            regional: true,
+            schema: MasterySchema
         })
     })
 };
