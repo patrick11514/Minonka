@@ -183,12 +183,12 @@ const RiotAPIStructure = {
     }),
     mastery: new ApiSet('/lol/champion-mastery/v4', {
         byPuuid: (puuid: string) => ({
-            endOfUrl: `/ champion - masteries / by - puuid / ${puuid} `,
+            endOfUrl: `/champion-masteries/by-puuid/${puuid}`,
             regional: true,
             schema: z.array(MasterySchema)
         }),
         top: (puuid: string, count = 3) => ({
-            endOfUrl: `/ champion - masteries / by - puuid / ${puuid}/top?count=${count}`,
+            endOfUrl: `/champion-masteries/by-puuid/${puuid}/top?count=${count}`,
             regional: true,
             schema: z.array(MasterySchema)
         }),
