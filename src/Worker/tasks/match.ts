@@ -34,11 +34,11 @@ import { updateLpForUser } from '$/crons/lp';
 export type MatchData = {
     region: Region;
     locale: Locale;
-    mySummonerId: string;
+    myPuuid: string;
 } & z.infer<typeof RegularMatchSchema>;
 
 export default async (data: MatchData) => {
-    const imageName = `${data.metadata.matchId}_${data.mySummonerId}_${data.locale}.png`;
+    const imageName = `${data.metadata.matchId}_${data.myPuuid}_${data.locale}.png`;
 
     if (persistantExists(imageName)) {
         return getPersistant(imageName);
@@ -108,7 +108,7 @@ export default async (data: MatchData) => {
     );
     mainLayout.addElement(Stats);
 
-    const matchStatus = getMatchStatus(data, data.mySummonerId);
+    const matchStatus = getMatchStatus(data, data.myPuuid);
 
     //Victory/Loss Text
     const VictoryLoss = new Text(
@@ -180,7 +180,7 @@ export default async (data: MatchData) => {
             .where((eb) =>
                 eb.and([
                     eb('matchId', '=', data.metadata.matchId),
-                    eb('account.summoner_id', '=', data.mySummonerId)
+                    eb('account.puuid', '=', data.myPuuid)
                 ])
             )
             .executeTakeFirst();
@@ -191,8 +191,7 @@ export default async (data: MatchData) => {
         } else {
             //check if its latest match and if yes, calculate lp for it
             const lastMatch = await api[data.region].match.ids(
-                data.info.participants.find((p) => p.summonerId === data.mySummonerId)!
-                    .puuid,
+                data.info.participants.find((p) => p.puuid === data.myPuuid)!.puuid,
                 {
                     start: 0,
                     count: 1,
@@ -204,7 +203,7 @@ export default async (data: MatchData) => {
                 const userData = await conn
                     .selectFrom('account')
                     .selectAll()
-                    .where('summoner_id', '=', data.mySummonerId)
+                    .where('puuid', '=', data.myPuuid)
                     .executeTakeFirst();
                 if (userData) {
                     await updateLpForUser({
@@ -371,7 +370,7 @@ export default async (data: MatchData) => {
                 height: playerHeight / 2
             },
             30,
-            player.summonerId === data.mySummonerId ? Color.YELLOW : Color.WHITE,
+            player.puuid === data.myPuuid ? Color.YELLOW : Color.WHITE,
             teamIdx === 0 ? 'start' : 'end'
         );
         playerBlank.addElement(name);
@@ -386,7 +385,7 @@ export default async (data: MatchData) => {
                 height: playerHeight / 2
             },
             20,
-            player.summonerId === data.mySummonerId ? Color.YELLOW : Color.WHITE,
+            player.puuid === data.myPuuid ? Color.YELLOW : Color.WHITE,
             teamIdx === 0 ? 'start' : 'end'
         );
         playerBlank.addElement(tag);

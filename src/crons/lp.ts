@@ -15,9 +15,7 @@ export const updateLpForUser = async (user: {
     gameName: string;
     tagLine: string;
 }) => {
-    const leagues = await api[user.region as Region].league.bySummonerId(
-        user.summoner_id
-    );
+    const leagues = await api[user.region as Region].league.byPuuid(user.puuid);
     if (!leagues.status) return;
 
     const recentQueues = await conn

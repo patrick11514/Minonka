@@ -54,7 +54,7 @@ export default class Rank extends AccountCommand {
     ) {
         const lang = getLocale(interaction.locale);
 
-        const league = await api[region].league.bySummonerId(DBaccount.summoner_id);
+        const league = await api[region].league.byPuuid(DBaccount.puuid);
         if (!league.status) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
@@ -63,7 +63,7 @@ export default class Rank extends AccountCommand {
             return;
         }
 
-        const summoner = await api[region].summoner.bySummonerId(DBaccount.summoner_id);
+        const summoner = await api[region].summoner.byPuuid(DBaccount.puuid);
         if (!summoner.status) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
@@ -82,7 +82,7 @@ export default class Rank extends AccountCommand {
         }
 
         const data = {
-            summonerId: DBaccount.summoner_id,
+            puuid: DBaccount.puuid,
             region,
             gameName: account.data.gameName,
             tagLine: account.data.tagLine,

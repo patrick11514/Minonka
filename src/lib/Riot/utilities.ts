@@ -7,17 +7,12 @@ export enum MatchStatus {
     Remake
 }
 
-export const getMatchStatus = (
-    match: z.infer<typeof MatchSchema>,
-    meSummonerId: string
-) => {
+export const getMatchStatus = (match: z.infer<typeof MatchSchema>, mePuuid: string) => {
     if (match.info.participants[0].gameEndedInEarlySurrender) {
         return MatchStatus.Remake;
     }
 
-    const meParticipant = match.info.participants.find(
-        (p) => p.summonerId === meSummonerId
-    );
+    const meParticipant = match.info.participants.find((p) => p.puuid === mePuuid);
     if (!meParticipant) {
         throw new Error('Participant not found');
     }

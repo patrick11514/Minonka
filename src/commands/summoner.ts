@@ -54,7 +54,7 @@ export default class Summoner extends AccountCommand {
     ) {
         const lang = getLocale(interaction.locale);
 
-        const summoner = await api[region].summoner.bySummonerId(DBaccount.summoner_id);
+        const summoner = await api[region].summoner.byPuuid(DBaccount.puuid);
         if (!summoner.status) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
@@ -82,7 +82,7 @@ export default class Summoner extends AccountCommand {
         }
 
         const data = {
-            summonerId: summoner.data.id,
+            puuid: summoner.data.puuid,
             region: region,
             level: summoner.data.summonerLevel,
             gameName: account.data.gameName,
