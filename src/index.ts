@@ -13,6 +13,9 @@ import { InMemory } from './lib/InMemory';
 import { EmojiManager } from './lib/EmojiManager';
 import './lib/pollyfill';
 
+//Initialize global process variables
+process.patching = false;
+
 if (process.argv.includes('--register')) {
     const l = new Logger('CommandRegister', 'cyan');
     const discordBot = new DiscordBot();
@@ -46,6 +49,8 @@ if (process.argv.includes('--register')) {
     discordBot.on('login', (client) => {
         l.stop('Connected to discord as ' + client.user.tag);
 
-        emoji.sync();
+        //Only sync, when its not patching on startup, because
+        //after patch it will automatically sync emojis
+        if (!process.patching) emoji.sync();
     });
 }
