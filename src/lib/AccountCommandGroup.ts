@@ -105,7 +105,7 @@ export class AccountCommandGroup extends SubCommandGroup {
         const select = new StringSelectMenuBuilder().setCustomId('summoner').addOptions(
             accounts.map((account) => {
                 const builder = new StringSelectMenuOptionBuilder()
-                    .setValue(this.name + '@' + account.puuid + '@@' + account.region)
+                    .setValue(this.name + '@' + account.puuid + '@' + account.region)
                     .setLabel(
                         `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`
                     );
