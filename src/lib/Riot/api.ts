@@ -64,11 +64,6 @@ const RiotAPIStructure = {
             regional: true,
             endOfUrl: `/by-puuid/${puuid}`,
             schema: SummonerSchema
-        }),
-        bySummonerId: (summonerId: string) => ({
-            regional: true,
-            endOfUrl: `/${summonerId}`,
-            schema: SummonerSchema
         })
     }),
     challenges: new ApiSet('/lol/challenges/v1', {
@@ -79,13 +74,12 @@ const RiotAPIStructure = {
         })
     }),
     league: new ApiSet('/lol/league/v4', {
-        bySummonerId: (summonerId: string) => ({
+        byPuuid: (puuid: string) => ({
             regional: true,
-            endOfUrl: `/entries/by-summoner/${summonerId}`,
+            endOfUrl: `/entries/by-puuid/${puuid}`,
             schema: z.array(
                 z.object({
                     leagueId: z.string(),
-                    summonerId: z.string(),
                     queueType: z.string(),
                     tier: z.string(),
                     rank: z.string(),

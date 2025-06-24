@@ -3,7 +3,7 @@ import { DePromise } from '$/types/types';
 import { Locale } from 'discord.js';
 
 export type DefaultParameters = {
-    summonerId: string;
+    puuid: string;
     region: Region;
     level: number;
     gameName: string;

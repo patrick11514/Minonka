@@ -23,6 +23,8 @@ export default [
             const newest = (await response.json())[0];
             if (newest !== process.lolPatch) {
                 //run subprocess, which will update it
+                process.patching = true;
+
                 l.log('New patch found, updating');
                 const download = spawn('bash', ['assets/download.sh'], {
                     cwd: process.cwd()
@@ -32,6 +34,7 @@ export default [
                         l.stopError('Error while updating patch ' + code);
                     } else {
                         l.stop('Patch updated');
+                        process.patching = false;
                         process.lolPatch = newest;
                         //sync emojis
                         process.emoji.sync();

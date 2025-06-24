@@ -10,14 +10,11 @@ const l = new Logger('LP', 'magenta');
 export const updateLpForUser = async (user: {
     id: number;
     region: string;
-    summoner_id: string;
     puuid: string;
     gameName: string;
     tagLine: string;
 }) => {
-    const leagues = await api[user.region as Region].league.bySummonerId(
-        user.summoner_id
-    );
+    const leagues = await api[user.region as Region].league.byPuuid(user.puuid);
     if (!leagues.status) return;
 
     const recentQueues = await conn

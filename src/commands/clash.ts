@@ -216,7 +216,7 @@ export default class Clash extends Command {
                         throw new Error(formatErrorResponse(lang, account));
                     }
 
-                    const ranks = await api[region].league.bySummonerId(summoner.data.id);
+                    const ranks = await api[region].league.byPuuid(summoner.data.puuid);
                     if (!ranks.status) {
                         throw new Error(formatErrorResponse(lang, ranks));
                     }

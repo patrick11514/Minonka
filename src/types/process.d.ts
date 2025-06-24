@@ -13,6 +13,7 @@ declare global {
             lolPatch: string;
             inMemory: InMemory;
             emoji: EmojiManager;
+            patching: boolean;
         }
     }
     interface ObjectConstructor {

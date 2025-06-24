@@ -29,7 +29,7 @@ import { getArenaSubTeamPosition } from '$/lib/Riot/utilities';
 export type CherryMatchData = {
     region: Region;
     locale: Locale;
-    mySummonerId: string;
+    myPuuid: string;
 } & z.infer<typeof CherryMatchSchema>;
 
 export enum SubTeam {
@@ -82,7 +82,7 @@ const MapSubTeamToName = (subteam: SubTeam) => {
 };
 
 export default async (data: CherryMatchData) => {
-    const imageName = `${data.metadata.matchId}_${data.mySummonerId}_${data.locale}.png`;
+    const imageName = `${data.metadata.matchId}_${data.myPuuid}_${data.locale}.png`;
 
     if (persistantExists(imageName)) {
         return getPersistant(imageName);
@@ -152,7 +152,7 @@ export default async (data: CherryMatchData) => {
     );
     mainLayout.addElement(Stats);
 
-    const teamPosition = getArenaSubTeamPosition(data, data.mySummonerId);
+    const teamPosition = getArenaSubTeamPosition(data, data.myPuuid);
 
     //Place
     const SubTeamPosition = new Text(
@@ -318,7 +318,7 @@ export default async (data: CherryMatchData) => {
         blank.addElement(icon);
 
         const textSize = 25;
-        const textColor = team.find((p) => p.summonerId === data.mySummonerId)
+        const textColor = team.find((p) => p.puuid === data.myPuuid)
             ? Color.YELLOW
             : Color.WHITE;
 
@@ -447,7 +447,7 @@ export default async (data: CherryMatchData) => {
                     height: Math.floor(playerHeight / 2)
                 },
                 20,
-                player.summonerId === data.mySummonerId ? Color.YELLOW : Color.WHITE,
+                player.puuid === data.myPuuid ? Color.YELLOW : Color.WHITE,
                 teamIdx < 4 ? 'start' : 'end'
             );
             playerBlank.addElement(name);
@@ -462,7 +462,7 @@ export default async (data: CherryMatchData) => {
                     height: Math.floor(playerHeight / 2)
                 },
                 15,
-                player.summonerId === data.mySummonerId ? Color.YELLOW : Color.WHITE,
+                player.puuid === data.myPuuid ? Color.YELLOW : Color.WHITE,
                 teamIdx < 4 ? 'start' : 'end'
             );
             playerBlank.addElement(tagLine);

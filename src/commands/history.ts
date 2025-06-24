@@ -27,14 +27,20 @@ const l = new Logger('History', 'white');
 
 type ButtonData = {
     discordId: string;
-    summonerId: string;
+    puuid: string;
     region: Region;
     queue: string | null;
     count: number;
     offset: number;
 };
 
-export default class History extends AccountCommand {
+type CustomData = {
+    queue: string | null;
+    count: number;
+    offset: number;
+};
+
+export default class History extends AccountCommand<CustomData> {
     constructor() {
         super(
             'history',
@@ -127,7 +133,6 @@ export default class History extends AccountCommand {
     async getFiles(
         locale: Locale,
         region: Region,
-        summonerId: string,
         puuid: string,
         queue: string | null,
         count: number,
@@ -163,14 +168,14 @@ export default class History extends AccountCommand {
                     ...(_match.data as z.infer<typeof CherryMatchSchema>),
                     locale,
                     region,
-                    mySummonerId: summonerId
+                    myPuuid: puuid
                 });
             } else {
                 jobId = process.workerServer.addJob('match', {
                     ...(_match.data as z.infer<typeof RegularMatchSchema>),
                     locale,
                     region,
-                    mySummonerId: summonerId
+                    myPuuid: puuid
                 });
             }
 
@@ -211,7 +216,7 @@ export default class History extends AccountCommand {
     }
 
     private async handleMessages(
-        editMessage: Message<boolean> | ChatInputCommandInteraction,
+        editMessage: Message<boolean> | RepliableInteraction<CacheType>,
         interaction: RepliableInteraction<CacheType>,
         jobIds: OmitUnion<DePromise<ReturnType<typeof this.getFiles>>, string>,
         row: ActionRowBuilder<ButtonBuilder>,
@@ -284,18 +289,16 @@ export default class History extends AccountCommand {
     async onMenuSelect(
         interaction: RepliableInteraction<CacheType>,
         account: Selectable<Account>,
-        region: Region
+        region: Region,
+        customData: CustomData
     ) {
-        if (!interaction.isChatInputCommand()) return;
+        if (!interaction.isStringSelectMenu()) return;
         const lang = getLocale(interaction.locale);
-        const queue = interaction.options.getString('queue');
-        const count = interaction.options.getInteger('count') || 6;
-        const offset = interaction.options.getInteger('offset') || 0;
+        const { queue, count, offset } = customData;
 
         const result = await this.getFiles(
             interaction.locale,
             region,
-            account.summoner_id,
             account.puuid,
             queue,
             count,
@@ -315,7 +318,7 @@ export default class History extends AccountCommand {
         const inMemory = process.inMemory.getInstance<ButtonData>();
         inMemory.set(key, {
             discordId: interaction.user.id,
-            summonerId: account.summoner_id,
+            puuid: account.puuid,
             region,
             queue: queue || '',
             count,
@@ -328,7 +331,15 @@ export default class History extends AccountCommand {
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
-        this.handleAccountCommand(interaction, l);
+        const queue = interaction.options.getString('queue');
+        const count = interaction.options.getInteger('count') || 6;
+        const offset = interaction.options.getInteger('offset') || 0;
+
+        this.handleAccountCommand(interaction, l, {
+            queue,
+            count,
+            offset
+        });
     }
 
     async autocomplete(interaction: Interaction) {
@@ -380,7 +391,7 @@ export default class History extends AccountCommand {
         }
 
         let { offset } = data;
-        const { count, summonerId, region, queue } = data;
+        const { count, puuid, region, queue } = data;
 
         const command = id[2];
         const originalOffset = offset;
@@ -397,13 +408,13 @@ export default class History extends AccountCommand {
         //clamp offset to 0
         offset = Math.max(0, offset);
 
-        const account = await api[region].summoner.bySummonerId(summonerId);
+        const account = await api[region].summoner.byPuuid(puuid);
         if (!account.status) return;
 
         //update in memory
         await inMemory.set(key, {
             discordId: interaction.user.id,
-            summonerId: account.data.id,
+            puuid: account.data.puuid,
             region,
             queue: queue || '',
             count,
@@ -413,8 +424,7 @@ export default class History extends AccountCommand {
         const result = await this.getFiles(
             interaction.locale,
             region,
-            summonerId,
-            account.data.puuid,
+            puuid,
             queue,
             count,
             offset

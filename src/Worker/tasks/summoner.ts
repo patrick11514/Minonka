@@ -56,7 +56,7 @@ export default async (data: SummonerData) => {
         (data.crest == 1 && data.prestigeCrest == 0) ||
         data.banner === 2
     ) {
-        const result = await api[data.region].league.bySummonerId(data.summonerId);
+        const result = await api[data.region].league.byPuuid(data.puuid);
         if (!result.status) {
             throw new Error(lang.league.error);
         }
