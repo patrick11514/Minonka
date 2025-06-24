@@ -10,7 +10,6 @@ const l = new Logger('LP', 'magenta');
 export const updateLpForUser = async (user: {
     id: number;
     region: string;
-    summoner_id: string;
     puuid: string;
     gameName: string;
     tagLine: string;

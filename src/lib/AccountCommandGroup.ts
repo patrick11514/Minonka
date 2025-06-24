@@ -95,7 +95,7 @@ export class AccountCommandGroup extends SubCommandGroup {
     public async sendAccountSelect(
         interaction: RepliableInteraction,
         accounts: {
-            summoner_id: string;
+            puuid: string;
             gameName: string;
             tagLine: string;
             region: string;
@@ -105,9 +105,7 @@ export class AccountCommandGroup extends SubCommandGroup {
         const select = new StringSelectMenuBuilder().setCustomId('summoner').addOptions(
             accounts.map((account) => {
                 const builder = new StringSelectMenuOptionBuilder()
-                    .setValue(
-                        this.name + '@@' + account.summoner_id + '@@' + account.region
-                    )
+                    .setValue(this.name + '@' + account.puuid + '@@' + account.region)
                     .setLabel(
                         `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`
                     );
@@ -205,8 +203,6 @@ export class AccountCommandGroup extends SubCommandGroup {
                     id: 0,
                     discord_id: interaction.user.id,
                     puuid: account.data.puuid,
-                    account_id: summoner.data.accountId,
-                    summoner_id: summoner.data.id,
                     region: region,
                     gameName: account.data.gameName,
                     tagLine: account.data.tagLine
@@ -254,13 +250,13 @@ export class AccountCommandGroup extends SubCommandGroup {
     async menuHandle(interaction: Interaction<CacheType>) {
         if (!interaction.isStringSelectMenu()) return;
 
-        const [commandSource, summonerId, region] = interaction.values[0].split('@@');
+        const [commandSource, puuid, region] = interaction.values[0].split('@');
         if (commandSource !== this.name) return;
 
         const account = await conn
             .selectFrom('account')
             .selectAll()
-            .where('summoner_id', '=', summonerId)
+            .where('puuid', '=', puuid)
             .executeTakeFirst();
         if (!account) return;
 

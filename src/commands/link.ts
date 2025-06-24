@@ -99,8 +99,6 @@ export default class Link extends Command {
                     .values({
                         discord_id: interaction.user.id,
                         puuid: userInfo.data.puuid,
-                        account_id: summoner.data.accountId,
-                        summoner_id: summoner.data.id,
                         gameName: userInfo.data.gameName,
                         tagLine: userInfo.data.tagLine,
                         region: region
@@ -112,7 +110,6 @@ export default class Link extends Command {
                     .set({
                         discord_id: interaction.user.id,
                         puuid: userInfo.data.puuid,
-                        summoner_id: summoner.data.id,
                         gameName: userInfo.data.gameName,
                         tagLine: userInfo.data.tagLine,
                         region: region

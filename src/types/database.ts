@@ -11,13 +11,11 @@ export type Generated<T> =
         : ColumnType<T, T | undefined, T>;
 
 export interface Account {
-    account_id: string;
     discord_id: Generated<string | null>;
     gameName: string;
     id: Generated<number>;
     puuid: string;
     region: string;
-    summoner_id: string;
     tagLine: string;
 }
 

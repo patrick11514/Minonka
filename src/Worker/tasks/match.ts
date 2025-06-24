@@ -209,7 +209,6 @@ export default async (data: MatchData) => {
                     await updateLpForUser({
                         id: userData.id,
                         region: userData.region,
-                        summoner_id: userData.summoner_id,
                         puuid: userData.puuid,
                         gameName: userData.gameName,
                         tagLine: userData.tagLine

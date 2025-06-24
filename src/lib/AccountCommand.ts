@@ -19,8 +19,17 @@ import { Account } from '$/types/database';
 import { conn } from '$/types/connection';
 import api from './Riot/api';
 import Logger from './logger';
+import crypto from 'node:crypto';
 
-export abstract class AccountCommand extends Command {
+type MenuSelectArguments = [
+    interaction: RepliableInteraction<CacheType>,
+    user: Selectable<Account>,
+    region: Region
+];
+
+type AccountCommandArguments = [interaction: ChatInputCommandInteraction, l: Logger];
+
+export abstract class AccountCommand<$CustomData = undefined> extends Command {
     protected meSubCommand: SubCommand;
     protected nameSubCommand: SubCommand;
     protected mentionSubCommand: SubCommand;
@@ -86,22 +95,24 @@ export abstract class AccountCommand extends Command {
     public async sendAccountSelect(
         interaction: RepliableInteraction,
         accounts: {
-            summoner_id: string;
+            puuid: string;
             gameName: string;
             tagLine: string;
             region: string;
         }[],
-        lang: ReturnType<typeof getLocale>
+        lang: ReturnType<typeof getLocale>,
+        key?: string
     ) {
         const select = new StringSelectMenuBuilder().setCustomId('summoner').addOptions(
             accounts.map((account) => {
                 const builder = new StringSelectMenuOptionBuilder()
                     .setValue(
                         this.slashCommand.name +
-                            '@@' +
-                            account.summoner_id +
-                            '@@' +
-                            account.region
+                            '@' +
+                            account.puuid +
+                            '@' +
+                            account.region +
+                            (key ? `@${key}` : '')
                     )
                     .setLabel(
                         `${account.gameName}#${account.tagLine} (${lang.regions[account.region as Region]})`
@@ -119,7 +130,13 @@ export abstract class AccountCommand extends Command {
         });
     }
 
-    async handleAccountCommand(interaction: ChatInputCommandInteraction, l: Logger) {
+    async handleAccountCommand(
+        ...args: $CustomData extends undefined
+            ? AccountCommandArguments
+            : [...AccountCommandArguments, customData: $CustomData]
+    ) {
+        const [interaction, l, customData] = args;
+
         const lang = getLocale(interaction.locale);
 
         let accounts: Selectable<Account>[];
@@ -200,8 +217,6 @@ export abstract class AccountCommand extends Command {
                     id: 0,
                     discord_id: interaction.user.id,
                     puuid: account.data.puuid,
-                    account_id: summoner.data.accountId,
-                    summoner_id: summoner.data.id,
                     region: region,
                     gameName: account.data.gameName,
                     tagLine: account.data.tagLine
@@ -239,27 +254,57 @@ export abstract class AccountCommand extends Command {
         }
 
         if (accounts.length > 1) {
-            await this.sendAccountSelect(interaction, accounts, lang);
+            //save custom data
+            let key: undefined | string = undefined;
+            if (customData !== undefined) {
+                key = crypto.randomBytes(4).toString('hex');
+                const inMemory = process.inMemory.getInstance<$CustomData>();
+                inMemory.set(key, customData);
+            }
+
+            await this.sendAccountSelect(interaction, accounts, lang, key);
             return;
         }
 
-        this.onMenuSelect(interaction, accounts[0], accounts[0].region as Region);
+        if (customData === undefined) {
+            // @ts-expect-error customData is undefined, so we don't pass it
+            this.onMenuSelect(interaction, accounts[0], accounts[0].region as Region);
+        } else {
+            //prettier-ignore
+            // @ts-expect-error customData is defined, so we pass it
+            this.onMenuSelect( interaction, accounts[0], accounts[0].region as Region, customData);
+        }
     }
 
     async menuHandle(interaction: Interaction<CacheType>) {
         if (!interaction.isStringSelectMenu()) return;
 
-        const [commandSource, summonerId, region] = interaction.values[0].split('@@');
+        const [commandSource, puuid, region, key] = interaction.values[0].split('@');
         if (commandSource !== this.slashCommand.name) return;
 
         const account = await conn
             .selectFrom('account')
             .selectAll()
-            .where('summoner_id', '=', summonerId)
+            .where('puuid', '=', puuid)
             .executeTakeFirst();
         if (!account) return;
 
-        this.onMenuSelect(interaction, account, region as Region);
+        if (key) {
+            const inMemory = process.inMemory.getInstance<$CustomData>();
+            const customData = await inMemory.get(key);
+            if (!customData) {
+                await interaction.reply({
+                    flags: MessageFlags.Ephemeral,
+                    content: getLocale(interaction.locale).genericError
+                });
+                return;
+            }
+            // @ts-expect-error We check, that key is set, so customData is not undefined
+            this.onMenuSelect(interaction, account, region as Region, customData);
+        } else {
+            // @ts-expect-error customData is undefined, so we don't pass it
+            this.onMenuSelect(interaction, account, region as Region);
+        }
     }
 
     /**
@@ -268,8 +313,8 @@ export abstract class AccountCommand extends Command {
      * Also discord_id in that case will be discord_id of user which used the command.
      */
     abstract onMenuSelect(
-        interaction: RepliableInteraction<CacheType>,
-        user: Selectable<Account>,
-        region: Region
+        ...args: $CustomData extends undefined
+            ? MenuSelectArguments
+            : [...MenuSelectArguments, $CustomData]
     ): Promise<void>;
 }

@@ -8,10 +8,8 @@ export const AccountSchema = z.object({
 });
 
 export const SummonerSchema = z.object({
-    accountId: z.string(),
     profileIconId: z.number(),
     revisionDate: z.number(),
-    id: z.string(),
     puuid: z.string(),
     summonerLevel: z.number()
 });
@@ -154,7 +152,6 @@ export const ParticipantSchema = z.object({
     totalMinionsKilled: z.number(),
     visionScore: z.number(),
     win: z.boolean(),
-    summonerId: z.string(),
     puuid: z.string()
 });
 

@@ -27,9 +27,9 @@ export const getMatchStatus = (match: z.infer<typeof MatchSchema>, mePuuid: stri
 
 export const getArenaSubTeamPosition = (
     data: z.infer<typeof CherryMatchSchema>,
-    meSummonerId: string
+    mePuuid: string
 ) => {
-    const me = data.info.participants.find((p) => p.summonerId === meSummonerId);
+    const me = data.info.participants.find((p) => p.puuid === mePuuid);
 
     if (!me) {
         throw new Error('Participant not found');

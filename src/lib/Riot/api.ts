@@ -80,7 +80,6 @@ const RiotAPIStructure = {
             schema: z.array(
                 z.object({
                     leagueId: z.string(),
-                    summonerId: z.string(),
                     queueType: z.string(),
                     tier: z.string(),
                     rank: z.string(),

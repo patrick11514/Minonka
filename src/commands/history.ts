@@ -34,7 +34,13 @@ type ButtonData = {
     offset: number;
 };
 
-export default class History extends AccountCommand {
+type CustomData = {
+    queue: string | null;
+    count: number;
+    offset: number;
+};
+
+export default class History extends AccountCommand<CustomData> {
     constructor() {
         super(
             'history',
@@ -210,7 +216,7 @@ export default class History extends AccountCommand {
     }
 
     private async handleMessages(
-        editMessage: Message<boolean> | ChatInputCommandInteraction,
+        editMessage: Message<boolean> | RepliableInteraction<CacheType>,
         interaction: RepliableInteraction<CacheType>,
         jobIds: OmitUnion<DePromise<ReturnType<typeof this.getFiles>>, string>,
         row: ActionRowBuilder<ButtonBuilder>,
@@ -283,13 +289,12 @@ export default class History extends AccountCommand {
     async onMenuSelect(
         interaction: RepliableInteraction<CacheType>,
         account: Selectable<Account>,
-        region: Region
+        region: Region,
+        customData: CustomData
     ) {
-        if (!interaction.isChatInputCommand()) return;
+        if (!interaction.isStringSelectMenu()) return;
         const lang = getLocale(interaction.locale);
-        const queue = interaction.options.getString('queue');
-        const count = interaction.options.getInteger('count') || 6;
-        const offset = interaction.options.getInteger('offset') || 0;
+        const { queue, count, offset } = customData;
 
         const result = await this.getFiles(
             interaction.locale,
@@ -326,7 +331,15 @@ export default class History extends AccountCommand {
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
-        this.handleAccountCommand(interaction, l);
+        const queue = interaction.options.getString('queue');
+        const count = interaction.options.getInteger('count') || 6;
+        const offset = interaction.options.getInteger('offset') || 0;
+
+        this.handleAccountCommand(interaction, l, {
+            queue,
+            count,
+            offset
+        });
     }
 
     async autocomplete(interaction: Interaction) {
