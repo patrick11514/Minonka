@@ -33,11 +33,11 @@ export const tier = [
     'CHALLENGER'
 ] as const;
 export type _Tier = (typeof tier)[number];
-export const tierType = z.custom<_Tier>((val) => tier.includes(val as _Tier));
+export const tierType = z.enum(tier);
 
 const rank = ['IV', 'III', 'II', 'I'] as const;
 export type _Rank = (typeof rank)[number];
-export const rankType = z.custom<_Rank>((val) => rank.includes(val as _Rank));
+export const rankType = z.enum(rank);
 
 export const deCapitalize = (str: string) => str.charAt(0) + str.slice(1).toLowerCase();
 
