@@ -1,7 +1,7 @@
 import { batchPromises, Cron } from '$/lib/cron';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
-import { Rank, Region } from '$/lib/Riot/types';
+import { _Rank, _Tier, Rank, Region } from '$/lib/Riot/types';
 import { conn } from '$/types/connection';
 import { sql } from 'kysely';
 
@@ -148,8 +148,8 @@ export const updateLpForUser = async (user: {
                     gain:
                         new Rank(league).getTotalLp() -
                         new Rank({
-                            rank: matchesLp[0].rank,
-                            tier: matchesLp[0].tier,
+                            rank: matchesLp[0].rank as _Rank,
+                            tier: matchesLp[0].tier as _Tier,
                             leaguePoints: matchesLp[0].LP
                         }).getTotalLp()
                 })
