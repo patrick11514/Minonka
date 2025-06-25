@@ -1,5 +1,5 @@
 import { Background } from '$/lib/Imaging/Background';
-import { _Tier, _Rank, deCapitalize } from '$/lib/Riot/types';
+import { _Tier, _Rank, deCapitalize, Rank } from '$/lib/Riot/types';
 import { DefaultParameters } from '../types';
 import { AssetType, getAsset } from '$/lib/Assets';
 import { save } from '../utilities';
@@ -166,7 +166,7 @@ export default async (data: RankData) => {
 
         //rank name
         const text = new Text(
-            lang.rank.tiers[rank.tier] + ' ' + rank.rank,
+            new Rank(rank).toString(lang),
             {
                 x: 'center',
                 y: 80 + 60
