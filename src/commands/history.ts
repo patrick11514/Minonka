@@ -292,7 +292,6 @@ export default class History extends AccountCommand<CustomData> {
         region: Region,
         customData: CustomData
     ) {
-        if (!interaction.isStringSelectMenu()) return;
         const lang = getLocale(interaction.locale);
         const { queue, count, offset } = customData;
 
