@@ -1,3 +1,6 @@
+import { z } from 'zod';
+import { getLocale } from '../langs';
+
 export const regions = [
     'BR1',
     'EUN1',
@@ -30,20 +33,28 @@ export const tier = [
     'CHALLENGER'
 ] as const;
 export type _Tier = (typeof tier)[number];
+export const tierType = z.custom<_Tier>((val) => tier.includes(val as _Tier));
 
 const rank = ['IV', 'III', 'II', 'I'] as const;
 export type _Rank = (typeof rank)[number];
+export const rankType = z.custom<_Rank>((val) => rank.includes(val as _Rank));
 
 export const deCapitalize = (str: string) => str.charAt(0) + str.slice(1).toLowerCase();
 
 export class Rank {
-    private tier: number;
-    private rank: number;
+    private tierIndex: number;
+    private tier: _Tier;
+    private rankIndex: number;
+    private rank: _Rank;
     private lp: number;
 
-    constructor(src: { tier: string; rank: string; leaguePoints: number }) {
-        this.tier = tier.findIndex((v) => v === src.tier);
-        this.rank = rank.findIndex((v) => v === src.rank);
+    constructor(src: { tier: _Tier; rank: _Rank; leaguePoints: number }) {
+        this.tier = src.tier;
+        this.tierIndex = tier.findIndex((v) => v === src.tier);
+
+        this.rank = src.rank;
+        this.rankIndex = rank.findIndex((v) => v === src.rank);
+
         this.lp = src.leaguePoints;
     }
 
@@ -52,15 +63,15 @@ export class Rank {
     }
 
     getTotalLp() {
-        return this.tier * 400 + this.rank * 100 + this.lp;
+        return this.tierIndex * 400 + this.rankIndex * 100 + this.lp;
     }
 
-    toString() {
+    toString(lang: ReturnType<typeof getLocale>) {
         if (this.isTiered()) {
-            return `${deCapitalize(tier[this.tier])} ${rank[this.rank]} (${this.lp} LP)`;
+            return `${lang.rank.tiers[this.tier]} ${this.rank}`;
         }
 
-        return `${deCapitalize(tier[this.tier])} (${this.lp} LP)`;
+        return `${lang.rank.tiers[this.tier]}`;
     }
 
     valueOf() {
@@ -72,15 +83,15 @@ export class Rank {
     }
 
     getTier() {
-        return tier[this.tier];
+        return tier[this.tierIndex];
     }
 
     getRank() {
-        return rank[this.rank];
+        return rank[this.rankIndex];
     }
 
     isTiered() {
-        return this.tier < 7;
+        return this.tierIndex < 7;
     }
 }
 

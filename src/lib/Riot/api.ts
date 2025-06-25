@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { ApiSet } from './apiSet';
-import { Region, regions } from './types';
+import { rankType, Region, regions, tierType } from './types';
 import RiotAPI from './riotApi';
 import {
     AccountSchema,
@@ -81,8 +81,8 @@ const RiotAPIStructure = {
                 z.object({
                     leagueId: z.string(),
                     queueType: z.string(),
-                    tier: z.string(),
-                    rank: z.string(),
+                    tier: tierType,
+                    rank: rankType,
                     leaguePoints: z.number(),
                     wins: z.number(),
                     losses: z.number(),
