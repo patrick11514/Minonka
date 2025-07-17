@@ -10,6 +10,9 @@ import { addRegionOption, getHighestRank } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import { TeamData } from '$/Worker/tasks/team';
 import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     CacheType,
     ChatInputCommandInteraction,
     Locale,
@@ -256,9 +259,28 @@ export default class Clash extends Command {
                 locale: interaction.locale
             });
 
+            const rankRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                newPlayers.map((player) =>
+                    new ButtonBuilder()
+                        .setLabel(`Rank: ${player.gameName}#${player.tagLine}`)
+                        .setCustomId(`clrank;${player.puuid};${region}`)
+                        .setStyle(ButtonStyle.Primary)
+                )
+            );
+
+            const clashHistoryRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                newPlayers.map((player) =>
+                    new ButtonBuilder()
+                        .setLabel(`History: ${player.gameName}#${player.tagLine}`)
+                        .setCustomId(`clhis;${player.puuid};${region}`)
+                        .setStyle(ButtonStyle.Secondary)
+                )
+            );
+
             await interaction.editReply({
                 content: replacePlaceholders(lang.clash.successMessage, team.data.id),
-                files: [result]
+                files: [result],
+                components: [rankRow, clashHistoryRow]
             });
 
             fs.unlinkSync(result);
