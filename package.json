@@ -16,7 +16,8 @@
         "lint": "prettier --check . && eslint src",
         "check": "tsc --noEmit",
         "migration:create": "./script/createMigration.sh",
-        "migrate": "tsx ./script/runMigration.ts"
+        "migrate": "tsx ./script/runMigration.ts",
+        "prepare": "husky"
     },
     "dependencies": {
         "@types/strip-color": "^0.1.2",
@@ -44,7 +45,9 @@
         "@types/ws": "^8.5.14",
         "eslint": "^9.20.0",
         "eslint-config-prettier": "^10.0.1",
+        "husky": "^9.1.7",
         "kysely-codegen": "^0.17.0",
+        "lint-staged": "^16.1.2",
         "tsc-alias": "^1.8.10",
         "tsx": "^4.19.2",
         "typescript": "^5.7.3",
@@ -55,6 +58,12 @@
             "es5-ext",
             "esbuild",
             "sharp"
+        ]
+    },
+    "lint-staged": {
+        "*.{js,ts}": [
+            "eslint --fix",
+            "prettier --write"
         ]
     }
 }
