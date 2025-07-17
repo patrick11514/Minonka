@@ -169,10 +169,11 @@ export class DiscordBot extends EventEmitter<Events> {
         } else if (interaction.isButton()) {
             interactionInfo = `Button (customId: ${interaction.customId})`;
         } else {
-            interactionInfo = `${interaction.type} (id: ${
-                //eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (interaction as any).customId ?? 'N/A'
-            })`;
+            if ('customId' in interaction) {
+                interactionInfo = `${interaction.type} (id: ${interaction.customId})`;
+            } else {
+                interactionInfo = `${interaction.type} (id: N/A)`;
+            }
         }
 
         // --- Final formatted message ---
