@@ -1,12 +1,5 @@
 import { env } from '$/types/env';
-import {
-    BaseInteraction,
-    Client,
-    GatewayIntentBits,
-    Interaction,
-    REST,
-    Routes
-} from 'discord.js';
+import { BaseInteraction, Client, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { EventEmitter } from './EventEmitter';
 import fs from 'node:fs';
 import Path from 'node:path';
@@ -96,17 +89,13 @@ export class DiscordBot extends EventEmitter<Events> {
             for (const [event, callbacks] of Object.entries(instance.events)) {
                 for (const callback of callbacks) {
                     this.client.on(event, (...args) => {
+                        //here we assume the first argument is always the interaction
+                        //because we are only listening to interactionCreate
                         const interaction = args[0];
-                        if (interaction instanceof Interaction) {
-                            Promise.resolve(callback.bind(instance)(interaction)).catch(
-                                (error) => this.handleError(error, interaction)
-                            );
-                        } else {
-                            const error = new Error(
-                                `Event '${event}' does not provide an Interaction parameter.`
-                            );
-                            this.handleError(error, interaction);
-                        }
+                        //but for safety we spread arguments into function, if it will have more than one argument
+                        Promise.resolve(callback.bind(instance)(...args)).catch((error) =>
+                            this.handleError(error, interaction)
+                        );
                     });
                 }
             }
