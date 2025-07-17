@@ -1,13 +1,22 @@
-import { AssetType, getAsset } from '$/lib/Assets';
+import {
+    AssetType,
+    getAsset,
+    getChampions,
+    getRiotLanguageFromDiscordLocale
+} from '$/lib/Assets';
 import { Background } from '$/lib/Imaging/Background';
 import { Text } from '$/lib/Imaging/Text';
-import { _Rank, _Tier } from '$/lib/Riot/types';
-import { save } from '../utilities';
+import { Rank } from '$/lib/Riot/types';
+import { fixChampName, save } from '../utilities';
 import { Color, Position } from '$/lib/Imaging/types';
 import { Image } from '$/lib/Imaging/Image';
 import { Blank } from '$/lib/Imaging/Blank';
 import { Locale } from 'discord.js';
 import { getLocale } from '$/lib/langs';
+import { RankData } from './rank';
+import { MasterySchema } from '$/lib/Riot/schemes';
+import { z } from 'zod';
+import { numberToOrder } from '$/lib/utilities';
 
 export type TeamData = {
     abbreviation: string;
@@ -28,12 +37,10 @@ export type TeamData = {
         role: 'CAPTAIN' | 'MEMBER';
         profileIconId: number;
         level: number;
-        highestRank: {
-            tier: _Tier;
-            rank: _Rank;
-        } | null;
+        highestRank: RankData['ranks'][number] | null;
         gameName: string;
         tagLine: string;
+        masteries: z.infer<typeof MasterySchema>[];
     }[];
     locale: Locale;
 };
@@ -84,6 +91,9 @@ export default async (data: TeamData) => {
     const captain = data.players.find(
         (player) => player.role === 'CAPTAIN' && data.captain === player.puuid
     )!;
+
+    const riotLang = getRiotLanguageFromDiscordLocale(data.locale);
+    const champions = (await getChampions(riotLang))!.data;
 
     const renderPlayer = async (
         container: Background | Blank,
@@ -184,9 +194,18 @@ export default async (data: TeamData) => {
         const rank = new Text(
             player.highestRank === null
                 ? lang.unranked
-                : lang.rank.tiers[player.highestRank.tier] +
-                  ' ' +
-                  player.highestRank.rank,
+                : [
+                      `${new Rank(player.highestRank).toString(lang)} `,
+                      {
+                          text: `(${
+                              lang.rank.queues[
+                                  player.highestRank
+                                      .queueType as keyof typeof lang.rank.queues
+                              ]
+                          })`,
+                          color: Color.WHITE
+                      }
+                  ],
             {
                 x: textStart,
                 y: (position.y as number) + 40
@@ -206,7 +225,15 @@ export default async (data: TeamData) => {
 
         //Position
         const _position = new Text(
-            lang.clash.positions[player.position],
+            player.highestRank === null
+                ? lang.clash.positions[player.position]
+                : [
+                      `${lang.clash.positions[player.position]} (`,
+                      { text: `${player.highestRank.wins}W`, color: Color.GREEN },
+                      '/',
+                      { text: `${player.highestRank.losses}L`, color: Color.RED },
+                      ')'
+                  ],
             {
                 x: textStart,
                 y: (position.y as number) + 80
@@ -223,6 +250,94 @@ export default async (data: TeamData) => {
             0
         );
         container.addElement(_position);
+
+        const MASTERY_SIZE = 75;
+        const EXTEND = 40; // for level + points
+        const masteries = new Blank(
+            {
+                x: 'center',
+                y: (position.y as number) + 120
+            },
+            {
+                width:
+                    MASTERY_SIZE * player.masteries.length +
+                    10 * (player.masteries.length - 1),
+                height: MASTERY_SIZE + EXTEND
+            }
+        );
+
+        masteries.addElements(
+            await player.masteries.asyncMap(async (mastery, index) => {
+                const blank = new Blank(
+                    {
+                        x: index * (MASTERY_SIZE + 10),
+                        y: 0
+                    },
+                    {
+                        width: MASTERY_SIZE,
+                        height: MASTERY_SIZE + 40
+                    }
+                );
+
+                const champion = Object.values(champions).find(
+                    (champ) => champ.key === mastery.championId
+                )!;
+                const championImage = await getAsset(
+                    AssetType.DDRAGON_CHAMPION,
+                    `${fixChampName(champion.id)}.png`
+                );
+
+                const image = new Image(championImage!, {
+                    x: 0,
+                    y: 0
+                });
+                await image.resize({
+                    width: MASTERY_SIZE,
+                    height: MASTERY_SIZE
+                });
+                blank.addElement(image);
+
+                const level = new Text(
+                    mastery.championLevel.toString(),
+                    {
+                        x: 'center',
+                        y: MASTERY_SIZE - 15
+                    },
+                    {
+                        width: MASTERY_SIZE,
+                        height: 20
+                    },
+                    20,
+                    Color.WHITE,
+                    'middle',
+                    'bold',
+                    true
+                );
+                blank.addElement(level);
+
+                const points = new Text(
+                    numberToOrder(mastery.championPoints),
+                    {
+                        x: 'center',
+                        y: MASTERY_SIZE + 5
+                    },
+                    {
+                        width: MASTERY_SIZE,
+                        height: 20
+                    },
+                    20,
+                    Color.WHITE,
+                    'middle',
+                    'bold',
+                    true
+                );
+                blank.addElement(points);
+
+                return blank;
+            })
+        );
+
+        container.addElement(masteries);
     };
 
     await renderPlayer(background, captain, { x: 'center', y: 140 });
