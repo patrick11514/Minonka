@@ -95,10 +95,18 @@ export class DiscordBot extends EventEmitter<Events> {
         for (const instance of instances) {
             for (const [event, callbacks] of Object.entries(instance.events)) {
                 for (const callback of callbacks) {
-                    this.client.on(event, (interaction: Interaction) => {
-                        Promise.resolve(callback.bind(instance)(interaction)).catch(
-                            (error) => this.handleError(error, interaction)
-                        );
+                    this.client.on(event, (...args) => {
+                        const interaction = args[0];
+                        if (interaction instanceof Interaction) {
+                            Promise.resolve(callback.bind(instance)(interaction)).catch(
+                                (error) => this.handleError(error, interaction)
+                            );
+                        } else {
+                            const error = new Error(
+                                `Event '${event}' does not provide an Interaction parameter.`
+                            );
+                            this.handleError(error, interaction);
+                        }
                     });
                 }
             }
