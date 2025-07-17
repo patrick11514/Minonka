@@ -119,7 +119,8 @@ export default template.parse({
             ionia: 'Ionský %1',
             piltover: 'Piltoverský %1',
             zaun: 'Zaunský %1',
-            shadowIsles: 'Pohár Stínových ostrovů'
+            shadowIsles: 'Pohár Stínových ostrovů',
+            bandle_city: 'Pohár Bandle City'
         }
     },
     regions: {
@@ -205,7 +206,8 @@ export default template.parse({
         piltover: 'Piltover',
         zaun: 'Zaun',
         bilgewater: 'Bilgewater',
-        shadowIsles: 'Stínové ostrovy'
+        shadowIsles: 'Stínové ostrovy',
+        bandle_city: 'Bandle City'
     },
     unranked: 'Nehodnocený',
     help: {

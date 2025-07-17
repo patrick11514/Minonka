@@ -11,7 +11,11 @@ export const getLocale = (locale: Locale) => {
     }
 };
 
-export const replacePlaceholders = (message: string, ...toReplace: string[]) => {
+export const replacePlaceholders = (message?: string, ...toReplace: string[]) => {
+    if (!message) {
+        return 'MISSING_TRANSLATION';
+    }
+
     for (let i = 0; i < toReplace.length; ++i) {
         message = message.replace(`%${i + 1}`, toReplace[i]);
     }

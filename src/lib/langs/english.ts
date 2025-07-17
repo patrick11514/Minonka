@@ -116,9 +116,12 @@ export default template.parse({
             FILL: 'Fill',
             UNSELECTED: 'Unselected'
         },
-        mapInflection: Object.fromEntries(
-            mapRegions.map((region) => [region, `${capitalize(region)} %1`])
-        ) as ClashMapInflection<typeof mapRegions>
+        mapInflection: {
+            ...(Object.fromEntries(
+                mapRegions.map((region) => [region, `${capitalize(region)} %1`])
+            ) as ClashMapInflection<typeof mapRegions>),
+            bandle_city: 'Bandle City %1'
+        }
     },
     regions: {
         EUN1: 'EUNE',
@@ -203,7 +206,8 @@ export default template.parse({
         shadowIsles: 'Shadow Isles',
         shurima: 'Shurima',
         targon: 'Targon',
-        zaun: 'Zaun'
+        zaun: 'Zaun',
+        bandle_city: 'Bandle City'
     },
     unranked: 'Unranked',
     help: {
