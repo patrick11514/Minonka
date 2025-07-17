@@ -2,7 +2,9 @@ import { Locale } from 'discord.js';
 import { Command } from './Command';
 import { SubCommand } from './SubCommand';
 import { getLocale } from './langs';
-import { regions } from './Riot/types';
+import { Rank, Region, regions } from './Riot/types';
+import api from './Riot/api';
+import { formatErrorResponse } from './Riot/baseRequest';
 
 export const setupRiotOptions = (instance: Command | SubCommand) => {
     instance.addOption({
@@ -123,4 +125,33 @@ export const discordLocaleToJSLocale = (locale: Locale) => {
         case Locale.Lithuanian:
             return 'lt-LT';
     }
+};
+
+export const getHighestRank = async (
+    puuid: string,
+    region: Region,
+    lang: ReturnType<typeof getLocale>
+) => {
+    const ranks = await api[region].league.byPuuid(puuid);
+    if (!ranks.status) {
+        throw new Error(formatErrorResponse(lang, ranks));
+    }
+
+    ranks.data.sort((a, b) => new Rank(b).getTotalLp() - new Rank(a).getTotalLp());
+
+    return ranks.data[0];
+};
+
+export const numberToOrder = (number: number) => {
+    const orders = ['k', 'm', 'b', 't'];
+
+    if (number < 1000) {
+        return number.toString();
+    }
+
+    const order = Math.floor(Math.log10(number) / 3);
+
+    const orderValue = orders[order - 1] || '';
+    const value = (number / Math.pow(1000, order)).toFixed(1);
+    return `${value}${orderValue}`;
 };
