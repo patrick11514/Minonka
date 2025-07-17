@@ -81,7 +81,9 @@ export default async (data: SummonerData) => {
             banner = asset;
         }
     } else {
-        const bannerName = banners.find((b) => b.startsWith(data.banner.toString()))!;
+        const bannerName = banners.find(
+            (b) => b.split('_')[0] === data.banner.toString()
+        )!;
         if (!bannerName) {
             banner = (await getAsset(AssetType.BANNER, '1_unranked_banner.png'))!;
         } else {
