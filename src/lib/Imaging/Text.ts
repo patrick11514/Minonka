@@ -4,7 +4,15 @@ import { Position, Size } from './types';
 
 export class Text extends Composite {
     constructor(
-        private text: string,
+        private text:
+            | string
+            | (
+                  | string
+                  | {
+                        text: string;
+                        color: string;
+                    }
+              )[],
         position: Position,
         private size: Size,
         private fontSize: number,
@@ -46,6 +54,22 @@ export class Text extends Composite {
         };
     }
 
+    private renderText(): string {
+        if (typeof this.text === 'string') {
+            return this.text;
+        }
+
+        return this.text
+            .map((t) => {
+                if (typeof t === 'string') {
+                    return t;
+                } else {
+                    return `<tspan fill="${t.color}">${t.text}</tspan>`;
+                }
+            })
+            .join('');
+    }
+
     async render() {
         let xPosition;
         if (this.alignment === 'middle') {
@@ -68,7 +92,7 @@ export class Text extends Composite {
                     </style>
                     <text class="${this.outline ? 'outline' : ''}" x="${xPosition}" y="${this.size.height / 2 + this.fontSize / 3}" font-size="${this.fontSize}" fill="${this.color}"
                         font-family="Beaufort for LOL Ja" dominant-baseline="${this.alignment}" text-anchor="${this.alignment}" font-weight="${this.weight}">
-                        ${this.text}
+                        ${this.renderText()}
                     </text>
                 </svg>`);
     }

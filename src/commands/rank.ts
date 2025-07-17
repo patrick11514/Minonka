@@ -9,6 +9,7 @@ import { RankData } from '$/Worker/tasks/rank';
 import {
     CacheType,
     ChatInputCommandInteraction,
+    Interaction,
     Locale,
     MessageFlags,
     RepliableInteraction
@@ -41,10 +42,28 @@ export default class Rank extends AccountCommand {
             }
         });
         super.addLocalization(Locale.Czech, 'rank', 'Zobrazí informace o tvém ranku');
+
+        super.on('interactionCreate', this.clashTeamButton.bind(this));
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
         await this.handleAccountCommand(interaction, l);
+    }
+
+    async clashTeamButton(interaction: Interaction) {
+        if (!interaction.isButton()) return;
+
+        const id = interaction.customId.split(';');
+        if (id[0] !== 'clrank') return;
+
+        this.onMenuSelect(
+            interaction as RepliableInteraction<CacheType>,
+            {
+                puuid: id[1],
+                region: id[2]
+            } as Selectable<Account>,
+            id[2] as Region
+        );
     }
 
     async onMenuSelect(

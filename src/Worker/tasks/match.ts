@@ -30,6 +30,7 @@ import { getMatchStatus, MatchStatus } from '$/lib/Riot/utilities';
 import { conn } from '$/types/connection';
 import api from '$/lib/Riot/api';
 import { updateLpForUser } from '$/crons/lp';
+import { getChampionsMap } from '$/lib/utilities';
 
 export type MatchData = {
     region: Region;
@@ -96,6 +97,75 @@ export default async (data: MatchData) => {
     // ....
 
     const STATSWidth = 500;
+
+    //Bans
+    const BansHeight = 70;
+    const CORNER_OFFSET = 60;
+    const riotLanguage = getRiotLanguageFromDiscordLocale(data.locale);
+    const champions = (await getChampionsMap(riotLanguage))!;
+    const banX = (await getAsset(AssetType.OTHER, 'ban-x.png'))!;
+
+    for (const team of data.info.teams) {
+        const first = team.teamId === 100;
+        const BANSWidth = Math.floor(
+            (mainLayoutSize.width - STATSWidth - CORNER_OFFSET * 2) / 2
+        );
+        const bans = new Blank(
+            {
+                x: first ? CORNER_OFFSET : BANSWidth + STATSWidth + CORNER_OFFSET,
+                y: CORNER_OFFSET
+            },
+            {
+                width: BANSWidth,
+                height: BansHeight
+            }
+        );
+        const banList = team.bans;
+
+        if (first) {
+            bans.setReverse();
+            banList.reverse();
+        }
+
+        mainLayout.addElement(bans);
+
+        bans.addElements(
+            (
+                await banList.asyncMap(async (ban, idx) => {
+                    const champion = champions.get(ban.championId!);
+                    const image = champion
+                        ? await getAsset(
+                              AssetType.DDRAGON_CHAMPION,
+                              fixChampName(champion.id) + '.png'
+                          )
+                        : await getAsset(AssetType.DDRAGON_PROFILEICON, '29.png');
+
+                    const banImage = new Image(image!, {
+                        x: idx * (BansHeight + 10),
+                        y: 0
+                    });
+
+                    await banImage.resize({
+                        width: BansHeight,
+                        height: BansHeight
+                    });
+
+                    const banXImage = new Image(banX, {
+                        x: idx * (BansHeight + 10),
+                        y: 0
+                    });
+
+                    await banXImage.resize({
+                        width: BansHeight,
+                        height: BansHeight
+                    });
+
+                    return [banImage, banXImage];
+                })
+            ).flat()
+        );
+    }
+
     const Stats = new Blank(
         {
             x: Math.floor((mainLayoutSize.width - STATSWidth) / 2),

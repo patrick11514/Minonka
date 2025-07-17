@@ -4,12 +4,15 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
-import { Rank, Region } from '$/lib/Riot/types';
+import { Region } from '$/lib/Riot/types';
 import { SubCommand } from '$/lib/SubCommand';
-import { addRegionOption } from '$/lib/utilities';
+import { addRegionOption, getHighestRank } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import { TeamData } from '$/Worker/tasks/team';
 import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
     CacheType,
     ChatInputCommandInteraction,
     Locale,
@@ -216,14 +219,15 @@ export default class Clash extends Command {
                         throw new Error(formatErrorResponse(lang, account));
                     }
 
-                    const ranks = await api[region].league.byPuuid(summoner.data.puuid);
-                    if (!ranks.status) {
-                        throw new Error(formatErrorResponse(lang, ranks));
-                    }
+                    const rank = await getHighestRank(summoner.data.puuid, region, lang);
 
-                    ranks.data.sort(
-                        (a, b) => new Rank(b).getTotalLp() - new Rank(a).getTotalLp()
+                    const masteries = await api[region].mastery.top(
+                        summoner.data.puuid,
+                        5
                     );
+                    if (!masteries.status) {
+                        throw new Error(formatErrorResponse(lang, masteries));
+                    }
 
                     return {
                         puuid: player.puuid,
@@ -231,13 +235,10 @@ export default class Clash extends Command {
                         role: player.role,
                         profileIconId: summoner.data.profileIconId,
                         level: summoner.data.summonerLevel,
-                        highestRank:
-                            ranks.data.length > 0
-                                ? (ranks
-                                      .data[0] as TeamData['players'][number]['highestRank'])
-                                : null,
+                        highestRank: rank,
                         gameName: account.data.gameName,
-                        tagLine: account.data.tagLine
+                        tagLine: account.data.tagLine,
+                        masteries: masteries.data
                     } satisfies TeamData['players'][number];
                 })
             );
@@ -258,9 +259,28 @@ export default class Clash extends Command {
                 locale: interaction.locale
             });
 
+            const rankRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                newPlayers.map((player) =>
+                    new ButtonBuilder()
+                        .setLabel(`Rank: ${player.gameName}#${player.tagLine}`)
+                        .setCustomId(`clrank;${player.puuid};${region}`)
+                        .setStyle(ButtonStyle.Primary)
+                )
+            );
+
+            const clashHistoryRow = new ActionRowBuilder<ButtonBuilder>().addComponents(
+                newPlayers.map((player) =>
+                    new ButtonBuilder()
+                        .setLabel(`History: ${player.gameName}#${player.tagLine}`)
+                        .setCustomId(`clhis;${player.puuid};${region}`)
+                        .setStyle(ButtonStyle.Secondary)
+                )
+            );
+
             await interaction.editReply({
                 content: replacePlaceholders(lang.clash.successMessage, team.data.id),
-                files: [result]
+                files: [result],
+                components: [rankRow, clashHistoryRow]
             });
 
             fs.unlinkSync(result);

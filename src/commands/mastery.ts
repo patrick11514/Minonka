@@ -1,12 +1,12 @@
 import { AccountCommand } from '$/lib/AccountCommand';
-import { getChampions, getRiotLanguageFromDiscordLocale } from '$/lib/Assets';
+import { getRiotLanguageFromDiscordLocale } from '$/lib/Assets';
 import { getLocale } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { MasterySchema } from '$/lib/Riot/schemes';
 import { Region } from '$/lib/Riot/types';
-import { discordLocaleToJSLocale } from '$/lib/utilities';
+import { discordLocaleToJSLocale, getChampionsMap } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import {
     RepliableInteraction,
@@ -71,9 +71,8 @@ export default class Mastery extends AccountCommand {
         const lang = getLocale(locale);
         const LIMIT = 25;
 
-        const champions = await getChampions(getRiotLanguageFromDiscordLocale(locale));
+        const champions = await getChampionsMap(getRiotLanguageFromDiscordLocale(locale));
         if (!champions) return;
-        const championData = Object.values(champions.data);
 
         const row = new ActionRowBuilder<StringSelectMenuBuilder>();
         const select = new StringSelectMenuBuilder()
@@ -88,9 +87,7 @@ export default class Mastery extends AccountCommand {
         const filteredMasteries = masteries.slice(offset, offset + LIMIT - cutDown);
 
         const options = await filteredMasteries.asyncMap(async (mastery) => {
-            const champion = championData.find(
-                (champion) => champion.key === mastery.championId
-            );
+            const champion = champions.get(mastery.championId);
             const emoji = await process.emoji.getEmoji('champion', champion?.name ?? '');
             if (!emoji) return null;
 
@@ -261,14 +258,12 @@ export default class Mastery extends AccountCommand {
             return;
         }
 
-        const champions = await getChampions(
+        const champions = await getChampionsMap(
             getRiotLanguageFromDiscordLocale(interaction.locale)
         );
 
         if (!champions) return;
-        const champion = Object.values(champions.data).find(
-            (champion) => champion.key === championId
-        )!;
+        const champion = champions.get(championId)!;
         const championEmoji = await process.emoji.getEmoji('champion', champion.name);
 
         const date = new Date(championData.data.lastPlayTime);

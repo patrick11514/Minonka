@@ -128,6 +128,29 @@ export default class History extends AccountCommand<CustomData> {
 
         super.on('interactionCreate', this.autocomplete);
         super.on('interactionCreate', this.onButton);
+        super.on('interactionCreate', this.clashTeamButton);
+    }
+
+    async clashTeamButton(interaction: Interaction) {
+        if (!interaction.isButton()) return;
+
+        const id = interaction.customId.split(';');
+        if (id[0] !== 'clhis') return;
+        this.onMenuSelect(
+            interaction as RepliableInteraction<CacheType>,
+            {
+                puuid: id[1],
+                region: id[2]
+            } as Selectable<Account>,
+            id[2] as Region,
+            {
+                queue: queues
+                    .find((q) => q.description === "Summoner's Rift Clash games")!
+                    .queueId.toString(),
+                count: 6,
+                offset: 0
+            }
+        );
     }
 
     async getFiles(

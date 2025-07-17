@@ -7,7 +7,6 @@ import {
 } from '$/lib/Assets';
 import { Background } from '$/lib/Imaging/Background';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
-import api from '$/lib/Riot/api';
 import { Rank } from '$/lib/Riot/types';
 import fs from 'node:fs';
 import { save } from '../utilities';
@@ -16,6 +15,7 @@ import { Text } from '$/lib/Imaging/Text';
 import { DefaultParameters } from '../types';
 import { Color } from '$/lib/Imaging/types';
 import { ChallengeData } from '$/lib/Riot/schemes';
+import { getHighestRank } from '$/lib/utilities';
 
 export type SummonerData = {
     titleId?: string;
@@ -49,23 +49,13 @@ const banners = fs.readdirSync(await getAssetPath(AssetType.BANNER, ''));
 export default async (data: SummonerData) => {
     const lang = getLocale(data.locale);
 
-    let ranked;
     let highestRank;
     if (
         data.crest === 2 ||
         (data.crest == 1 && data.prestigeCrest == 0) ||
         data.banner === 2
     ) {
-        const result = await api[data.region].league.byPuuid(data.puuid);
-        if (!result.status) {
-            throw new Error(lang.league.error);
-        }
-
-        ranked = result.data;
-
-        highestRank = ranked
-            .map((r) => new Rank(r))
-            .sort((a, b) => b.toNumber() - a.toNumber())[0];
+        highestRank = new Rank(await getHighestRank(data.puuid, data.region, lang));
     }
 
     let banner: Buffer<ArrayBufferLike>;
