@@ -334,7 +334,7 @@ export default class History extends AccountCommand<CustomData> {
         const count = interaction.options.getInteger('count') || 6;
         const offset = interaction.options.getInteger('offset') || 0;
 
-        this.handleAccountCommand(interaction, l, {
+        await this.handleAccountCommand(interaction, l, {
             queue,
             count,
             offset

@@ -109,14 +109,14 @@ export default class Clash extends Command {
 
     async handler(interaction: ChatInputCommandInteraction) {
         if (this.schedule.match(interaction)) {
-            this.getSchedule(interaction);
+            await this.getSchedule(interaction);
         } else if (this.team.match(interaction)) {
             if (this.teamId.match(interaction)) {
                 const option = interaction.options.getString('team_id', true);
                 const region = interaction.options.getString('region', true) as Region;
-                this.handleTeam(interaction, option, region);
+                await this.handleTeam(interaction, option, region);
             } else {
-                this.team.handleAccountCommand(interaction, l);
+                await this.team.handleAccountCommand(interaction, l);
             }
         }
     }

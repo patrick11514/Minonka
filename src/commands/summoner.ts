@@ -44,7 +44,7 @@ export default class Summoner extends AccountCommand {
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
-        this.handleAccountCommand(interaction, l);
+        await this.handleAccountCommand(interaction, l);
     }
 
     async onMenuSelect(

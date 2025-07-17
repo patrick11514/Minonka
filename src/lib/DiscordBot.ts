@@ -1,5 +1,12 @@
 import { env } from '$/types/env';
-import { Client, GatewayIntentBits, REST, Routes } from 'discord.js';
+import {
+    BaseInteraction,
+    Client,
+    GatewayIntentBits,
+    Interaction,
+    REST,
+    Routes
+} from 'discord.js';
 import { EventEmitter } from './EventEmitter';
 import fs from 'node:fs';
 import Path from 'node:path';
@@ -80,13 +87,19 @@ export class DiscordBot extends EventEmitter<Events> {
             );
             if (!command) return;
 
-            command.handler(interaction);
+            command.handler(interaction).catch((error) => {
+                this.handleError(error, interaction);
+            });
         });
 
         for (const instance of instances) {
             for (const [event, callbacks] of Object.entries(instance.events)) {
                 for (const callback of callbacks) {
-                    this.client.on(event, callback.bind(instance));
+                    this.client.on(event, (interaction: Interaction) => {
+                        Promise.resolve(callback.bind(instance)(interaction)).catch(
+                            (error) => this.handleError(error, interaction)
+                        );
+                    });
                 }
             }
         }
@@ -120,5 +133,65 @@ export class DiscordBot extends EventEmitter<Events> {
 
     getCommand(name: string) {
         return this.commands.find((c) => c.slashCommand.name === name);
+    }
+
+    private async handleError(error: unknown, interaction: BaseInteraction) {
+        // --- Error details ---
+        const errName = error instanceof Error ? error.name : 'UnknownError';
+        const errMessage =
+            error instanceof Error
+                ? error.message
+                : typeof error === 'string'
+                  ? error
+                  : 'No error message';
+        const stack =
+            error instanceof Error && error.stack
+                ? error.stack
+                : 'No stack trace available';
+
+        // --- Interaction details ---
+        let interactionInfo = 'Unknown interaction';
+
+        if (interaction.isChatInputCommand()) {
+            interactionInfo = `/${interaction.commandName} ${interaction.options.data
+                .map((opt) => (opt.value ? `${opt.name}:${opt.value}` : opt.name))
+                .join(' ')}`;
+        } else if (interaction.isStringSelectMenu()) {
+            interactionInfo = `SelectMenu (customId: ${interaction.customId})`;
+        } else if (interaction.isButton()) {
+            interactionInfo = `Button (customId: ${interaction.customId})`;
+        } else {
+            interactionInfo = `${interaction.type} (id: ${
+                //eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (interaction as any).customId ?? 'N/A'
+            })`;
+        }
+
+        // --- Final formatted message ---
+        const formatted = `## Hey, some error occurred!
+**Time:** ${new Date().toLocaleString()}
+**Interaction:** ${interactionInfo}
+**Server:** ${interaction.guild?.name ?? 'DM'} (${interaction.guildId ?? 'N/A'})
+**Executor:** <@${interaction.user.id}> (${interaction.user.id})
+
+\`\`\`js
+${errName}: ${errMessage}
+${stack}
+\`\`\``;
+
+        /* eslint-disable no-console */
+        try {
+            const channel = await this.client.channels.fetch(env.ERRORS_LOG_CHANNEL);
+            if (!channel || !channel.isTextBased() || !channel.isSendable()) {
+                console.error(
+                    "Error log channel is not a text channel or doesn't exist."
+                );
+                return;
+            }
+            await channel.send(formatted);
+        } catch (e) {
+            console.log('Failed to report error to channel:', e);
+        }
+        /*eslint-enable no-console */
     }
 }

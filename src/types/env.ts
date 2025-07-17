@@ -17,7 +17,8 @@ const schema = z.object({
     PERSISTANT_CACHE_PATH: z.string(),
     EMOJI_GUILD_CHAMPIONS: z.string(),
     EMOJI_GUILD_ITEMS: z.string(),
-    EMOJI_GUILD_MISC: z.string()
+    EMOJI_GUILD_MISC: z.string(),
+    ERRORS_LOG_CHANNEL: z.string()
 });
 
 export const env = schema.parse(process.env);
