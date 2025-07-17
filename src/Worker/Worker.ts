@@ -8,6 +8,7 @@ import Logger from '$/lib/logger';
 import { env } from '$/types/env';
 import { WebSocket } from 'ws';
 import Path from 'node:path';
+import '../lib/pollyfill';
 
 const InstanceId = process.env.INSTANCE_ID || '';
 
