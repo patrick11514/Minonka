@@ -189,6 +189,11 @@ ${stack}
 \`\`\``;
 
         /* eslint-disable no-console */
+        // Log original error details to console as a fallback
+        console.error('Original error details:');
+        console.error(`Name: ${errName}`);
+        console.error(`Message: ${errMessage}`);
+        console.error(`Stack: ${stack}`);
         try {
             const channel = await this.client.channels.fetch(env.ERRORS_LOG_CHANNEL);
             if (!channel || !channel.isTextBased() || !channel.isSendable()) {
