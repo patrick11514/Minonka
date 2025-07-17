@@ -5,6 +5,7 @@ import { getLocale } from './langs';
 import { Rank, Region, regions } from './Riot/types';
 import api from './Riot/api';
 import { formatErrorResponse } from './Riot/baseRequest';
+import { getChampions, RiotLanguage } from './Assets';
 
 export const setupRiotOptions = (instance: Command | SubCommand) => {
     instance.addOption({
@@ -142,7 +143,7 @@ export const getHighestRank = async (
     return ranks.data[0];
 };
 
-export const numberToOrder = (number: number) => {
+export const formatNumbersWithSuffix = (number: number) => {
     const orders = ['k', 'm', 'b', 't'];
 
     if (number < 1000) {
@@ -154,4 +155,14 @@ export const numberToOrder = (number: number) => {
     const orderValue = orders[order - 1] || '';
     const value = (number / Math.pow(1000, order)).toFixed(1);
     return `${value}${orderValue}`;
+};
+
+export const getChampionsMap = async (lang: RiotLanguage) => {
+    const champions = (await getChampions(lang))!;
+
+    const map = new Map<number, (typeof champions)['data'][string]>();
+    for (const champion of Object.values(champions.data)) {
+        map.set(champion.key, champion);
+    }
+    return map;
 };

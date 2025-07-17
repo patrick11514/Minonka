@@ -1,7 +1,6 @@
 import {
     AssetType,
     getAsset,
-    getChampions,
     getRiotLanguageFromDiscordLocale,
     getRunesReforged,
     getSummonerSpells
@@ -31,6 +30,7 @@ import { getMatchStatus, MatchStatus } from '$/lib/Riot/utilities';
 import { conn } from '$/types/connection';
 import api from '$/lib/Riot/api';
 import { updateLpForUser } from '$/crons/lp';
+import { getChampionsMap } from '$/lib/utilities';
 
 export type MatchData = {
     region: Region;
@@ -102,7 +102,7 @@ export default async (data: MatchData) => {
     const BansHeight = 70;
     const CORNER_OFFSET = 60;
     const riotLanguage = getRiotLanguageFromDiscordLocale(data.locale);
-    const champions = (await getChampions(riotLanguage))!;
+    const champions = (await getChampionsMap(riotLanguage))!;
     const banX = (await getAsset(AssetType.OTHER, 'ban-x.png'))!;
 
     for (const team of data.info.teams) {
@@ -132,9 +132,7 @@ export default async (data: MatchData) => {
         bans.addElements(
             (
                 await banList.asyncMap(async (ban, idx) => {
-                    const champion = Object.values(champions.data).find(
-                        (champ) => champ.key === ban.championId
-                    );
+                    const champion = champions.get(ban.championId!);
                     const image = champion
                         ? await getAsset(
                               AssetType.DDRAGON_CHAMPION,

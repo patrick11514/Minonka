@@ -1,9 +1,4 @@
-import {
-    AssetType,
-    getAsset,
-    getChampions,
-    getRiotLanguageFromDiscordLocale
-} from '$/lib/Assets';
+import { AssetType, getAsset, getRiotLanguageFromDiscordLocale } from '$/lib/Assets';
 import { Background } from '$/lib/Imaging/Background';
 import { Text } from '$/lib/Imaging/Text';
 import { Rank } from '$/lib/Riot/types';
@@ -16,7 +11,7 @@ import { getLocale } from '$/lib/langs';
 import { RankData } from './rank';
 import { MasterySchema } from '$/lib/Riot/schemes';
 import { z } from 'zod';
-import { numberToOrder } from '$/lib/utilities';
+import { formatNumbersWithSuffix, getChampionsMap } from '$/lib/utilities';
 
 export type TeamData = {
     abbreviation: string;
@@ -93,7 +88,7 @@ export default async (data: TeamData) => {
     )!;
 
     const riotLang = getRiotLanguageFromDiscordLocale(data.locale);
-    const champions = (await getChampions(riotLang))!.data;
+    const champions = (await getChampionsMap(riotLang))!;
 
     const renderPlayer = async (
         container: Background | Blank,
@@ -279,9 +274,7 @@ export default async (data: TeamData) => {
                     }
                 );
 
-                const champion = Object.values(champions).find(
-                    (champ) => champ.key === mastery.championId
-                )!;
+                const champion = champions.get(mastery.championId)!;
                 const championImage = await getAsset(
                     AssetType.DDRAGON_CHAMPION,
                     `${fixChampName(champion.id)}.png`
@@ -316,7 +309,7 @@ export default async (data: TeamData) => {
                 blank.addElement(level);
 
                 const points = new Text(
-                    numberToOrder(mastery.championPoints),
+                    formatNumbersWithSuffix(mastery.championPoints),
                     {
                         x: 'center',
                         y: MASTERY_SIZE + 5
