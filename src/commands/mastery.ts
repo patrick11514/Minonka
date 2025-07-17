@@ -59,7 +59,7 @@ export default class Mastery extends AccountCommand {
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
-        this.handleAccountCommand(interaction, l);
+        await this.handleAccountCommand(interaction, l);
     }
 
     private async generateComponents(
