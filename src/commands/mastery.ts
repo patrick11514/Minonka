@@ -88,7 +88,7 @@ export default class Mastery extends AccountCommand {
 
         const options = await filteredMasteries.asyncMap(async (mastery) => {
             const champion = champions.get(mastery.championId);
-            const emoji = await process.emoji.getEmoji('champion', champion?.name ?? '');
+            const emoji = await process.emoji.getEmoji('champion', champion?.id ?? '');
             if (!emoji) return null;
 
             return {
