@@ -1,10 +1,11 @@
 import Path from 'node:path';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import { Locale } from 'discord.js';
 import Logger from './logger';
 import { z } from 'zod';
 import { ChallengeTier } from './Riot/schemes';
 import { env } from '$/types/env';
+import { asyncExists } from './fsAsync';
 
 const l = new Logger('Assets', 'blue');
 
@@ -136,7 +137,7 @@ export const getAssetPath = async (
         //we need to download file from the internet into cache folder
         const path = Path.join(env.PERSISTANT_CACHE_PATH, name);
 
-        if (fs.existsSync(path)) {
+        if (await asyncExists(path)) {
             return path;
         }
 
@@ -147,11 +148,11 @@ export const getAssetPath = async (
 
         //create folder structure
         const folder = Path.dirname(path);
-        if (!fs.existsSync(folder)) {
-            fs.mkdirSync(folder, { recursive: true });
+        if (!(await asyncExists(folder))) {
+            await fs.mkdir(folder, { recursive: true });
         }
 
-        fs.writeFileSync(path, Buffer.from(buffer));
+        await fs.writeFile(path, Buffer.from(buffer));
 
         return path;
     } else {
@@ -169,7 +170,7 @@ export const checkAsset = async (
 ) => {
     const path = await getAssetPath(type, name, language);
 
-    if (!fs.existsSync(path)) {
+    if (!(await asyncExists(path))) {
         return false;
     }
 
@@ -183,11 +184,11 @@ export const getAsset = async (
 ) => {
     const path = await getAssetPath(type, name, language);
 
-    if (!fs.existsSync(path)) {
+    if (!(await asyncExists(path))) {
         return null;
     }
 
-    return fs.readFileSync(path);
+    return fs.readFile(path);
 };
 
 export const getChallenges = async (lang: RiotLanguage) => {
@@ -380,6 +381,41 @@ export const getChampions = async (lang: RiotLanguage) => {
             )
         );
         return champions;
+    } catch (e) {
+        l.error(e);
+        return null;
+    }
+};
+
+export const getMaps = async (lang: RiotLanguage) => {
+    const schema = z.object({
+        type: z.literal('map'),
+        version: z.string(),
+        data: z.record(
+            z.string(),
+            z.object({
+                MapName: z.string(),
+                MapId: z.string(),
+                image: z.object({
+                    full: z.string(),
+                    sprite: z.string(),
+                    group: z.string(),
+                    x: z.number(),
+                    y: z.number(),
+                    w: z.number(),
+                    h: z.number()
+                })
+            })
+        )
+    });
+
+    try {
+        const maps = schema.parse(
+            JSON.parse(
+                (await getAsset(AssetType.DDRAGON_DATA, 'map.json', lang))!.toString()
+            )
+        );
+        return maps;
     } catch (e) {
         l.error(e);
         return null;

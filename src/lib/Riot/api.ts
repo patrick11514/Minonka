@@ -8,7 +8,8 @@ import {
     ClashMemberSchema,
     MatchSchema,
     SummonerSchema,
-    MasterySchema
+    MasterySchema,
+    SpectatorSchema
 } from './schemes';
 
 const getBaseRoutingURL = (region: Region) => {
@@ -190,6 +191,13 @@ const RiotAPIStructure = {
             endOfUrl: `/champion-masteries/by-puuid/${puuid}/by-champion/${championId}`,
             regional: true,
             schema: MasterySchema
+        })
+    }),
+    spectator: new ApiSet('/lol/spectator/v5', {
+        byPuuid: (puuid: string) => ({
+            endOfUrl: `/active-games/by-summoner/${puuid}`,
+            regional: true,
+            schema: SpectatorSchema
         })
     })
 };

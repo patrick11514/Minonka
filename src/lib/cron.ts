@@ -1,5 +1,5 @@
 import { Awaitable } from '$/types/types';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 import cron from 'node-cron';
 import Logger from './logger';
@@ -11,7 +11,7 @@ export type Cron =
 const l = new Logger('Cron', 'blue');
 
 export const registerCrons = async () => {
-    const crons = fs.readdirSync(path.join(import.meta.dirname, '../crons'));
+    const crons = await fs.readdir(path.join(import.meta.dirname, '../crons'));
     l.start(`Registering ${crons.length} crons...`);
     const promises = crons.map(
         (cron) => import(import.meta.resolve(path.join('../crons', cron)))

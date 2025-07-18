@@ -1,7 +1,7 @@
 import { env } from '$/types/env';
 import { BaseInteraction, Client, GatewayIntentBits, REST, Routes } from 'discord.js';
 import { EventEmitter } from './EventEmitter';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import Path from 'node:path';
 import Logger from './logger';
 import { Command } from './Command';
@@ -42,8 +42,7 @@ export class DiscordBot extends EventEmitter<Events> {
         const l = new Logger('CommandLoader', 'cyan');
         l.start('Loading commands...');
         const path = Path.join(import.meta.dirname, '..', 'commands');
-        const files = fs
-            .readdirSync(path)
+        const files = (await fs.readdir(path))
             .filter((file) => file.endsWith('.js') || file.endsWith('.ts'))
             .map(async (file) => await import(Path.join(path, file)));
         const result = await Promise.all(files);

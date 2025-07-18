@@ -227,5 +227,8 @@ export default template.parse({
         prev: 'Previous level',
         lastPlayed: 'Last played',
         atTime: 'at'
+    },
+    spectator: {
+        not_in_game: 'Account %1#%2 is not in any game'
     }
 } satisfies z.infer<typeof template>);

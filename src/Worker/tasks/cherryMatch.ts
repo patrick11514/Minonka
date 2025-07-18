@@ -84,7 +84,7 @@ const MapSubTeamToName = (subteam: SubTeam) => {
 export default async (data: CherryMatchData) => {
     const imageName = `${data.metadata.matchId}_${data.myPuuid}_${data.locale}.png`;
 
-    if (persistantExists(imageName)) {
+    if (await persistantExists(imageName)) {
         return getPersistant(imageName);
     }
 

@@ -155,5 +155,8 @@ export default o({
         prev: _,
         lastPlayed: _,
         atTime: _
+    }),
+    spectator: o({
+        not_in_game: _
     })
 });
