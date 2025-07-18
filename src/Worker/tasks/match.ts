@@ -41,7 +41,7 @@ export type MatchData = {
 export default async (data: MatchData) => {
     const imageName = `${data.metadata.matchId}_${data.myPuuid}_${data.locale}.png`;
 
-    if (persistantExists(imageName)) {
+    if (await persistantExists(imageName)) {
         return getPersistant(imageName);
     }
 

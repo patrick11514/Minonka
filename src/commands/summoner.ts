@@ -12,7 +12,7 @@ import { Region } from '$/lib/Riot/types';
 import { AccountCommand } from '$/lib/AccountCommand';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { SummonerData } from '$/Worker/tasks/summoner';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import { Selectable } from 'kysely';
 import { Account } from '$/types/database';
 
@@ -106,7 +106,7 @@ export default class Summoner extends AccountCommand {
                 files: [result]
             });
 
-            fs.unlinkSync(result);
+            await fs.unlink(result);
         } catch (e) {
             if (e instanceof Error) {
                 l.error(e);

@@ -15,7 +15,7 @@ import {
     RepliableInteraction
 } from 'discord.js';
 import { Selectable } from 'kysely';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 
 const l = new Logger('Rank', 'yellow');
 
@@ -119,7 +119,7 @@ export default class Rank extends AccountCommand {
                 files: [result]
             });
 
-            fs.unlinkSync(result);
+            await fs.unlink(result);
         } catch (e) {
             l.log(e);
 

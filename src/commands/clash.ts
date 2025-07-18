@@ -20,7 +20,7 @@ import {
     RepliableInteraction
 } from 'discord.js';
 import { Selectable } from 'kysely';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 
 const l = new Logger('Clash', 'green');
 
@@ -283,7 +283,7 @@ export default class Clash extends Command {
                 components: [rankRow, clashHistoryRow]
             });
 
-            fs.unlinkSync(result);
+            await fs.unlink(result);
         } catch (e) {
             if (e instanceof Error) {
                 l.error(e);

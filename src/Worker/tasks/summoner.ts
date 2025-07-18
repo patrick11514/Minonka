@@ -8,7 +8,7 @@ import {
 import { Background } from '$/lib/Imaging/Background';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import { Rank } from '$/lib/Riot/types';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import { save } from '../utilities';
 import { Image } from '$/lib/Imaging/Image';
 import { Text } from '$/lib/Imaging/Text';
@@ -44,9 +44,9 @@ crests:
 
 */
 
-const banners = fs.readdirSync(await getAssetPath(AssetType.BANNER, ''));
-
 export default async (data: SummonerData) => {
+    const banners = await fs.readdir(await getAssetPath(AssetType.BANNER, ''));
+
     const lang = getLocale(data.locale);
 
     let highestRank;

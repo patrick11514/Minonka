@@ -1,7 +1,7 @@
 import { Background } from '$/lib/Imaging/Background';
 import { env } from '$/types/env';
 import crypto from 'node:crypto';
-import fs from 'node:fs';
+import fs from 'node:fs/promises';
 import { CherryMatchData } from './tasks/cherryMatch';
 import { MatchData } from './tasks/match';
 import { ExtractAssetResult } from './types';
@@ -13,20 +13,21 @@ import { Color } from '$/lib/Imaging/types';
 import { DePromise, OmitUnion } from '$/types/types';
 import { ParticipantSchema } from '$/lib/Riot/schemes';
 import { z } from 'zod';
+import { asyncExists } from '$/lib/fsAsync';
 
 export const save = async (image: Background) => {
-    if (!fs.existsSync(env.CACHE_PATH)) {
-        fs.mkdirSync(env.CACHE_PATH);
+    if (!(await asyncExists(env.CACHE_PATH))) {
+        await fs.mkdir(env.CACHE_PATH);
     }
 
     const name = crypto.randomBytes(16).toString('hex');
 
-    fs.writeFileSync(`${env.CACHE_PATH}/${name}.png`, await image.render());
+    await fs.writeFile(`${env.CACHE_PATH}/${name}.png`, await image.render());
     return `${env.CACHE_PATH}/${name}.png`;
 };
 
 export const persistantExists = (name: string) => {
-    return fs.existsSync(`${env.PERSISTANT_CACHE_PATH}/${name}`);
+    return asyncExists(`${env.PERSISTANT_CACHE_PATH}/${name}`);
 };
 
 export const getPersistant = (name: string) => {
@@ -34,11 +35,11 @@ export const getPersistant = (name: string) => {
 };
 
 export const savePersistant = async (image: Background, name: string) => {
-    if (!fs.existsSync(env.PERSISTANT_CACHE_PATH)) {
-        fs.mkdirSync(env.PERSISTANT_CACHE_PATH);
+    if (!(await asyncExists(env.PERSISTANT_CACHE_PATH))) {
+        await fs.mkdir(env.PERSISTANT_CACHE_PATH);
     }
 
-    fs.writeFileSync(`${env.PERSISTANT_CACHE_PATH}/${name}`, await image.render());
+    await fs.writeFile(`${env.PERSISTANT_CACHE_PATH}/${name}`, await image.render());
     return `${env.PERSISTANT_CACHE_PATH}/${name}`;
 };
 
