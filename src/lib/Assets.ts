@@ -47,6 +47,28 @@ const ASSET_PATHS = {
     [AssetType.COMMUNITY_DDRAGON]: 'https://raw.communitydragon.org'
 } satisfies Record<AssetType, string>;
 
+class AssetCache {
+    private cache: Record<string, Buffer> = {};
+
+    public async get(path: string): Promise<Buffer | null> {
+        if (this.cache[path]) {
+            return this.cache[path];
+        }
+
+        try {
+            const data = await fs.readFile(path);
+            this.cache[path] = data;
+            return data;
+        } catch (e) {
+            l.error(`Failed to read asset from cache: ${path}`);
+            l.error(e);
+            return null;
+        }
+    }
+}
+
+const assetCache = new AssetCache();
+
 export type RiotLanguage =
     | 'ar_AE'
     | 'cs_CZ'
@@ -188,7 +210,7 @@ export const getAsset = async (
         return null;
     }
 
-    return fs.readFile(path);
+    return assetCache.get(path);
 };
 
 export const getChallenges = async (lang: RiotLanguage) => {

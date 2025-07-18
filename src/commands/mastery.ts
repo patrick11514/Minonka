@@ -264,7 +264,7 @@ export default class Mastery extends AccountCommand {
 
         if (!champions) return;
         const champion = champions.get(championId)!;
-        const championEmoji = await process.emoji.getEmoji('champion', champion.name);
+        const championEmoji = await process.emoji.getEmoji('champion', champion.id);
 
         const date = new Date(championData.data.lastPlayTime);
 
