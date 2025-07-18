@@ -386,3 +386,38 @@ export const getChampions = async (lang: RiotLanguage) => {
         return null;
     }
 };
+
+export const getMaps = async (lang: RiotLanguage) => {
+    const schema = z.object({
+        type: z.literal('map'),
+        version: z.string(),
+        data: z.record(
+            z.string(),
+            z.object({
+                MapName: z.string(),
+                MapId: z.string(),
+                image: z.object({
+                    full: z.string(),
+                    sprite: z.string(),
+                    group: z.string(),
+                    x: z.number(),
+                    y: z.number(),
+                    w: z.number(),
+                    h: z.number()
+                })
+            })
+        )
+    });
+
+    try {
+        const maps = schema.parse(
+            JSON.parse(
+                (await getAsset(AssetType.DDRAGON_DATA, 'map.json', lang))!.toString()
+            )
+        );
+        return maps;
+    } catch (e) {
+        l.error(e);
+        return null;
+    }
+};

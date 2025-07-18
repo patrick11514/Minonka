@@ -2,8 +2,6 @@ import { Background } from '$/lib/Imaging/Background';
 import { env } from '$/types/env';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
-import { CherryMatchData } from './tasks/cherryMatch';
-import { MatchData } from './tasks/match';
 import { ExtractAssetResult } from './types';
 import { AssetType, getAsset, getRunesReforged, getSummonerSpells } from '$/lib/Assets';
 import { Image } from '$/lib/Imaging/Image';
@@ -11,7 +9,7 @@ import { Blank } from '$/lib/Imaging/Blank';
 import { Text } from '$/lib/Imaging/Text';
 import { Color } from '$/lib/Imaging/types';
 import { DePromise, OmitUnion } from '$/types/types';
-import { ParticipantSchema } from '$/lib/Riot/schemes';
+import { SpectatorSchema } from '$/lib/Riot/schemes';
 import { z } from 'zod';
 import { asyncExists } from '$/lib/fsAsync';
 
@@ -26,7 +24,7 @@ export const save = async (image: Background) => {
     return `${env.CACHE_PATH}/${name}.png`;
 };
 
-export const persistantExists = (name: string) => {
+export const persistantExists = async (name: string) => {
     return asyncExists(`${env.PERSISTANT_CACHE_PATH}/${name}`);
 };
 
@@ -52,7 +50,10 @@ export const toMMSS = (seconds: number) => {
 };
 
 export const putSumms = async (
-    player: (MatchData | CherryMatchData)['info']['participants'][number],
+    player: {
+        summoner1Id: number;
+        summoner2Id: number;
+    },
     summoners: ExtractAssetResult<typeof getSummonerSpells>,
     playerHeight: number,
     imageSpacing: number,
@@ -80,7 +81,16 @@ export const putSumms = async (
 };
 
 export const putItems = async (
-    player: (MatchData | CherryMatchData)['info']['participants'][number],
+    player: {
+        item0: number;
+        item1: number;
+        item2: number;
+        item3: number;
+        item4: number;
+        item5: number;
+        item6: number;
+        visionScore: number;
+    },
     begin: number,
     imageWidth: number,
     imageSpacing: number,
@@ -163,9 +173,19 @@ export const fixChampName = (champName: string) => {
     return champName;
 };
 
+type NormalizedPerks = {
+    styles: {
+        style: number;
+        selections: { perk: number }[];
+    }[];
+    statPerks: { defense: number; flex: number; offense: number };
+};
+
 export const getRuneTree = (
     runesReforged: OmitUnion<DePromise<ReturnType<typeof getRunesReforged>>, null>,
-    player: z.infer<typeof ParticipantSchema>,
+    player: {
+        perks: NormalizedPerks;
+    },
     idx: number
 ) => {
     const root = player.perks.styles[idx];
@@ -192,11 +212,43 @@ export const getRuneTree = (
 
 export const getRune = (
     tree: ReturnType<typeof getRuneTree>,
-    player: z.infer<typeof ParticipantSchema>,
+    player: {
+        perks: NormalizedPerks;
+    },
     idx: number,
     selection: number
 ) => {
     return tree.slots[0].runes.find(
         (rune) => rune.id === player.perks.styles[idx].selections[selection].perk
     )!;
+};
+
+export const spectatorPerksNormalize = (
+    perks: z.infer<typeof SpectatorSchema>['participants'][number]['perks']
+): NormalizedPerks => {
+    const STYLES = ['primaryStyle', 'subStyle'];
+    const STYLES_COUNT = [4, 2];
+
+    const perksSTART = STYLES_COUNT.reduce((acc, curr) => acc + curr, 0);
+
+    return {
+        styles: STYLES.map((_, idx) => {
+            const previous = STYLES_COUNT[idx - 1] ?? 0;
+            const selections = perks.perkIds.slice(
+                previous,
+                previous + STYLES_COUNT[idx]
+            );
+
+            return {
+                style:
+                    STYLES[idx] === 'primaryStyle' ? perks.perkStyle : perks.perkSubStyle,
+                selections: selections.map((perkId) => ({ perk: perkId }))
+            };
+        }),
+        statPerks: {
+            offense: perks.perkIds[perksSTART + 0],
+            flex: perks.perkIds[perksSTART + 1],
+            defense: perks.perkIds[perksSTART + 2]
+        }
+    };
 };

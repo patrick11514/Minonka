@@ -227,5 +227,8 @@ export default template.parse({
         prev: 'Předchozí stránka',
         lastPlayed: 'Naposledy hrán',
         atTime: 'v'
+    },
+    spectator: {
+        not_in_game: 'Účet %1#%2 není v žádné hře'
     }
 } satisfies z.infer<typeof template>);

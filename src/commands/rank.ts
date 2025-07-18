@@ -125,15 +125,13 @@ export default class Rank extends AccountCommand {
 
             if (e instanceof Error) {
                 l.error(e);
-                await interaction.reply({
-                    flags: MessageFlags.Ephemeral,
+                await interaction.editReply({
                     content: replacePlaceholders(lang.workerError, e.message)
                 });
                 return;
             }
 
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
+            await interaction.editReply({
                 content: lang.genericError
             });
         }

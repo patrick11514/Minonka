@@ -8,6 +8,7 @@ import { RankData } from '$/Worker/tasks/rank';
 import { MatchData } from '$/Worker/tasks/match';
 import { TeamData } from '$/Worker/tasks/team';
 import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
+import { SpectatorData } from '$/Worker/tasks/spectator';
 
 enum WorkerState {
     FREE,
@@ -28,6 +29,7 @@ type Jobs = {
     match: MatchData;
     cherryMatch: CherryMatchData;
     team: TeamData;
+    spectator: SpectatorData;
 };
 
 const l = new Logger('WorkerServer', 'magenta');

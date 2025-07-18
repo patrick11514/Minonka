@@ -260,3 +260,39 @@ export const MasterySchema = z.object({
     championPoints: z.number(),
     lastPlayTime: z.number()
 });
+
+export const SpectatorSchema = z.object({
+    gameId: z.number(),
+    mapId: z.number(),
+    gameMode: z.string(),
+    gameType: z.string(),
+    gameQueueConfigId: z.number(),
+    gameStartTime: z.number(),
+    gameLength: z.number(),
+    participants: z.array(
+        z.object({
+            puuid: z.string(),
+            teamId: z.number(),
+            spell1Id: z.number(),
+            spell2Id: z.number(),
+            championId: z.number(),
+            profileIconId: z.number(),
+            riotId: z.string(),
+            bot: z.boolean(),
+            gameCustomizationObjects: z.array(z.any()),
+            perks: z.object({
+                perkIds: z.array(z.number()),
+                perkStyle: z.number(),
+                perkSubStyle: z.number()
+            })
+        })
+    ),
+    platformId: z.string(),
+    bannedChampions: z.array(
+        z.object({
+            championId: z.number(),
+            teamId: z.number(),
+            pickTurn: z.number()
+        })
+    )
+});
