@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import template from './_template';
 import { MatchStatus } from '../Riot/utilities';
+import template from './_template';
 
 export default template.parse({
     genericError: 'Nastala chyba, zkus to prosím později',
@@ -120,7 +120,8 @@ export default template.parse({
             piltover: 'Piltoverský %1',
             zaun: 'Zaunský %1',
             shadowIsles: 'Pohár Stínových ostrovů',
-            bandle_city: 'Pohár Bandle City'
+            bandle_city: 'Pohár Bandle City',
+            aram2022: 'ARAM %1'
         }
     },
     regions: {

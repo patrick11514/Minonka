@@ -1,3 +1,4 @@
+import { subTeamMap } from '$/Worker/tasks/cherryMatch';
 import { z } from 'zod';
 import {
     mapRegions,
@@ -9,10 +10,11 @@ import {
     tier
 } from '../Riot/types';
 import { MatchStatus } from '../Riot/utilities';
-import { subTeamMap } from '$/Worker/tasks/cherryMatch';
 
 const _ = z.string();
 const o = z.object;
+
+const additionalClashNames = ['aram2022'] as const;
 
 export default o({
     genericError: _,
@@ -113,8 +115,10 @@ export default o({
             >
         ),
         mapInflection: o(
-            Object.fromEntries(mapRegions.map((region) => [region, _])) as Record<
-                (typeof mapRegions)[number],
+            Object.fromEntries(
+                [...mapRegions, ...additionalClashNames].map((name) => [name, _])
+            ) as Record<
+                (typeof mapRegions)[number] | (typeof additionalClashNames)[number],
                 typeof _
             >
         )

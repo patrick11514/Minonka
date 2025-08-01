@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import template from './_template';
-import { MatchStatus } from '../Riot/utilities';
 import { mapRegions } from '../Riot/types';
+import { MatchStatus } from '../Riot/utilities';
+import template from './_template';
 
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -120,7 +120,8 @@ export default template.parse({
             ...(Object.fromEntries(
                 mapRegions.map((region) => [region, `${capitalize(region)} %1`])
             ) as ClashMapInflection<typeof mapRegions>),
-            bandle_city: 'Bandle City %1'
+            bandle_city: 'Bandle City %1',
+            aram2022: 'ARAM %1'
         }
     },
     regions: {

@@ -1,6 +1,6 @@
-import english from './english';
-import czech from './czech';
 import { Locale } from 'discord.js';
+import czech from './czech';
+import english from './english';
 
 export const getLocale = (locale: Locale) => {
     switch (locale) {
