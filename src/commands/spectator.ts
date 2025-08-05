@@ -56,7 +56,7 @@ export default class Spectator extends AccountCommand {
             'Zobrazí informace o tvém aktuálním zápase'
         );
 
-        super.on('interactionCreate', this.onButton);
+        super.on('interactionCreate', this.onButton.bind(this));
     }
 
     generateButtonRow(lang: ReturnType<typeof getLocale>, key: string) {
