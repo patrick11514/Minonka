@@ -161,6 +161,7 @@ export default o({
         atTime: _
     }),
     spectator: o({
-        not_in_game: _
+        not_in_game: _,
+        reload: _
     })
 });

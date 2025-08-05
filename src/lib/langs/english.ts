@@ -230,6 +230,7 @@ export default template.parse({
         atTime: 'at'
     },
     spectator: {
-        not_in_game: 'Account %1#%2 is not in any game'
+        not_in_game: 'Account %1#%2 is not in any game',
+        reload: 'Reload'
     }
 } satisfies z.infer<typeof template>);
