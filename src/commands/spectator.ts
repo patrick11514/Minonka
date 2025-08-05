@@ -5,17 +5,37 @@ import api from '$/lib/Riot/api';
 import { Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
 import { SpectatorData } from '$/Worker/tasks/spectator';
+import crypto from 'node:crypto';
 import {
     CacheType,
     ChatInputCommandInteraction,
     Locale,
     MessageFlags,
-    RepliableInteraction
+    RepliableInteraction,
+    Interaction,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import fs from 'node:fs/promises';
 
 const l = new Logger('Spectator', 'green');
+
+type ButtonData = {
+    discordId: string;
+    puuid: string;
+    region: Region;
+    level: number;
+    gameName: string;
+    tagLine: string;
+    profileIconId: number;
+    locale: Locale;
+    queueId: number;
+    gameLength: number;
+    participants: SpectatorData['participants'];
+    mapId: number;
+};
 
 export default class Spectator extends AccountCommand {
     constructor() {
@@ -44,6 +64,18 @@ export default class Spectator extends AccountCommand {
             'spectator',
             'Zobrazí informace o tvém aktuálním zápase'
         );
+
+        super.on('interactionCreate', this.onButton);
+    }
+
+    generateButtonRow(lang: ReturnType<typeof getLocale>, key: string) {
+        return new ActionRowBuilder<ButtonBuilder>().addComponents([
+            new ButtonBuilder()
+                .setCustomId(`spectator;${key};reload`)
+                .setEmoji('🔄')
+                .setLabel(lang.spectator.reload)
+                .setStyle(ButtonStyle.Primary)
+        ]);
     }
 
     async onMenuSelect(
@@ -110,8 +142,29 @@ export default class Spectator extends AccountCommand {
 
         try {
             const result = await process.workerServer.addJobWait('spectator', data);
+
+            const key = crypto.randomBytes(16).toString('hex');
+            const inMemory = process.inMemory.getInstance<ButtonData>();
+            inMemory.set(key, {
+                discordId: interaction.user.id,
+                puuid: summoner.data.puuid,
+                region: region,
+                level: summoner.data.summonerLevel,
+                gameName: account.data.gameName,
+                tagLine: account.data.tagLine,
+                profileIconId: summoner.data.profileIconId,
+                locale: interaction.locale,
+                queueId: spectator.data.gameQueueConfigId,
+                gameLength: spectator.data.gameLength,
+                participants: spectator.data.participants,
+                mapId: spectator.data.mapId
+            });
+
+            const row = this.generateButtonRow(lang, key);
+
             await interaction.editReply({
-                files: [result]
+                files: [result],
+                components: [row]
             });
 
             await fs.unlink(result);
@@ -127,6 +180,114 @@ export default class Spectator extends AccountCommand {
                 content: lang.genericError
             });
             return;
+        }
+    }
+
+    async onButton(interaction: Interaction) {
+        if (!interaction.isButton()) return;
+
+        const id = interaction.customId.split(';');
+        if (id[0] !== 'spectator') return;
+
+        const lang = getLocale(interaction.locale);
+        const key = id[1];
+
+        const inMemory = process.inMemory.getInstance<ButtonData>();
+        const data = await inMemory.get(key);
+
+        if (!data) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: lang.genericError
+            });
+            return;
+        }
+
+        if (interaction.user.id !== data.discordId) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: lang.noPermission
+            });
+            return;
+        }
+
+        // Check if user is still in game
+        const spectator = await api[data.region].spectator.byPuuid(data.puuid);
+
+        if (!spectator.status) {
+            if (spectator.code === 404) {
+                await interaction.reply({
+                    content: replacePlaceholders(
+                        lang.spectator.not_in_game,
+                        data.gameName,
+                        data.tagLine
+                    ),
+                    flags: MessageFlags.Ephemeral
+                });
+                return;
+            }
+
+            await interaction.reply({
+                content: replacePlaceholders(lang.genericError, spectator.message),
+                flags: MessageFlags.Ephemeral
+            });
+            return;
+        }
+
+        await interaction.deferReply({
+            flags: MessageFlags.Ephemeral
+        });
+
+        try {
+            // Update data with current game info
+            const spectatorData = {
+                puuid: data.puuid,
+                region: data.region,
+                level: data.level,
+                gameName: data.gameName,
+                tagLine: data.tagLine,
+                profileIconId: data.profileIconId,
+                locale: data.locale,
+                queueId: spectator.data.gameQueueConfigId,
+                gameLength: spectator.data.gameLength,
+                participants: spectator.data.participants,
+                mapId: spectator.data.mapId
+            } satisfies SpectatorData;
+
+            // Update stored data
+            await inMemory.set(key, {
+                ...data,
+                queueId: spectator.data.gameQueueConfigId,
+                gameLength: spectator.data.gameLength,
+                participants: spectator.data.participants,
+                mapId: spectator.data.mapId
+            });
+
+            const result = await process.workerServer.addJobWait(
+                'spectator',
+                spectatorData
+            );
+
+            const row = this.generateButtonRow(lang, key);
+
+            await interaction.message.edit({
+                files: [result],
+                components: [row]
+            });
+
+            await interaction.deleteReply();
+            await fs.unlink(result);
+        } catch (e) {
+            l.error(e);
+            if (e instanceof Error) {
+                await interaction.editReply({
+                    content: replacePlaceholders(lang.workerError, e.message)
+                });
+                return;
+            }
+            await interaction.editReply({
+                content: lang.genericError
+            });
         }
     }
 

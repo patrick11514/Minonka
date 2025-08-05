@@ -230,6 +230,7 @@ export default template.parse({
         atTime: 'v'
     },
     spectator: {
-        not_in_game: 'Účet %1#%2 není v žádné hře'
+        not_in_game: 'Účet %1#%2 není v žádné hře',
+        reload: 'Obnovit'
     }
 } satisfies z.infer<typeof template>);
