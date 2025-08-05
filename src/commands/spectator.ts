@@ -26,11 +26,6 @@ type ButtonData = {
     discordId: string;
     puuid: string;
     region: Region;
-    level: number;
-    gameName: string;
-    tagLine: string;
-    profileIconId: number;
-    locale: Locale;
 };
 
 export default class Spectator extends AccountCommand {
@@ -144,12 +139,7 @@ export default class Spectator extends AccountCommand {
             inMemory.set(key, {
                 discordId: interaction.user.id,
                 puuid: summoner.data.puuid,
-                region: region,
-                level: summoner.data.summonerLevel,
-                gameName: account.data.gameName,
-                tagLine: account.data.tagLine,
-                profileIconId: summoner.data.profileIconId,
-                locale: interaction.locale
+                region: region
             });
 
             const row = this.generateButtonRow(lang, key);
@@ -208,11 +198,16 @@ export default class Spectator extends AccountCommand {
 
         if (!spectator.status) {
             if (spectator.code === 404) {
+                // Get account data for error message
+                const account = await api[data.region].account.byPuuid(data.puuid);
+                const gameName = account.status ? account.data.gameName : 'Unknown';
+                const tagLine = account.status ? account.data.tagLine : 'Unknown';
+
                 await interaction.reply({
                     content: replacePlaceholders(
                         lang.spectator.not_in_game,
-                        data.gameName,
-                        data.tagLine
+                        gameName,
+                        tagLine
                     ),
                     flags: MessageFlags.Ephemeral
                 });
@@ -231,15 +226,26 @@ export default class Spectator extends AccountCommand {
         });
 
         try {
-            // Create spectator data using stored user info and fresh game data
+            // Get fresh user data from API
+            const summoner = await api[data.region].summoner.byPuuid(data.puuid);
+            const account = await api[data.region].account.byPuuid(data.puuid);
+
+            if (!summoner.status || !account.status) {
+                await interaction.editReply({
+                    content: lang.genericError
+                });
+                return;
+            }
+
+            // Create spectator data using stored essential data, fresh user data and game data
             const spectatorData = {
                 puuid: data.puuid,
                 region: data.region,
-                level: data.level,
-                gameName: data.gameName,
-                tagLine: data.tagLine,
-                profileIconId: data.profileIconId,
-                locale: data.locale,
+                level: summoner.data.summonerLevel,
+                gameName: account.data.gameName,
+                tagLine: account.data.tagLine,
+                profileIconId: summoner.data.profileIconId,
+                locale: interaction.locale,
                 queueId: spectator.data.gameQueueConfigId,
                 gameLength: spectator.data.gameLength,
                 participants: spectator.data.participants,
