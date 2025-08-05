@@ -31,10 +31,6 @@ type ButtonData = {
     tagLine: string;
     profileIconId: number;
     locale: Locale;
-    queueId: number;
-    gameLength: number;
-    participants: SpectatorData['participants'];
-    mapId: number;
 };
 
 export default class Spectator extends AccountCommand {
@@ -153,11 +149,7 @@ export default class Spectator extends AccountCommand {
                 gameName: account.data.gameName,
                 tagLine: account.data.tagLine,
                 profileIconId: summoner.data.profileIconId,
-                locale: interaction.locale,
-                queueId: spectator.data.gameQueueConfigId,
-                gameLength: spectator.data.gameLength,
-                participants: spectator.data.participants,
-                mapId: spectator.data.mapId
+                locale: interaction.locale
             });
 
             const row = this.generateButtonRow(lang, key);
@@ -239,7 +231,7 @@ export default class Spectator extends AccountCommand {
         });
 
         try {
-            // Update data with current game info
+            // Create spectator data using stored user info and fresh game data
             const spectatorData = {
                 puuid: data.puuid,
                 region: data.region,
@@ -253,15 +245,6 @@ export default class Spectator extends AccountCommand {
                 participants: spectator.data.participants,
                 mapId: spectator.data.mapId
             } satisfies SpectatorData;
-
-            // Update stored data
-            await inMemory.set(key, {
-                ...data,
-                queueId: spectator.data.gameQueueConfigId,
-                gameLength: spectator.data.gameLength,
-                participants: spectator.data.participants,
-                mapId: spectator.data.mapId
-            });
 
             const result = await process.workerServer.addJobWait(
                 'spectator',
