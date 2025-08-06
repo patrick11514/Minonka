@@ -9,6 +9,7 @@ import { env } from '$/types/env';
 import { WebSocket } from 'ws';
 import Path from 'node:path';
 import '../lib/pollyfill';
+import { setWorkerWebSocket } from './utilities';
 
 const InstanceId = process.env.INSTANCE_ID || '';
 
@@ -36,6 +37,8 @@ const setupWebSocket = () => {
 
     websocket.on('open', () => {
         l.stop('Connected to server');
+        // Set the websocket reference for utilities
+        setWorkerWebSocket(websocket);
     });
 
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -50,7 +53,15 @@ const setupWebSocket = () => {
     };
 
     websocket.on('message', async (message) => {
-        const [job, jobId, startDate, strData] = message.toString().split(';');
+        const messageStr = message.toString();
+
+        // Handle persistent file check responses
+        if (messageStr.startsWith('persistentResult')) {
+            // This is handled by the utilities persistantExists function
+            return;
+        }
+
+        const [job, jobId, startDate, strData] = messageStr.split(';');
 
         l.start('Got job ' + job + ' with id ' + jobId);
 

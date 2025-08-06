@@ -1,6 +1,7 @@
 import { env } from '$/types/env';
 import { WebSocket, WebSocketServer } from 'ws';
 import crypto from 'node:crypto';
+import fs from 'node:fs/promises';
 import { SummonerData } from '$/Worker/tasks/summoner';
 import Logger from './logger';
 import { EventEmitter } from './EventEmitter';
@@ -9,6 +10,7 @@ import { MatchData } from '$/Worker/tasks/match';
 import { TeamData } from '$/Worker/tasks/team';
 import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
 import { SpectatorData } from '$/Worker/tasks/spectator';
+import { asyncExists } from './fsAsync';
 
 enum WorkerState {
     FREE,
@@ -32,12 +34,23 @@ type Jobs = {
     spectator: SpectatorData;
 };
 
+export type FileResult =
+    | {
+          type: 'temp' | 'persistent';
+          data: string; // base64 encoded image data
+          name?: string; // for persistent files
+      }
+    | {
+          type: 'local';
+          path: string; // local file path (for backward compatibility)
+      };
+
 const l = new Logger('WorkerServer', 'magenta');
 
 const TIMEOUT = 40 * 1000; // 40s
 
 type JobResult = {
-    data: unknown;
+    data: FileResult | Error;
     elapsed: number;
 };
 
@@ -77,7 +90,7 @@ export class WorkerServer extends EventEmitter<Events> {
                     Workers[newId].state = WorkerState.FREE;
                     const elapsed = Date.now() - parseInt(startTimestamp);
                     const jobResult = {
-                        data: JSON.parse(result),
+                        data: JSON.parse(result) as FileResult,
                         elapsed
                     };
 
@@ -94,6 +107,19 @@ export class WorkerServer extends EventEmitter<Events> {
 
                     this.jobResults.set(jobId, jobResult);
                     super.emit('jobDone', jobId, jobResult);
+                } else if (str.startsWith('checkPersistent')) {
+                    // Handle persistent file existence check
+                    const [, requestId, fileName] = str.split(';');
+                    const exists = asyncExists(
+                        `${env.PERSISTANT_CACHE_PATH}/${fileName}`
+                    );
+                    exists
+                        .then((result) => {
+                            ws.send(`persistentResult;${requestId};${result}`);
+                        })
+                        .catch(() => {
+                            ws.send(`persistentResult;${requestId};false`);
+                        });
                 }
                 this.schedule();
             });
@@ -152,6 +178,40 @@ export class WorkerServer extends EventEmitter<Events> {
         return jobId;
     }
 
+    private async handleFileResult(result: FileResult): Promise<string> {
+        if (result.type === 'local') {
+            // Already a local file path, return as-is
+            return result.path;
+        }
+
+        // Decode base64 data to buffer
+        const buffer = Buffer.from(result.data, 'base64');
+
+        if (result.type === 'temp') {
+            // Save to temporary cache directory
+            if (!(await asyncExists(env.CACHE_PATH))) {
+                await fs.mkdir(env.CACHE_PATH, { recursive: true });
+            }
+
+            const name = crypto.randomBytes(16).toString('hex');
+            const filePath = `${env.CACHE_PATH}/${name}.png`;
+
+            await fs.writeFile(filePath, buffer);
+            return filePath;
+        } else if (result.type === 'persistent') {
+            // Save to persistent cache directory
+            if (!(await asyncExists(env.PERSISTANT_CACHE_PATH))) {
+                await fs.mkdir(env.PERSISTANT_CACHE_PATH, { recursive: true });
+            }
+
+            const filePath = `${env.PERSISTANT_CACHE_PATH}/${result.name}`;
+            await fs.writeFile(filePath, buffer);
+            return filePath;
+        }
+
+        throw new Error('Invalid FileResult type');
+    }
+
     async wait(jobId: string) {
         if (this.jobResults.has(jobId)) {
             const result = this.jobResults.get(jobId)!;
@@ -163,12 +223,12 @@ export class WorkerServer extends EventEmitter<Events> {
                 throw result.data;
             }
 
-            return result.data as string;
+            return this.handleFileResult(result.data);
         }
 
         const result = await Promise.race([
             new Promise<string>((resolve, reject) => {
-                const checkJob = (id: string, result: JobResult) => {
+                const checkJob = async (id: string, result: JobResult) => {
                     if (id !== jobId) return;
                     //remove job from map, because we got it using the event
                     this.jobResults.delete(jobId);
@@ -176,11 +236,17 @@ export class WorkerServer extends EventEmitter<Events> {
 
                     if (result.data instanceof Error) {
                         reject(result.data);
+                        return;
                     }
 
                     l.log(`Job ${jobId} completed in ${result.elapsed}ms`);
 
-                    resolve(result.data as string);
+                    try {
+                        const filePath = await this.handleFileResult(result.data);
+                        resolve(filePath);
+                    } catch (error) {
+                        reject(error);
+                    }
                 };
 
                 super.on('jobDone', checkJob);
