@@ -13,7 +13,6 @@ const schema = z.object({
     CLIENT_TOKEN: z.string(),
     WEBSOCKET_PORT: z.coerce.number(),
     WEBSOCKET_HOST: z.string(),
-    WEBSOCKET_PROTOCOL: z.string().default('ws://'),
     CACHE_PATH: z.string(),
     PERSISTANT_CACHE_PATH: z.string(),
     EMOJI_GUILD_CHAMPIONS: z.string(),

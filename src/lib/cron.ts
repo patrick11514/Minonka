@@ -13,14 +13,14 @@ const l = new Logger('Cron', 'blue');
 export const registerCrons = async (cronFilter?: string[]) => {
     const crons = await fs.readdir(path.join(import.meta.dirname, '../crons'));
     let filteredCrons = crons;
-    
+
     if (cronFilter) {
-        filteredCrons = crons.filter(cron => {
+        filteredCrons = crons.filter((cron) => {
             const cronName = path.basename(cron, '.ts');
             return cronFilter.includes(cronName);
         });
     }
-    
+
     l.start(`Registering ${filteredCrons.length} crons...`);
     const promises = filteredCrons.map(
         (cron) => import(import.meta.resolve(path.join('../crons', cron)))

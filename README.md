@@ -145,12 +145,13 @@ For development:
 npm run dev:worker # npm
 pnpm dev:worker    # pnpm
 
-# Remote worker development  
+# Remote worker development
 npm run dev:worker:remote # npm
 pnpm dev:worker:remote    # pnpm
 ```
 
 Remote workers automatically handle:
+
 - Base64 encoding of generated images
 - Websocket communication with the main server
 - Riot game data updates (version checking)
@@ -182,8 +183,7 @@ CLIENT_TOKEN=4561651651516556156165
 #WORKER config
 #this is websocket, via which the worker communicates with main process
 WEBSOCKET_PORT=8080
-WEBSOCKET_HOST=localhost
-WEBSOCKET_PROTOCOL=ws:// # Use wss:// for secure connections in production
+WEBSOCKET_HOST=ws://localhost # Use wss://hostname for secure connections in production
 CACHE_PATH=/tmp # this is the cache path, it is ment to be temporarily, so you can use /tmp if mounted in memory, or for example /dev/shm instead
 PERSISTANT_CACHE_PATH=cache # this is persistant cache path, it is ment to be used for storing images, which will be used multiple times, eg. match history images, because its unlike, that data from past match will be modified
 #Emoji settings

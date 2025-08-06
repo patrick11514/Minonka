@@ -36,7 +36,7 @@ const resolveModule = (path: string) => {
 };
 
 const setupWebSocket = () => {
-    const websocket = new WebSocket(`${env.WEBSOCKET_PROTOCOL}${env.WEBSOCKET_HOST}:${env.WEBSOCKET_PORT}`);
+    const websocket = new WebSocket(`${env.WEBSOCKET_HOST}:${env.WEBSOCKET_PORT}`);
 
     websocket.on('error', (err) => {
         l.error(err);
