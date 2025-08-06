@@ -123,6 +123,40 @@ npm run start:worker # npm
 pnpm start:worker    # pnpm
 ```
 
+### Worker Modes
+
+Workers can run in two modes:
+
+**Local Mode (default)**: Workers run on the same server and share the filesystem with the main application.
+
+**Remote Mode**: Workers can run on separate servers and communicate via websocket with base64-encoded image transfer.
+
+To run a worker in remote mode:
+
+```bash
+npm run start:worker:remote # npm
+pnpm start:worker:remote    # pnpm
+```
+
+For development:
+
+```bash
+# Local worker development
+npm run dev:worker # npm
+pnpm dev:worker    # pnpm
+
+# Remote worker development
+npm run dev:worker:remote # npm
+pnpm dev:worker:remote    # pnpm
+```
+
+Remote workers automatically handle:
+
+- Base64 encoding of generated images
+- Websocket communication with the main server
+- Riot game data updates (version checking)
+- File persistence operations
+
 The bot logs all info into logs folder, the worker logs can be separated by setting `INSTANCE_ID` environment variable, so it's better to run worker with their specific id, eg.:
 
 ```bash
@@ -149,7 +183,7 @@ CLIENT_TOKEN=4561651651516556156165
 #WORKER config
 #this is websocket, via which the worker communicates with main process
 WEBSOCKET_PORT=8080
-WEBSOCKET_HOST=localhost
+WEBSOCKET_HOST=ws://localhost # Use wss://hostname for secure connections in production
 CACHE_PATH=/tmp # this is the cache path, it is ment to be temporarily, so you can use /tmp if mounted in memory, or for example /dev/shm instead
 PERSISTANT_CACHE_PATH=cache # this is persistant cache path, it is ment to be used for storing images, which will be used multiple times, eg. match history images, because its unlike, that data from past match will be modified
 #Emoji settings

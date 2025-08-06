@@ -1,7 +1,7 @@
 import { Cron } from '$/lib/cron';
 import Logger from '$/lib/logger';
-import fs from 'node:fs';
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
 
 const l = new Logger('LolPatch', 'white');
 
@@ -36,8 +36,13 @@ export default [
                         l.stop('Patch updated');
                         process.patching = false;
                         process.lolPatch = newest;
-                        //sync emojis
-                        process.emoji.sync();
+
+                        //if we are in remote woker, we don't need to sync emojis, because
+                        //its just the worker
+                        if (process.env.WORKER_MODE !== 'remote') {
+                            //sync emojis
+                            process.emoji.sync();
+                        }
                     }
                 });
             } else {

@@ -1,44 +1,130 @@
-import { Background } from '$/lib/Imaging/Background';
-import { env } from '$/types/env';
-import crypto from 'node:crypto';
-import fs from 'node:fs/promises';
-import { ExtractAssetResult } from './types';
 import { AssetType, getAsset, getRunesReforged, getSummonerSpells } from '$/lib/Assets';
-import { Image } from '$/lib/Imaging/Image';
+import { asyncExists } from '$/lib/fsAsync';
+import { Background } from '$/lib/Imaging/Background';
 import { Blank } from '$/lib/Imaging/Blank';
+import { Image } from '$/lib/Imaging/Image';
 import { Text } from '$/lib/Imaging/Text';
 import { Color } from '$/lib/Imaging/types';
-import { DePromise, OmitUnion } from '$/types/types';
 import { SpectatorSchema } from '$/lib/Riot/schemes';
+import { env } from '$/types/env';
+import { DePromise, FileResult, OmitUnion } from '$/types/types';
+import crypto from 'node:crypto';
+import fs from 'node:fs/promises';
+import { WebSocket } from 'ws';
 import { z } from 'zod';
-import { asyncExists } from '$/lib/fsAsync';
+import { ExtractAssetResult } from './types';
 
-export const save = async (image: Background) => {
-    if (!(await asyncExists(env.CACHE_PATH))) {
-        await fs.mkdir(env.CACHE_PATH);
+// Check if we're running in a worker environment (not on main server)
+const isRemoteWorker = process.env.WORKER_MODE === 'remote';
+
+// Global websocket reference for remote worker communication
+let workerWebSocket: WebSocket | null = null;
+
+export const setWorkerWebSocket = (ws: WebSocket) => {
+    workerWebSocket = ws;
+};
+
+export const save = async (image: Background): Promise<FileResult> => {
+    const renderedImage = await image.render();
+
+    if (isRemoteWorker) {
+        // Return base64 data for remote workers
+        return {
+            type: 'temp',
+            data: renderedImage.toString('base64')
+        };
+    } else {
+        // Local mode - save to file and return path (backward compatibility)
+        if (!(await asyncExists(env.CACHE_PATH))) {
+            await fs.mkdir(env.CACHE_PATH, { recursive: true });
+        }
+
+        const name = crypto.randomBytes(16).toString('hex');
+        const filePath = `${env.CACHE_PATH}/${name}.png`;
+
+        await fs.writeFile(filePath, renderedImage);
+
+        return {
+            type: 'local',
+            path: filePath
+        };
     }
-
-    const name = crypto.randomBytes(16).toString('hex');
-
-    await fs.writeFile(`${env.CACHE_PATH}/${name}.png`, await image.render());
-    return `${env.CACHE_PATH}/${name}.png`;
 };
 
-export const persistantExists = async (name: string) => {
-    return asyncExists(`${env.PERSISTANT_CACHE_PATH}/${name}`);
-};
+export const persistantExists = async (name: string): Promise<boolean> => {
+    if (isRemoteWorker && workerWebSocket) {
+        // For remote workers, send a request to check if file exists
+        return new Promise((resolve) => {
+            const requestId = crypto.randomBytes(16).toString('hex');
 
-export const getPersistant = (name: string) => {
-    return `${env.PERSISTANT_CACHE_PATH}/${name}`;
-};
+            // Set up a one-time listener for the response
+            const messageHandler = (message: Buffer) => {
+                const str = message.toString();
+                if (str.startsWith('persistentResult')) {
+                    const [, responseId, exists] = str.split(';');
+                    if (responseId === requestId) {
+                        workerWebSocket?.off('message', messageHandler);
+                        resolve(exists === 'true');
+                    }
+                }
+            };
 
-export const savePersistant = async (image: Background, name: string) => {
-    if (!(await asyncExists(env.PERSISTANT_CACHE_PATH))) {
-        await fs.mkdir(env.PERSISTANT_CACHE_PATH);
+            workerWebSocket?.on('message', messageHandler);
+            workerWebSocket?.send(`checkPersistent;${requestId};${name}`);
+
+            // Timeout after 5 seconds
+            setTimeout(() => {
+                workerWebSocket?.off('message', messageHandler);
+                resolve(false);
+            }, 5000);
+        });
+    } else {
+        // Local mode - check filesystem directly
+        return asyncExists(`${env.PERSISTANT_CACHE_PATH}/${name}`);
     }
+};
 
-    await fs.writeFile(`${env.PERSISTANT_CACHE_PATH}/${name}`, await image.render());
-    return `${env.PERSISTANT_CACHE_PATH}/${name}`;
+export const getPersistant = (name: string): FileResult => {
+    if (isRemoteWorker) {
+        return {
+            type: 'persistent',
+            name: name
+        };
+    } else {
+        return {
+            type: 'local',
+            path: `${env.PERSISTANT_CACHE_PATH}/${name}`
+        };
+    }
+};
+
+export const savePersistant = async (
+    image: Background,
+    name: string
+): Promise<FileResult> => {
+    const renderedImage = await image.render();
+
+    if (isRemoteWorker) {
+        // Return base64 data for remote workers
+        return {
+            type: 'persistent',
+            data: renderedImage.toString('base64'),
+            name: name
+        };
+    } else {
+        // Local mode - save to file and return path (backward compatibility)
+        if (!(await asyncExists(env.PERSISTANT_CACHE_PATH))) {
+            await fs.mkdir(env.PERSISTANT_CACHE_PATH, { recursive: true });
+        }
+
+        const filePath = `${env.PERSISTANT_CACHE_PATH}/${name}`;
+        await fs.writeFile(filePath, renderedImage);
+
+        return {
+            type: 'local',
+            path: filePath
+        };
+    }
 };
 
 export const toMMSS = (seconds: number) => {

@@ -5,3 +5,18 @@ export type Mutable<T> = {
 };
 
 export type OmitUnion<$Union, $Omit> = $Union extends $Omit ? never : $Union;
+
+export type FileResult =
+    | {
+          type: 'temp';
+          data: string;
+      }
+    | {
+          type: 'persistent';
+          name: string;
+          data?: string;
+      }
+    | {
+          type: 'local';
+          path: string;
+      };
