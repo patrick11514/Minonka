@@ -11,6 +11,7 @@ import { TeamData } from '$/Worker/tasks/team';
 import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
 import { SpectatorData } from '$/Worker/tasks/spectator';
 import { asyncExists } from './fsAsync';
+import { FileResult } from '$/types/types';
 
 enum WorkerState {
     FREE,
@@ -33,17 +34,6 @@ type Jobs = {
     team: TeamData;
     spectator: SpectatorData;
 };
-
-export type FileResult =
-    | {
-          type: 'temp' | 'persistent';
-          data: string; // base64 encoded image data
-          name?: string; // for persistent files
-      }
-    | {
-          type: 'local';
-          path: string; // local file path (for backward compatibility)
-      };
 
 const l = new Logger('WorkerServer', 'magenta');
 

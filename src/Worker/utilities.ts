@@ -8,22 +8,11 @@ import { Image } from '$/lib/Imaging/Image';
 import { Blank } from '$/lib/Imaging/Blank';
 import { Text } from '$/lib/Imaging/Text';
 import { Color } from '$/lib/Imaging/types';
-import { DePromise, OmitUnion } from '$/types/types';
+import { DePromise, OmitUnion, FileResult } from '$/types/types';
 import { SpectatorSchema } from '$/lib/Riot/schemes';
 import { z } from 'zod';
 import { asyncExists } from '$/lib/fsAsync';
 import { WebSocket } from 'ws';
-
-export type FileResult =
-    | {
-          type: 'temp' | 'persistent';
-          data: string; // base64 encoded image data
-          name?: string; // for persistent files
-      }
-    | {
-          type: 'local';
-          path: string; // local file path (for backward compatibility)
-      };
 
 // Check if we're running in a worker environment (not on main server)
 const isRemoteWorker = process.env.WORKER_MODE === 'remote';

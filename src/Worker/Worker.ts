@@ -10,8 +10,10 @@ import { WebSocket } from 'ws';
 import Path from 'node:path';
 import '../lib/pollyfill';
 import { setWorkerWebSocket } from './utilities';
+import { registerCrons } from '$/lib/cron';
 
 const InstanceId = process.env.INSTANCE_ID || '';
+const isRemoteWorker = process.env.WORKER_MODE === 'remote';
 
 if (InstanceId) {
     Logger.loggingDirectory = 'logs/worker' + InstanceId;
@@ -19,6 +21,11 @@ if (InstanceId) {
 
 const l = new Logger('Worker' + InstanceId, 'yellow');
 l.start('Connecting to server');
+
+// Register crons for remote workers (only version updates)
+if (isRemoteWorker) {
+    registerCrons(['version']);
+}
 
 const resolveModule = (path: string) => {
     let module = import.meta.resolve(path);
@@ -29,7 +36,7 @@ const resolveModule = (path: string) => {
 };
 
 const setupWebSocket = () => {
-    const websocket = new WebSocket(`ws://${env.WEBSOCKET_HOST}:${env.WEBSOCKET_PORT}`);
+    const websocket = new WebSocket(`${env.WEBSOCKET_PROTOCOL}${env.WEBSOCKET_HOST}:${env.WEBSOCKET_PORT}`);
 
     websocket.on('error', (err) => {
         l.error(err);

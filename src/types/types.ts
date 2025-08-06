@@ -5,3 +5,14 @@ export type Mutable<T> = {
 };
 
 export type OmitUnion<$Union, $Omit> = $Union extends $Omit ? never : $Union;
+
+export type FileResult =
+    | {
+          type: 'temp' | 'persistent';
+          data: string; // base64 encoded image data
+          name?: string; // for persistent files
+      }
+    | {
+          type: 'local';
+          path: string; // local file path (for backward compatibility)
+      };
