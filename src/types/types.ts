@@ -8,11 +8,15 @@ export type OmitUnion<$Union, $Omit> = $Union extends $Omit ? never : $Union;
 
 export type FileResult =
     | {
-          type: 'temp' | 'persistent';
-          data: string; // base64 encoded image data
-          name?: string; // for persistent files
+          type: 'temp';
+          data: string;
+      }
+    | {
+          type: 'persistent';
+          name: string;
+          data?: string;
       }
     | {
           type: 'local';
-          path: string; // local file path (for backward compatibility)
+          path: string;
       };

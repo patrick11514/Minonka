@@ -1,18 +1,18 @@
-import { Background } from '$/lib/Imaging/Background';
-import { env } from '$/types/env';
-import crypto from 'node:crypto';
-import fs from 'node:fs/promises';
-import { ExtractAssetResult } from './types';
 import { AssetType, getAsset, getRunesReforged, getSummonerSpells } from '$/lib/Assets';
-import { Image } from '$/lib/Imaging/Image';
+import { asyncExists } from '$/lib/fsAsync';
+import { Background } from '$/lib/Imaging/Background';
 import { Blank } from '$/lib/Imaging/Blank';
+import { Image } from '$/lib/Imaging/Image';
 import { Text } from '$/lib/Imaging/Text';
 import { Color } from '$/lib/Imaging/types';
-import { DePromise, OmitUnion, FileResult } from '$/types/types';
 import { SpectatorSchema } from '$/lib/Riot/schemes';
-import { z } from 'zod';
-import { asyncExists } from '$/lib/fsAsync';
+import { env } from '$/types/env';
+import { DePromise, FileResult, OmitUnion } from '$/types/types';
+import crypto from 'node:crypto';
+import fs from 'node:fs/promises';
 import { WebSocket } from 'ws';
+import { z } from 'zod';
+import { ExtractAssetResult } from './types';
 
 // Check if we're running in a worker environment (not on main server)
 const isRemoteWorker = process.env.WORKER_MODE === 'remote';
@@ -86,9 +86,10 @@ export const persistantExists = async (name: string): Promise<boolean> => {
 
 export const getPersistant = (name: string): FileResult => {
     if (isRemoteWorker) {
-        // For remote workers, persistent files are handled differently
-        // This function might not be needed in remote mode
-        throw new Error('getPersistant not supported in remote worker mode');
+        return {
+            type: 'persistent',
+            name: name
+        };
     } else {
         return {
             type: 'local',

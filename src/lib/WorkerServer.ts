@@ -1,17 +1,17 @@
 import { env } from '$/types/env';
-import { WebSocket, WebSocketServer } from 'ws';
+import { FileResult } from '$/types/types';
+import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
+import { MatchData } from '$/Worker/tasks/match';
+import { RankData } from '$/Worker/tasks/rank';
+import { SpectatorData } from '$/Worker/tasks/spectator';
+import { SummonerData } from '$/Worker/tasks/summoner';
+import { TeamData } from '$/Worker/tasks/team';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
-import { SummonerData } from '$/Worker/tasks/summoner';
-import Logger from './logger';
+import { WebSocket, WebSocketServer } from 'ws';
 import { EventEmitter } from './EventEmitter';
-import { RankData } from '$/Worker/tasks/rank';
-import { MatchData } from '$/Worker/tasks/match';
-import { TeamData } from '$/Worker/tasks/team';
-import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
-import { SpectatorData } from '$/Worker/tasks/spectator';
 import { asyncExists } from './fsAsync';
-import { FileResult } from '$/types/types';
+import Logger from './logger';
 
 enum WorkerState {
     FREE,
@@ -174,10 +174,9 @@ export class WorkerServer extends EventEmitter<Events> {
             return result.path;
         }
 
-        // Decode base64 data to buffer
-        const buffer = Buffer.from(result.data, 'base64');
-
         if (result.type === 'temp') {
+            const buffer = Buffer.from(result.data, 'base64');
+
             // Save to temporary cache directory
             if (!(await asyncExists(env.CACHE_PATH))) {
                 await fs.mkdir(env.CACHE_PATH, { recursive: true });
@@ -188,18 +187,24 @@ export class WorkerServer extends EventEmitter<Events> {
 
             await fs.writeFile(filePath, buffer);
             return filePath;
-        } else if (result.type === 'persistent') {
-            // Save to persistent cache directory
-            if (!(await asyncExists(env.PERSISTANT_CACHE_PATH))) {
-                await fs.mkdir(env.PERSISTANT_CACHE_PATH, { recursive: true });
-            }
-
-            const filePath = `${env.PERSISTANT_CACHE_PATH}/${result.name}`;
-            await fs.writeFile(filePath, buffer);
-            return filePath;
         }
 
-        throw new Error('Invalid FileResult type');
+        // Decode base64 data to buffer
+        if (result.data === undefined) {
+            //the file is already present, so just return the path
+            return `${env.PERSISTANT_CACHE_PATH}/${result.name}`;
+        }
+
+        const buffer = Buffer.from(result.data, 'base64');
+
+        // Save to persistent cache directory
+        if (!(await asyncExists(env.PERSISTANT_CACHE_PATH))) {
+            await fs.mkdir(env.PERSISTANT_CACHE_PATH, { recursive: true });
+        }
+
+        const filePath = `${env.PERSISTANT_CACHE_PATH}/${result.name}`;
+        await fs.writeFile(filePath, buffer);
+        return filePath;
     }
 
     async wait(jobId: string) {
