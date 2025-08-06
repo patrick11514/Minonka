@@ -1,7 +1,7 @@
 import { Awaitable } from '$/types/types';
+import cron from 'node-cron';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import cron from 'node-cron';
 import Logger from './logger';
 
 export type Cron =
@@ -16,7 +16,10 @@ export const registerCrons = async (cronFilter?: string[]) => {
 
     if (cronFilter) {
         filteredCrons = crons.filter((cron) => {
-            const cronName = path.basename(cron, '.ts');
+            const cronName = path.basename(
+                cron,
+                process.env.NODE_ENV === 'production' ? '.js' : '.ts'
+            );
             return cronFilter.includes(cronName);
         });
     }
