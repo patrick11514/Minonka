@@ -62,8 +62,8 @@ export class WorkerServer extends EventEmitter<Events> {
         super();
 
         this.WSS = new WebSocketServer({
-            host: env.WEBSOCKET_HOST,
-            port: env.WEBSOCKET_PORT
+            host: env.WEBSOCKET_SERVER_HOST,
+            port: env.WEBSOCKET_SERVER_PORT
         });
 
         this.WSS.on('connection', (ws) => {
