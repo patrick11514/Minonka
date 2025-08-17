@@ -117,7 +117,7 @@ ALWAYS run `pnpm run lint` before committing or the CI will fail.
 ```
 src/
 ├── index.ts              # Main bot entry point
-├── commands/             # Discord slash commands (9 files)
+├── commands/             # Discord slash commands
 │   ├── clash.ts         # Clash team information
 │   ├── history.ts       # Match history with images
 │   ├── mastery.ts       # Champion mastery
