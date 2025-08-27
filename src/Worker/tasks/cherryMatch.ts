@@ -177,7 +177,8 @@ export default async (data: CherryMatchData) => {
 
     //QUEUE
     const queue = new Text(
-        lang.queues[data.info.queueId],
+        lang.queues[data.info.queueId as keyof typeof lang.queues] ||
+            `Queue ${data.info.queueId}`,
         {
             x: 'center',
             y:

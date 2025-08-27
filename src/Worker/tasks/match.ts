@@ -207,7 +207,8 @@ export default async (data: MatchData) => {
 
     //QUEUE
     const queue = new Text(
-        lang.queues[data.info.queueId],
+        lang.queues[data.info.queueId as keyof typeof lang.queues] ||
+            `Queue ${data.info.queueId}`,
         {
             x: 'center',
             y: (VictoryLoss.position.y as number) + VictorySize.height + spacing

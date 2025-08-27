@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Position, positions, QueueId, queues } from './types';
+import { Position, positions } from './types';
 
 export const AccountSchema = z.object({
     puuid: z.string(),
@@ -169,8 +169,6 @@ const cherryParticipantSchema = ParticipantSchema.extend({
     )
 });
 
-const queueIds = queues.map((queue) => queue.queueId);
-
 export const RegularMatchSchema = z.object({
     metadata: z.object({
         dataVersion: z.string(),
@@ -187,7 +185,7 @@ export const RegularMatchSchema = z.object({
         gameName: z.string(),
         mapId: z.number(),
         participants: z.array(ParticipantSchema),
-        queueId: z.number().refine((v): v is QueueId => queueIds.includes(v as QueueId)),
+        queueId: z.number(),
         teams: z.array(
             z.object({
                 bans: z.array(
