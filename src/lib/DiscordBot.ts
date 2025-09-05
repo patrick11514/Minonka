@@ -1,11 +1,20 @@
+import { setStatus } from '$/crons/status';
 import { env } from '$/types/env';
-import { BaseInteraction, Client, GatewayIntentBits, REST, Routes } from 'discord.js';
-import { EventEmitter } from './EventEmitter';
+import {
+    ApplicationCommandOptionType,
+    BaseInteraction,
+    CacheType,
+    Client,
+    CommandInteractionOption,
+    GatewayIntentBits,
+    REST,
+    Routes
+} from 'discord.js';
 import fs from 'node:fs/promises';
 import Path from 'node:path';
-import Logger from './logger';
 import { Command } from './Command';
-import { setStatus } from '$/crons/status';
+import { EventEmitter } from './EventEmitter';
+import Logger from './logger';
 
 type Events = {
     login: (client: Client<true>) => void;
@@ -131,7 +140,7 @@ export class DiscordBot extends EventEmitter<Events> {
         return this.commands.find((c) => c.slashCommand.name === name);
     }
 
-    private async handleError(error: unknown, interaction: BaseInteraction) {
+    async handleError(error: unknown, interaction: BaseInteraction) {
         // --- Error details ---
         const errName = error instanceof Error ? error.name : 'UnknownError';
         const errMessage =
@@ -149,9 +158,51 @@ export class DiscordBot extends EventEmitter<Events> {
         let interactionInfo = 'Unknown interaction';
 
         if (interaction.isChatInputCommand()) {
-            interactionInfo = `/${interaction.commandName} ${interaction.options.data
-                .map((opt) => (opt.value ? `${opt.name}:${opt.value}` : opt.name))
-                .join(' ')}`;
+            let command = `/${interaction.commandName}`;
+
+            const stringifyOptions = (option: CommandInteractionOption<CacheType>) => {
+                let value = option.name;
+                if (option.value) {
+                    switch (option.type) {
+                        case ApplicationCommandOptionType.Boolean:
+                        case ApplicationCommandOptionType.Integer:
+                        case ApplicationCommandOptionType.Number:
+                        case ApplicationCommandOptionType.String:
+                            value += `:${option.value}`;
+                            break;
+                        case ApplicationCommandOptionType.User:
+                            value += `:<@${option.value}>`;
+                            break;
+                        case ApplicationCommandOptionType.Channel:
+                            value += `:<#${option.value}>`;
+                            break;
+                        case ApplicationCommandOptionType.Role:
+                            value += `:<@&${option.value}>`;
+                            break;
+                        case ApplicationCommandOptionType.Mentionable:
+                            value += `:<@${option.value}>`;
+                            break;
+                        default:
+                            value += `:N/A`;
+                            break;
+                    }
+                } else if (option.options && option.options.length > 0) {
+                    value +=
+                        ' ' +
+                        option.options.map((opt) => stringifyOptions(opt)).join(' ');
+                }
+                return value;
+            };
+
+            if (interaction.options.data.length > 0) {
+                command +=
+                    ' ' +
+                    interaction.options.data
+                        .map((opt) => stringifyOptions(opt))
+                        .join(' ');
+            }
+
+            interactionInfo = command;
         } else if (interaction.isStringSelectMenu()) {
             interactionInfo = `SelectMenu (customId: ${interaction.customId})`;
         } else if (interaction.isButton()) {
