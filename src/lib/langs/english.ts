@@ -18,7 +18,7 @@ export default template.parse({
         challenges: 'Challenge'
     },
     riotApi: {
-        error: 'There was an error while comunicating with Riot API: (%1) %2'
+        error: 'There was an error while communicating with Riot API: (%1) %2'
     },
     lang: {
         notFound: 'Account not found',
