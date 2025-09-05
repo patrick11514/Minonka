@@ -247,6 +247,8 @@ export default class Clash extends Command {
                 flags: MessageFlags.Ephemeral,
                 content: (e as Error).message
             });
+
+            process.discordBot.handleError(e, interaction);
             return;
         }
 
@@ -293,12 +295,16 @@ export default class Clash extends Command {
                         e.message
                     )
                 });
+
+                process.discordBot.handleError(e, interaction);
                 return;
             }
 
             await interaction.editReply({
                 content: getLocale(interaction.locale).genericError
             });
+
+            process.discordBot.handleError(e, interaction);
             return;
         }
     }

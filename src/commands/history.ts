@@ -1,6 +1,5 @@
 import { AccountCommand } from '$/lib/AccountCommand';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
-import crypto from 'node:crypto';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse, toValidResponse } from '$/lib/Riot/baseRequest';
@@ -9,18 +8,19 @@ import { queues, Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
 import { DePromise, OmitUnion } from '$/types/types';
 import {
-    RepliableInteraction,
-    CacheType,
-    ChatInputCommandInteraction,
-    Locale,
-    Interaction,
-    MessageFlags,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle,
-    Message
+    CacheType,
+    ChatInputCommandInteraction,
+    Interaction,
+    Locale,
+    Message,
+    MessageFlags,
+    RepliableInteraction
 } from 'discord.js';
 import { Selectable } from 'kysely';
+import crypto from 'node:crypto';
 import { z } from 'zod';
 
 const l = new Logger('History', 'white');
@@ -136,7 +136,7 @@ export default class History extends AccountCommand<CustomData> {
 
         const id = interaction.customId.split(';');
         if (id[0] !== 'clhis') return;
-        this.onMenuSelect(
+        await this.onMenuSelect(
             interaction as RepliableInteraction<CacheType>,
             {
                 puuid: id[1],
@@ -299,12 +299,16 @@ export default class History extends AccountCommand<CustomData> {
                 await interaction.editReply({
                     content: replacePlaceholders(lang.workerError, e.message)
                 });
+
+                process.discordBot.handleError(e, interaction);
                 return;
             }
 
             await interaction.editReply({
                 content: lang.genericError
             });
+
+            process.discordBot.handleError(e, interaction);
             return;
         }
     }

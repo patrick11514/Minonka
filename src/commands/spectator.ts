@@ -5,19 +5,19 @@ import api from '$/lib/Riot/api';
 import { Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
 import { SpectatorData } from '$/Worker/tasks/spectator';
-import crypto from 'node:crypto';
 import {
-    CacheType,
-    ChatInputCommandInteraction,
-    Locale,
-    MessageFlags,
-    RepliableInteraction,
-    Interaction,
     ActionRowBuilder,
     ButtonBuilder,
-    ButtonStyle
+    ButtonStyle,
+    CacheType,
+    ChatInputCommandInteraction,
+    Interaction,
+    Locale,
+    MessageFlags,
+    RepliableInteraction
 } from 'discord.js';
 import { Selectable } from 'kysely';
+import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 
 const l = new Logger('Spectator', 'green');
@@ -156,11 +156,15 @@ export default class Spectator extends AccountCommand {
                 await interaction.editReply({
                     content: replacePlaceholders(lang.workerError, e.message)
                 });
+
+                process.discordBot.handleError(e, interaction);
                 return;
             }
             await interaction.editReply({
                 content: lang.genericError
             });
+
+            process.discordBot.handleError(e, interaction);
             return;
         }
     }
@@ -272,11 +276,15 @@ export default class Spectator extends AccountCommand {
                 await interaction.editReply({
                     content: replacePlaceholders(lang.workerError, e.message)
                 });
+
+                process.discordBot.handleError(e, interaction);
                 return;
             }
             await interaction.editReply({
                 content: lang.genericError
             });
+
+            process.discordBot.handleError(e, interaction);
         }
     }
 

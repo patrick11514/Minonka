@@ -141,6 +141,8 @@ export default class Links extends Command {
                 flags: MessageFlags.Ephemeral,
                 content: lang.genericError
             });
+
+            process.discordBot.handleError(e, interaction);
         }
     }
 }

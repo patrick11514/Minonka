@@ -1,3 +1,4 @@
+import { DiscordBot } from '$/lib/DiscordBot';
 import { EmojiManager } from '$/lib/EmojiManager';
 import { InMemory } from '$/lib/InMemory';
 import { WorkerServer } from '$/lib/WorkerServer';
@@ -10,6 +11,7 @@ declare global {
         interface Process {
             workerServer: WorkerServer;
             client: Client;
+            discordBot: DiscordBot;
             lolPatch: string;
             inMemory: InMemory;
             emoji: EmojiManager;

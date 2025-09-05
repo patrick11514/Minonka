@@ -4,13 +4,14 @@
  * @license MIT
  */
 
+import { registerCrons } from '$/lib/cron';
+import { DiscordBot } from '$/lib/DiscordBot';
 import Logger from '$/lib/logger';
 import { env } from '$/types/env';
-import { WebSocket } from 'ws';
 import Path from 'node:path';
+import { WebSocket } from 'ws';
 import '../lib/pollyfill';
 import { setWorkerWebSocket } from './utilities';
-import { registerCrons } from '$/lib/cron';
 
 const InstanceId = process.env.INSTANCE_ID || '';
 const isRemoteWorker = process.env.WORKER_MODE === 'remote';
@@ -35,6 +36,11 @@ const resolveModule = (path: string) => {
     return module;
 };
 
+process.discordBot = {
+    handleError: () => {}
+    //eslint-disable-next-line @typescript-eslint/no-explicit-any
+} as any as DiscordBot;
+
 const setupWebSocket = () => {
     const websocket = new WebSocket(`${env.WEBSOCKET_HOST}:${env.WEBSOCKET_PORT}`);
 
@@ -53,7 +59,7 @@ const setupWebSocket = () => {
 
     const sendJobBack = (jobId: string, data: string | Error, startDate: string) => {
         if (data instanceof Error) {
-            websocket.send(`error;${jobId};${data.message};${startDate}`);
+            websocket.send(`error;${jobId};${data.message};${data.stack};${startDate}`);
             return;
         }
         websocket.send(`completed;${jobId};${JSON.stringify(data)};${startDate}`);

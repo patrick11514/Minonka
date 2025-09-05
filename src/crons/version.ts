@@ -50,6 +50,8 @@ export default [
             }
         } catch (e) {
             l.stopError('Error while checking for new patch ' + e);
+
+            process.discordBot.handleError(e, 'LolPatch Cron');
         }
     },
     {

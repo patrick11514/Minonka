@@ -40,13 +40,20 @@ const l = new Logger('WorkerServer', 'magenta');
 const TIMEOUT = 40 * 1000; // 40s
 
 type JobResult = {
-    data: FileResult | Error;
+    data: FileResult | ErrorWithStack;
     elapsed: number;
 };
 
 type Events = {
     jobDone: (jobId: string, result: JobResult) => void;
 };
+
+class ErrorWithStack extends Error {
+    constructor(message: string, stack: string) {
+        super(message);
+        this.stack = stack;
+    }
+}
 
 export class WorkerServer extends EventEmitter<Events> {
     private WSS: WebSocketServer;
@@ -87,11 +94,11 @@ export class WorkerServer extends EventEmitter<Events> {
                     this.jobResults.set(jobId, jobResult);
                     super.emit('jobDone', jobId, jobResult);
                 } else if (str.startsWith('error')) {
-                    const [, jobId, error, startTimestmap] = str.split(';');
+                    const [, jobId, message, stack, startTimestmap] = str.split(';');
                     Workers[newId].state = WorkerState.FREE;
                     const elapsed = Date.now() - parseInt(startTimestmap);
                     const jobResult = {
-                        data: new Error(error),
+                        data: new ErrorWithStack(message, stack),
                         elapsed
                     };
 
@@ -214,7 +221,7 @@ export class WorkerServer extends EventEmitter<Events> {
             //remove, since we got it
             this.jobResults.delete(jobId);
 
-            if (result.data instanceof Error) {
+            if (result.data instanceof ErrorWithStack) {
                 throw result.data;
             }
 

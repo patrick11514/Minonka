@@ -1,11 +1,20 @@
+import { setStatus } from '$/crons/status';
 import { env } from '$/types/env';
-import { BaseInteraction, Client, GatewayIntentBits, REST, Routes } from 'discord.js';
-import { EventEmitter } from './EventEmitter';
+import {
+    ApplicationCommandOptionType,
+    BaseInteraction,
+    CacheType,
+    Client,
+    CommandInteractionOption,
+    GatewayIntentBits,
+    REST,
+    Routes
+} from 'discord.js';
 import fs from 'node:fs/promises';
 import Path from 'node:path';
-import Logger from './logger';
 import { Command } from './Command';
-import { setStatus } from '$/crons/status';
+import { EventEmitter } from './EventEmitter';
+import Logger from './logger';
 
 type Events = {
     login: (client: Client<true>) => void;
@@ -123,6 +132,8 @@ export class DiscordBot extends EventEmitter<Events> {
         } catch (e) {
             // eslint-disable-next-line no-console
             console.error(e);
+
+            process.discordBot.handleError(e, 'RegisterCommands');
             return [];
         }
     }
@@ -131,7 +142,7 @@ export class DiscordBot extends EventEmitter<Events> {
         return this.commands.find((c) => c.slashCommand.name === name);
     }
 
-    private async handleError(error: unknown, interaction: BaseInteraction) {
+    async handleError(error: unknown, interactionOrContext: BaseInteraction | string) {
         // --- Error details ---
         const errName = error instanceof Error ? error.name : 'UnknownError';
         const errMessage =
@@ -146,30 +157,83 @@ export class DiscordBot extends EventEmitter<Events> {
                 : 'No stack trace available';
 
         // --- Interaction details ---
-        let interactionInfo = 'Unknown interaction';
+        let extendedInfo =
+            interactionOrContext instanceof BaseInteraction
+                ? 'Unknown interaction'
+                : interactionOrContext;
 
-        if (interaction.isChatInputCommand()) {
-            interactionInfo = `/${interaction.commandName} ${interaction.options.data
-                .map((opt) => (opt.value ? `${opt.name}:${opt.value}` : opt.name))
-                .join(' ')}`;
-        } else if (interaction.isStringSelectMenu()) {
-            interactionInfo = `SelectMenu (customId: ${interaction.customId})`;
-        } else if (interaction.isButton()) {
-            interactionInfo = `Button (customId: ${interaction.customId})`;
-        } else {
-            if ('customId' in interaction) {
-                interactionInfo = `${interaction.type} (id: ${interaction.customId})`;
+        if (interactionOrContext instanceof BaseInteraction) {
+            if (interactionOrContext.isChatInputCommand()) {
+                let command = `/${interactionOrContext.commandName}`;
+
+                const stringifyOptions = (
+                    option: CommandInteractionOption<CacheType>
+                ) => {
+                    let value = option.name;
+                    if (option.value) {
+                        switch (option.type) {
+                            case ApplicationCommandOptionType.Boolean:
+                            case ApplicationCommandOptionType.Integer:
+                            case ApplicationCommandOptionType.Number:
+                            case ApplicationCommandOptionType.String:
+                                value += `:${option.value}`;
+                                break;
+                            case ApplicationCommandOptionType.User:
+                                value += `:<@${option.value}>`;
+                                break;
+                            case ApplicationCommandOptionType.Channel:
+                                value += `:<#${option.value}>`;
+                                break;
+                            case ApplicationCommandOptionType.Role:
+                                value += `:<@&${option.value}>`;
+                                break;
+                            case ApplicationCommandOptionType.Mentionable:
+                                value += `:<@${option.value}>`;
+                                break;
+                            default:
+                                value += `:N/A`;
+                                break;
+                        }
+                    } else if (option.options && option.options.length > 0) {
+                        value +=
+                            ' ' +
+                            option.options.map((opt) => stringifyOptions(opt)).join(' ');
+                    }
+                    return value;
+                };
+
+                if (interactionOrContext.options.data.length > 0) {
+                    command +=
+                        ' ' +
+                        interactionOrContext.options.data
+                            .map((opt) => stringifyOptions(opt))
+                            .join(' ');
+                }
+
+                extendedInfo = command;
+            } else if (interactionOrContext.isStringSelectMenu()) {
+                extendedInfo = `SelectMenu (customId: ${interactionOrContext.customId})`;
+            } else if (interactionOrContext.isButton()) {
+                extendedInfo = `Button (customId: ${interactionOrContext.customId})`;
             } else {
-                interactionInfo = `${interaction.type} (id: N/A)`;
+                if ('customId' in interactionOrContext) {
+                    extendedInfo = `${interactionOrContext.type} (id: ${interactionOrContext.customId})`;
+                } else {
+                    extendedInfo = `${interactionOrContext.type} (id: N/A)`;
+                }
             }
         }
 
         // --- Final formatted message ---
-        const formatted = `## Hey, some error occurred!
+        let formatted = `## Hey, some error occurred!
 **Time:** ${new Date().toLocaleString()}
-**Interaction:** ${interactionInfo}
-**Server:** ${interaction.guild?.name ?? 'DM'} (${interaction.guildId ?? 'N/A'})
-**Executor:** <@${interaction.user.id}> (${interaction.user.id})
+**Interaction:** ${extendedInfo}`;
+        if (interactionOrContext instanceof BaseInteraction) {
+            formatted += `
+**Server:** ${interactionOrContext.guild?.name ?? 'DM'} (${interactionOrContext.guildId ?? 'N/A'})
+**Executor:** <@${interactionOrContext.user.id}> (${interactionOrContext.user.id})`;
+        }
+        formatted += `
 
 \`\`\`js
 ${errName}: ${errMessage}
