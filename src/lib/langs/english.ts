@@ -11,7 +11,7 @@ type ClashMapInflection<$Keys extends readonly string[]> = {
 
 export default template.parse({
     genericError: 'There was an error, please try again later',
-    workerError: 'There was and error, while generating image: %1',
+    workerError: 'There was an error, while generating image: %1',
     noPermission: 'You do not have permission to do that',
     assets: {
         error: 'There was an error while loading assets: %1',
