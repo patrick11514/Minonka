@@ -1,3 +1,11 @@
+import { AccountCommand } from '$/lib/AccountCommand';
+import { getLocale, replacePlaceholders } from '$/lib/langs';
+import Logger from '$/lib/logger';
+import api from '$/lib/Riot/api';
+import { formatErrorResponse } from '$/lib/Riot/baseRequest';
+import { Region } from '$/lib/Riot/types';
+import { Account } from '$/types/database';
+import { SummonerData } from '$/Worker/tasks/summoner';
 import {
     CacheType,
     ChatInputCommandInteraction,
@@ -5,16 +13,8 @@ import {
     MessageFlags,
     RepliableInteraction
 } from 'discord.js';
-import Logger from '$/lib/logger';
-import { getLocale, replacePlaceholders } from '$/lib/langs';
-import api from '$/lib/Riot/api';
-import { Region } from '$/lib/Riot/types';
-import { AccountCommand } from '$/lib/AccountCommand';
-import { formatErrorResponse } from '$/lib/Riot/baseRequest';
-import { SummonerData } from '$/Worker/tasks/summoner';
-import fs from 'node:fs/promises';
 import { Selectable } from 'kysely';
-import { Account } from '$/types/database';
+import fs from 'node:fs/promises';
 
 const l = new Logger('Summoner', 'green');
 
@@ -113,12 +113,16 @@ export default class Summoner extends AccountCommand {
                 await interaction.editReply({
                     content: replacePlaceholders(lang.workerError, e.message)
                 });
+
+                process.discordBot.handleError(e, interaction);
                 return;
             }
 
             await interaction.editReply({
                 content: lang.genericError
             });
+
+            process.discordBot.handleError(e, interaction);
             return;
         }
     }

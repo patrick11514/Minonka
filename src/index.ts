@@ -5,13 +5,13 @@
  */
 
 import { exit } from 'process';
-import { DiscordBot } from './lib/DiscordBot';
-import Logger from './lib/logger';
-import { WorkerServer } from './lib/WorkerServer';
 import { registerCrons } from './lib/cron';
-import { InMemory } from './lib/InMemory';
+import { DiscordBot } from './lib/DiscordBot';
 import { EmojiManager } from './lib/EmojiManager';
+import { InMemory } from './lib/InMemory';
+import Logger from './lib/logger';
 import './lib/pollyfill';
+import { WorkerServer } from './lib/WorkerServer';
 
 //Initialize global process variables
 process.patching = false;
@@ -45,6 +45,7 @@ if (process.argv.includes('--register')) {
     l.start('Starting Discord Bot...');
 
     const discordBot = new DiscordBot();
+    process.discordBot = discordBot;
 
     discordBot.on('login', (client) => {
         l.stop('Connected to discord as ' + client.user.tag);

@@ -158,6 +158,11 @@ export const updateLpForUser = async (user: {
     } catch (e) {
         l.error(`Failed to update LPs for ${user.gameName}#${user.tagLine}`);
         l.error(e);
+
+        process.discordBot.handleError(
+            e,
+            `UpdateLPForUser user: ${JSON.stringify(user)}`
+        );
     }
 };
 

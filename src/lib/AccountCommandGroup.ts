@@ -1,3 +1,5 @@
+import { conn } from '$/types/connection';
+import { Account } from '$/types/database';
 import {
     ActionRowBuilder,
     CacheType,
@@ -9,16 +11,14 @@ import {
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder
 } from 'discord.js';
+import { Selectable } from 'kysely';
+import { getLocale, replacePlaceholders } from './langs';
+import Logger from './logger';
+import api from './Riot/api';
+import { Region } from './Riot/types';
 import { SubCommand } from './SubCommand';
 import { SubCommandGroup } from './SubCommandGroup';
 import { setupRiotOptions } from './utilities';
-import { getLocale, replacePlaceholders } from './langs';
-import { Region } from './Riot/types';
-import { Selectable } from 'kysely';
-import { Account } from '$/types/database';
-import Logger from './logger';
-import { conn } from '$/types/connection';
-import api from './Riot/api';
 
 export class AccountCommandGroup extends SubCommandGroup {
     protected meSubCommand: SubCommand;
@@ -149,6 +149,8 @@ export class AccountCommandGroup extends SubCommandGroup {
                     flags: MessageFlags.Ephemeral,
                     content: lang.genericError
                 });
+
+                process.discordBot.handleError(e, interaction);
                 return;
             }
         } else if (this.nameSubCommand.match(interaction)) {
@@ -235,6 +237,7 @@ export class AccountCommandGroup extends SubCommandGroup {
                     content: lang.genericError
                 });
 
+                process.discordBot.handleError(e, interaction);
                 return;
             }
         }

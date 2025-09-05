@@ -1,3 +1,5 @@
+import { conn } from '$/types/connection';
+import { Account } from '$/types/database';
 import {
     ActionRowBuilder,
     CacheType,
@@ -9,17 +11,15 @@ import {
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder
 } from 'discord.js';
+import { Selectable } from 'kysely';
+import crypto from 'node:crypto';
 import { Command, HelpParameter } from './Command';
+import api from './Riot/api';
 import { Region } from './Riot/types';
 import { SubCommand } from './SubCommand';
-import { setupRiotOptions } from './utilities';
 import { getLocale, replacePlaceholders } from './langs';
-import { Selectable } from 'kysely';
-import { Account } from '$/types/database';
-import { conn } from '$/types/connection';
-import api from './Riot/api';
 import Logger from './logger';
-import crypto from 'node:crypto';
+import { setupRiotOptions } from './utilities';
 
 type MenuSelectArguments = [
     interaction: RepliableInteraction<CacheType>,
@@ -163,6 +163,8 @@ export abstract class AccountCommand<$CustomData = undefined> extends Command {
                     flags: MessageFlags.Ephemeral,
                     content: lang.genericError
                 });
+
+                process.discordBot.handleError(e, interaction);
                 return;
             }
         } else if (this.nameSubCommand.match(interaction)) {
@@ -249,6 +251,7 @@ export abstract class AccountCommand<$CustomData = undefined> extends Command {
                     content: lang.genericError
                 });
 
+                process.discordBot.handleError(e, interaction);
                 return;
             }
         }
@@ -267,12 +270,13 @@ export abstract class AccountCommand<$CustomData = undefined> extends Command {
         }
 
         if (customData === undefined) {
+            //prettier-ignore
             // @ts-expect-error customData is undefined, so we don't pass it
-            this.onMenuSelect(interaction, accounts[0], accounts[0].region as Region);
+            await this.onMenuSelect(interaction, accounts[0], accounts[0].region as Region);
         } else {
             //prettier-ignore
             // @ts-expect-error customData is defined, so we pass it
-            this.onMenuSelect( interaction, accounts[0], accounts[0].region as Region, customData);
+            await this.onMenuSelect( interaction, accounts[0], accounts[0].region as Region, customData);
         }
     }
 

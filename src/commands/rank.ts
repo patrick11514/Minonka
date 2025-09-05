@@ -128,12 +128,15 @@ export default class Rank extends AccountCommand {
                 await interaction.editReply({
                     content: replacePlaceholders(lang.workerError, e.message)
                 });
+                process.discordBot.handleError(e, interaction);
                 return;
             }
 
             await interaction.editReply({
                 content: lang.genericError
             });
+
+            process.discordBot.handleError(e, interaction);
         }
     }
 }

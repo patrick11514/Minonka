@@ -1,11 +1,11 @@
-import Path from 'node:path';
-import fs from 'node:fs/promises';
-import { Locale } from 'discord.js';
-import Logger from './logger';
-import { z } from 'zod';
-import { ChallengeTier } from './Riot/schemes';
 import { env } from '$/types/env';
+import { Locale } from 'discord.js';
+import fs from 'node:fs/promises';
+import Path from 'node:path';
+import { z } from 'zod';
 import { asyncExists } from './fsAsync';
+import Logger from './logger';
+import { ChallengeTier } from './Riot/schemes';
 
 const l = new Logger('Assets', 'blue');
 
@@ -62,6 +62,8 @@ class AssetCache {
         } catch (e) {
             l.error(`Failed to read asset from cache: ${path}`);
             l.error(e);
+
+            process.discordBot.handleError(e, `AssetCache get path: ${path}`);
             return null;
         }
     }
@@ -252,6 +254,8 @@ export const getChallenges = async (lang: RiotLanguage) => {
         return challenges;
     } catch (e) {
         l.error(e);
+
+        process.discordBot.handleError(e, 'GetChallenges Asset parsing');
         return null;
     }
 };
@@ -296,6 +300,8 @@ export const getRunesReforged = async (lang: RiotLanguage) => {
         return runes;
     } catch (e) {
         l.error(e);
+
+        process.discordBot.handleError(e, 'GetRunesReforged Asset parsing');
         return null;
     }
 };
@@ -327,6 +333,8 @@ export const getSummonerSpells = async (lang: RiotLanguage) => {
         return spells;
     } catch (e) {
         l.error(e);
+
+        process.discordBot.handleError(e, 'GetSummonerSpells Asset parsing');
         return null;
     }
 };
@@ -359,6 +367,8 @@ export const getAugments = async (lang: RiotLanguage) => {
         return augments;
     } catch (e) {
         l.error(e);
+
+        process.discordBot.handleError(e, 'GetAugments Asset parsing');
         return null;
     }
 };
@@ -405,6 +415,8 @@ export const getChampions = async (lang: RiotLanguage) => {
         return champions;
     } catch (e) {
         l.error(e);
+
+        process.discordBot.handleError(e, 'GetChampions Asset parsing');
         return null;
     }
 };
@@ -440,6 +452,8 @@ export const getMaps = async (lang: RiotLanguage) => {
         return maps;
     } catch (e) {
         l.error(e);
+
+        process.discordBot.handleError(e, 'GetMaps Asset parsing');
         return null;
     }
 };

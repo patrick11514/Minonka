@@ -72,6 +72,8 @@ export default class Link extends Command {
                 flags: MessageFlags.Ephemeral,
                 content: lang.genericError
             });
+
+            process.discordBot.handleError(e, interaction);
             return;
         }
 
@@ -133,6 +135,8 @@ export default class Link extends Command {
                 flags: MessageFlags.Ephemeral,
                 content: lang.genericError
             });
+
+            process.discordBot.handleError(e, interaction);
             return;
         }
     }
