@@ -41,6 +41,9 @@ process.discordBot = {
     //eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any as DiscordBot;
 
+// Initialize updating state
+process.isUpdating = false;
+
 const setupWebSocket = () => {
     const websocket = new WebSocket(`${env.WEBSOCKET_HOST}:${env.WEBSOCKET_PORT}`);
 
@@ -79,6 +82,13 @@ const setupWebSocket = () => {
         l.start('Got job ' + job + ' with id ' + jobId);
 
         try {
+            // Check if assets are being updated
+            if (process.isUpdating) {
+                throw new Error(
+                    'Assets are currently being updated due to new version of League of Legends, please execute this command later again.'
+                );
+            }
+
             const data = JSON.parse(strData);
 
             if (!jobsCache.has(job)) {

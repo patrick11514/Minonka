@@ -2,6 +2,26 @@
 # DDRAGON THINGS
 cd $(dirname "$0")
 
+# Lock file management for concurrent updates
+LOCK_FILE=".update-lock"
+
+# Check if lock file exists
+if [ -f "$LOCK_FILE" ]; then
+    echo "Update already in progress (lock file exists), exiting..."
+    exit 1
+fi
+
+# Create lock file
+echo $$ > "$LOCK_FILE"
+
+# Function to cleanup lock file on exit
+cleanup() {
+    rm -f "$LOCK_FILE"
+}
+
+# Set up trap to cleanup on script exit
+trap cleanup EXIT INT TERM
+
 DDRAGON_VERSION=$(curl https://ddragon.leagueoflegends.com/api/versions.json | jq -r ".[0]")
 
 CURRENT_VERSION=$(cat ddragon/.version)

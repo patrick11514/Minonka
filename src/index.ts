@@ -15,6 +15,7 @@ import { WorkerServer } from './lib/WorkerServer';
 
 //Initialize global process variables
 process.patching = false;
+process.isUpdating = false;
 
 if (process.argv.includes('--register')) {
     const l = new Logger('CommandRegister', 'cyan');
