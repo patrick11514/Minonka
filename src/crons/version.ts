@@ -40,8 +40,12 @@ export default [
                 const timeout = setTimeout(() => {
                     clearInterval(checkInterval);
                     process.isUpdating = false;
-                    l.stopError(`Timeout waiting for update lock file to be removed after ${MAX_WAIT_MS / 1000 / 60} minutes`);
-                    reject(new Error('Timeout waiting for update lock file to be removed'));
+                    l.stopError(
+                        `Timeout waiting for update lock file to be removed after ${MAX_WAIT_MS / 1000 / 60} minutes`
+                    );
+                    reject(
+                        new Error('Timeout waiting for update lock file to be removed')
+                    );
                 }, MAX_WAIT_MS);
             });
             return;
