@@ -27,7 +27,6 @@ export default [
             // Wait for lock file to be removed
             const MAX_WAIT_MS = 5 * 60 * 1000; // 5 minutes
             await new Promise<void>((resolve, reject) => {
-                const start = Date.now();
                 const checkInterval = setInterval(() => {
                     if (!fs.existsSync(lockPath)) {
                         clearInterval(checkInterval);
