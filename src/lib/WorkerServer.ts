@@ -162,6 +162,13 @@ export class WorkerServer extends EventEmitter<Events> {
     }
 
     addJob<$Job extends keyof Jobs>(jobName: $Job, data: Jobs[$Job]) {
+        // Check if assets are being updated
+        if (process.isUpdating) {
+            throw new Error(
+                'Assets are currently being updated due to new version of League of Legends, please execute this command later again.'
+            );
+        }
+
         const jobId = crypto.randomBytes(16).toString('hex');
 
         this.jobs.push({

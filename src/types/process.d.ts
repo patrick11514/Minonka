@@ -16,6 +16,7 @@ declare global {
             inMemory: InMemory;
             emoji: EmojiManager;
             patching: boolean;
+            isUpdating: boolean;
         }
     }
     interface ObjectConstructor {
