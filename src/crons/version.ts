@@ -25,15 +25,24 @@ export default [
             process.isUpdating = true;
 
             // Wait for lock file to be removed
-            await new Promise<void>((resolve) => {
+            const MAX_WAIT_MS = 5 * 60 * 1000; // 5 minutes
+            await new Promise<void>((resolve, reject) => {
+                const start = Date.now();
                 const checkInterval = setInterval(() => {
                     if (!fs.existsSync(lockPath)) {
                         clearInterval(checkInterval);
+                        clearTimeout(timeout);
                         process.isUpdating = false;
                         l.stop('Update completed by another worker');
                         resolve();
                     }
                 }, 1000); // Check every second
+                const timeout = setTimeout(() => {
+                    clearInterval(checkInterval);
+                    process.isUpdating = false;
+                    l.stopError(`Timeout waiting for update lock file to be removed after ${MAX_WAIT_MS / 1000 / 60} minutes`);
+                    reject(new Error('Timeout waiting for update lock file to be removed'));
+                }, MAX_WAIT_MS);
             });
             return;
         }
