@@ -122,7 +122,7 @@ export default template.parse({
             ) as ClashMapInflection<typeof mapRegions>),
             bandle_city: 'Bandle City %1',
             aram2022: 'ARAM %1',
-            worlds2024: 'Worlds %1',
+            worlds2024: 'Worlds %1'
         }
     },
     regions: {
