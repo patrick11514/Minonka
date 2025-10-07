@@ -121,7 +121,8 @@ export default template.parse({
                 mapRegions.map((region) => [region, `${capitalize(region)} %1`])
             ) as ClashMapInflection<typeof mapRegions>),
             bandle_city: 'Bandle City %1',
-            aram2022: 'ARAM %1'
+            aram2022: 'ARAM %1',
+            worlds2024: 'Worlds %1',
         }
     },
     regions: {
