@@ -121,7 +121,8 @@ export default template.parse({
             zaun: 'Zaunský %1',
             shadowIsles: 'Pohár Stínových ostrovů',
             bandle_city: 'Pohár Bandle City',
-            aram2022: 'ARAM %1'
+            aram2022: 'ARAM %1',
+            worlds2024: "Pohár Worlds",
         }
     },
     regions: {
