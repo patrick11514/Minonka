@@ -142,12 +142,19 @@ export default class Clash extends Command {
 
         message += schedule.data
             .map((tournament) => {
-                const name = replacePlaceholders(
+                const key =
                     lang.clash.mapInflection[
                         tournament.nameKey as keyof typeof lang.clash.mapInflection
-                    ],
-                    lang.clash.cup
-                );
+                    ];
+
+                if (!key) {
+                    process.discordBot.handleError(
+                        new Error(`Missing translation key for ${tournament.nameKey}`),
+                        interaction
+                    );
+                }
+
+                const name = replacePlaceholders(key, lang.clash.cup);
 
                 const activity = tournament.schedule[0];
                 const registration = Math.floor(activity.registrationTime / 1000);
