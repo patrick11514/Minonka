@@ -14,7 +14,7 @@ import { MatchStatus } from '../Riot/utilities';
 const _ = z.string();
 const o = z.object;
 
-const additionalClashNames = ['aram2022'] as const;
+const additionalClashNames = ['aram2022', 'worlds2024'] as const;
 
 export default o({
     genericError: _,
