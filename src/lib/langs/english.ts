@@ -121,6 +121,7 @@ export default template.parse({
                 mapRegions.map((region) => [region, `${capitalize(region)} %1`])
             ) as ClashMapInflection<typeof mapRegions>),
             bandle_city: 'Bandle City %1',
+            mount_targon: 'Mount Targon %1',
             aram2022: 'ARAM %1',
             worlds2024: 'Worlds %1'
         }
@@ -209,7 +210,8 @@ export default template.parse({
         shurima: 'Shurima',
         targon: 'Targon',
         zaun: 'Zaun',
-        bandle_city: 'Bandle City'
+        bandle_city: 'Bandle City',
+        mount_targon: 'Mount Targon'
     },
     unranked: 'Unranked',
     help: {

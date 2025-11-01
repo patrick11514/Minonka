@@ -122,7 +122,8 @@ export default template.parse({
             shadowIsles: 'Pohár Stínových ostrovů',
             bandle_city: 'Pohár Bandle City',
             aram2022: 'ARAM %1',
-            worlds2024: 'Pohár Worlds'
+            worlds2024: 'Pohár Worlds',
+            mount_targon: '%1 Hory Targonu'
         }
     },
     regions: {
@@ -209,7 +210,8 @@ export default template.parse({
         zaun: 'Zaun',
         bilgewater: 'Bilgewater',
         shadowIsles: 'Stínové ostrovy',
-        bandle_city: 'Bandle City'
+        bandle_city: 'Bandle City',
+        mount_targon: 'Hora Targonu'
     },
     unranked: 'Nehodnocený',
     help: {
