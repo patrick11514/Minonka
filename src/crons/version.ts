@@ -1,5 +1,6 @@
 import { clearAssetCache } from '$/lib/Assets';
 import { Cron } from '$/lib/cron';
+import { asyncExists } from '$/lib/fsAsync';
 import Logger from '$/lib/logger';
 import { env } from '$/types/env';
 import { spawn } from 'node:child_process';
@@ -26,7 +27,7 @@ const clearPersistentCache = async (): Promise<void> => {
     const cachePath = env.PERSISTANT_CACHE_PATH;
 
     try {
-        if (!fs.existsSync(cachePath)) {
+        if (!(await asyncExists(cachePath))) {
             l.log('Persistent cache directory does not exist, nothing to clear');
             return;
         }
