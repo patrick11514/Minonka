@@ -1,7 +1,12 @@
+import { clearAssetCache } from '$/lib/Assets';
 import { Cron } from '$/lib/cron';
+import { asyncExists } from '$/lib/fsAsync';
 import Logger from '$/lib/logger';
+import { env } from '$/types/env';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
+import fsPromises from 'node:fs/promises';
+import path from 'node:path';
 
 const l = new Logger('LolPatch', 'white');
 
@@ -13,6 +18,42 @@ const currentVersion = fs.existsSync(versionPath)
     : '0.0.0';
 process.lolPatch = currentVersion;
 process.isUpdating = false;
+
+/**
+ * Clears cached icon files from the persistent cache directory.
+ * This removes generated match images that may contain outdated champion/item icons.
+ */
+const clearPersistentCache = async (): Promise<void> => {
+    const cachePath = env.PERSISTANT_CACHE_PATH;
+
+    try {
+        if (!(await asyncExists(cachePath))) {
+            l.log('Persistent cache directory does not exist, nothing to clear');
+            return;
+        }
+
+        const files = await fsPromises.readdir(cachePath);
+        let deletedCount = 0;
+
+        for (const file of files) {
+            const filePath = path.join(cachePath, file);
+            const stat = await fsPromises.stat(filePath);
+
+            if (stat.isFile()) {
+                await fsPromises.unlink(filePath);
+                deletedCount++;
+            } else if (stat.isDirectory()) {
+                // Remove directories recursively (e.g., cdragon subdirectories)
+                await fsPromises.rm(filePath, { recursive: true });
+                deletedCount++;
+            }
+        }
+
+        l.log(`Cleared ${deletedCount} cached files/directories from persistent cache`);
+    } catch (e) {
+        l.error(`Failed to clear persistent cache: ${e}`);
+    }
+};
 
 export default [
     '0 0 */2 * * *',
@@ -64,12 +105,16 @@ export default [
                 const download = spawn('bash', ['assets/download.sh'], {
                     cwd: process.cwd()
                 });
-                download.on('exit', (code) => {
+                download.on('exit', async (code) => {
                     if (code !== 0) {
                         l.stopError('Error while updating patch ' + code);
                     } else {
                         l.stop('Patch updated');
                         process.lolPatch = newest;
+
+                        // Clear cached icons to ensure new assets are used
+                        clearAssetCache();
+                        await clearPersistentCache();
 
                         //if we are in remote woker, we don't need to sync emojis, because
                         //its just the worker
