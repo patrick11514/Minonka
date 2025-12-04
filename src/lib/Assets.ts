@@ -67,9 +67,18 @@ class AssetCache {
             return null;
         }
     }
+
+    public clear(): void {
+        this.cache = {};
+        l.log('In-memory asset cache cleared');
+    }
 }
 
 const assetCache = new AssetCache();
+
+export const clearAssetCache = (): void => {
+    assetCache.clear();
+};
 
 export type RiotLanguage =
     | 'ar_AE'
