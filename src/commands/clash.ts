@@ -136,6 +136,14 @@ export default class Clash extends Command {
             return;
         }
 
+        if (schedule.data.length === 0) {
+            await interaction.reply({
+                flags: MessageFlags.Ephemeral,
+                content: lang.clash.noCups
+            });
+            return;
+        }
+
         let message = `# ${lang.clash.title}:\n\n`;
 
         schedule.data.sort((a, b) => a.id - b.id);

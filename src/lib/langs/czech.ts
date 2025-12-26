@@ -124,7 +124,8 @@ export default template.parse({
             aram2022: 'ARAM %1',
             worlds2024: 'Pohár Worlds',
             mount_targon: '%1 Hory Targonu'
-        }
+        },
+        noCups: 'Nebyly nalezeny žádné nadcházející Clash turnaje.'
     },
     regions: {
         EUN1: 'EUNE',
