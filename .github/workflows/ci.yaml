@@ -76,5 +76,6 @@ jobs:
                   cd /opt/apps/Minonka
                   pnpm install --prod
                   pnpm run migrate
+                  pnpm run start:register
                   sudo systemctl restart minonka
                   sudo systemctl restart minonka_worker
