@@ -1,17 +1,17 @@
 import { AssetType, getAsset, getRiotLanguageFromDiscordLocale } from '$/lib/Assets';
 import { Background } from '$/lib/Imaging/Background';
-import { Text } from '$/lib/Imaging/Text';
-import { Rank } from '$/lib/Riot/types';
-import { fixChampName, save } from '../utilities';
-import { Color, Position } from '$/lib/Imaging/types';
-import { Image } from '$/lib/Imaging/Image';
 import { Blank } from '$/lib/Imaging/Blank';
-import { Locale } from 'discord.js';
+import { Image } from '$/lib/Imaging/Image';
+import { Text } from '$/lib/Imaging/Text';
+import { Color, Position } from '$/lib/Imaging/types';
 import { getLocale } from '$/lib/langs';
-import { RankData } from './rank';
 import { MasterySchema } from '$/lib/Riot/schemes';
-import { z } from 'zod';
+import { Rank } from '$/lib/Riot/types';
 import { formatNumbersWithSuffix, getChampionsMap } from '$/lib/utilities';
+import { Locale } from 'discord.js';
+import { z } from 'zod';
+import { fixChampName, save } from '../utilities';
+import { RankData } from './rank';
 
 export type TeamData = {
     abbreviation: string;
@@ -206,7 +206,7 @@ export default async (data: TeamData) => {
                 y: (position.y as number) + 40
             },
             {
-                width: 400,
+                width: 520,
                 height: 40
             },
             30,
