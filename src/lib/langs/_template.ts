@@ -121,7 +121,8 @@ export default o({
                 (typeof mapRegions)[number] | (typeof additionalClashNames)[number],
                 typeof _
             >
-        )
+        ),
+        noCups: _
     }),
     regions: o(
         Object.fromEntries(regions.map((region) => [region, _])) as Record<

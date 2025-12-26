@@ -124,7 +124,8 @@ export default template.parse({
             mount_targon: 'Mount Targon %1',
             aram2022: 'ARAM %1',
             worlds2024: 'Worlds %1'
-        }
+        },
+        noCups: 'No upcoming Clash tournaments were found.'
     },
     regions: {
         EUN1: 'EUNE',
