@@ -74,7 +74,7 @@ jobs:
             - name: Restart Application
               run: |
                   cd /opt/apps/Minonka
-                  pnpm install --prod
+                  pnpm install
                   pnpm run migrate
                   pnpm run start:register
                   sudo systemctl restart minonka
