@@ -2,6 +2,9 @@ name: CI
 
 on:
     push:
+        branches: ['main']
+    pull_request:
+        branches: ['main']
 
 jobs:
     lint:
@@ -41,46 +44,37 @@ jobs:
 
     deploy:
         name: Deploy
-        runs-on: ubuntu-latest
         needs: lint
-        if: github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        runs-on: self-hosted
         steps:
             - name: Checkout
               uses: actions/checkout@v4
-
-            - name: Deploy via SSH
-              uses: appleboy/ssh-action@v1.2.0
+            - name: Setup Node
+              uses: actions/setup-node@v4
               with:
-                  host: ${{ secrets.HOST }}
-                  username: ${{ secrets.USERNAME }}
-                  port: ${{ secrets.PORT }}
-                  key: ${{ secrets.SSH_KEY }}
-                  script: |
-                      cd /opt/NodeApps/Minonka
-
-                      echo "Setting up nvm"                
-                      export NVM_DIR="$HOME/.nvm"
-                      source "$NVM_DIR/nvm.sh"
-                      nvm use
-
-                      echo "Pulling latest changes from git"
-                      git pull
-
-                      echo "Installing dependencies"
-                      npm install -g pnpm
-
-                      echo "Installing dependencies"
-                      pnpm install --frozen-lockfile
-
-                      echo "Building the app"
-                      pnpm run build
-
-                      echo "Registering commands"
-                      pnpm run start:register 
-
-                      echo "Run migrations"
-                      pnpm run migrate
-
-                      echo "Restarting the app"
-                      sudo systemctl restart minonka
-                      echo "Deployment completed"
+                  node-version: 24
+            - name: Install & Build
+              run: |
+                  npm install -g pnpm
+                  pnpm install --frozen-lockfile
+                  pnpm run build
+            - name: Sync Files
+              run: |
+                  rsync -av --delete ./ /opt/apps/Minonka/ \
+                    --exclude .git \
+                    --exclude node_modules \
+                    --exclude .env \
+                    --exclude "cache/" \
+                    --exclude "logs/" \
+                    --exclude "assets/banners/" \
+                    --exclude "assets/ddragon/" \
+                    --exclude "assets/lanes/" \
+                    --exclude "assets/ranks/"
+            - name: Restart Application
+              run: |
+                  cd /opt/apps/Minonka
+                  pnpm install --prod
+                  pnpm run migrate
+                  sudo systemctl restart minonka
+                  sudo systemctl restart minonka_worker
