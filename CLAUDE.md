@@ -60,22 +60,26 @@ src/
 ## Architecture
 
 ### Worker Pattern
+
 CPU-intensive image generation runs in separate worker processes communicating via WebSocket:
+
 - Main bot (`src/index.ts`) → WorkerServer → Worker processes (`src/Worker/Worker.ts`)
 - Workers handle: rank, match, summoner, team, spectator, cherryMatch image generation
 
 ### Command Structure
+
 - `Command` - Base slash command class
 - `AccountCommand` - Commands requiring linked Riot account
 - Commands auto-loaded from `src/commands/` directory
 
 ### Global Process Extensions
+
 ```typescript
-process.discordBot   // Main Discord bot instance
-process.workerServer // Worker communication server
-process.inMemory     // In-memory cache
-process.emoji        // Discord emoji manager
-process.client       // Discord.js client
+process.discordBot; // Main Discord bot instance
+process.workerServer; // Worker communication server
+process.inMemory; // In-memory cache
+process.emoji; // Discord emoji manager
+process.client; // Discord.js client
 ```
 
 ## Code Conventions
@@ -87,18 +91,19 @@ process.client       // Discord.js client
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/index.ts` | Bot entry point, initializes all services |
-| `src/lib/DiscordBot.ts` | Discord client, command registration |
+| File                      | Purpose                                   |
+| ------------------------- | ----------------------------------------- |
+| `src/index.ts`            | Bot entry point, initializes all services |
+| `src/lib/DiscordBot.ts`   | Discord client, command registration      |
 | `src/lib/WorkerServer.ts` | WebSocket server for worker communication |
-| `src/lib/Riot/riotApi.ts` | Riot API wrapper |
-| `src/types/env.ts` | Environment variable schema (zod) |
-| `src/types/database.ts` | Generated database types |
+| `src/lib/Riot/riotApi.ts` | Riot API wrapper                          |
+| `src/types/env.ts`        | Environment variable schema (zod)         |
+| `src/types/database.ts`   | Generated database types                  |
 
 ## Environment Variables
 
 Key variables needed (see `.env.example`):
+
 - `CLIENT_ID`, `CLIENT_TOKEN` - Discord bot credentials
 - `RIOT_API_KEY` - Riot Games API key
 - `DATABASE_*` - MySQL connection settings
@@ -120,16 +125,19 @@ Migrations in `migrations/` - run with `pnpm run migrate`
 ## Common Workflows
 
 ### Adding a New Command
+
 1. Create file in `src/commands/`
 2. Export class extending `Command` or `AccountCommand`
 3. Run `pnpm run start:register` to register with Discord
 
 ### Modifying Database Schema
+
 1. `./script/createMigration.sh migration_name`
 2. Edit migration file in `migrations/`
 3. `pnpm run migrate`
 4. `pnpm run genDatabaseSchema`
 
 ### Adding Localization
+
 1. Edit `src/lib/langs/english.ts` and `src/lib/langs/czech.ts`
 2. Follow existing patterns for type safety

@@ -164,5 +164,12 @@ export default o({
     spectator: o({
         not_in_game: _,
         reload: _
+    }),
+    graph: o({
+        title: _,
+        currentRank: _,
+        change: _,
+        dataPoints: _,
+        noData: _
     })
 });
