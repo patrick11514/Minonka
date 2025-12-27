@@ -123,7 +123,9 @@ export default async (data: GraphData) => {
     const numLabels = 5;
     for (let i = 0; i <= numLabels; i++) {
         const lp = minLp + (lpRange * i) / numLabels;
-        const y = PADDING + GRAPH_AREA_HEIGHT - (i / numLabels) * GRAPH_AREA_HEIGHT;
+        const y = Math.round(
+            PADDING + GRAPH_AREA_HEIGHT - (i / numLabels) * GRAPH_AREA_HEIGHT
+        );
 
         const label = new Text(
             Math.round(lp).toString(),
@@ -146,7 +148,9 @@ export default async (data: GraphData) => {
         const date = new Date(entry.time);
         const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
 
-        const x = PADDING + (index / (data.lpHistory.length - 1 || 1)) * GRAPH_AREA_WIDTH;
+        const x = Math.round(
+            PADDING + (index / (data.lpHistory.length - 1 || 1)) * GRAPH_AREA_WIDTH
+        );
 
         const label = new Text(
             dateStr,
