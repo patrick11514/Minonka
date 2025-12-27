@@ -1,6 +1,7 @@
 import { env } from '$/types/env';
 import { FileResult } from '$/types/types';
 import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
+import { GraphData } from '$/Worker/tasks/graph';
 import { MatchData } from '$/Worker/tasks/match';
 import { RankData } from '$/Worker/tasks/rank';
 import { SpectatorData } from '$/Worker/tasks/spectator';
@@ -33,6 +34,7 @@ type Jobs = {
     cherryMatch: CherryMatchData;
     team: TeamData;
     spectator: SpectatorData;
+    graph: GraphData;
 };
 
 const l = new Logger('WorkerServer', 'magenta');
