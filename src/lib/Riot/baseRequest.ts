@@ -50,8 +50,6 @@ export const baseRequest = async <$ResponseData>(
         }
 
         const data = await response.json();
-        const fs = await import('fs');
-        fs.promises.writeFile(`./riot_${Date.now()}.json`, JSON.stringify(data, null, 4));
 
         const parse = schema.safeParse(data);
 
