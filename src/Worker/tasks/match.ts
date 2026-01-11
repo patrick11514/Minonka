@@ -1,3 +1,4 @@
+import { updateLpForUser } from '$/crons/lp';
 import {
     AssetType,
     getAsset,
@@ -6,8 +7,17 @@ import {
     getSummonerSpells
 } from '$/lib/Assets';
 import { Background } from '$/lib/Imaging/Background';
+import { Blank } from '$/lib/Imaging/Blank';
+import { Image } from '$/lib/Imaging/Image';
+import { Text } from '$/lib/Imaging/Text';
+import { Color } from '$/lib/Imaging/types';
+import { getLocale } from '$/lib/langs';
+import api from '$/lib/Riot/api';
 import { RegularMatchSchema } from '$/lib/Riot/schemes';
 import { Region } from '$/lib/Riot/types';
+import { getMatchStatus, MatchStatus } from '$/lib/Riot/utilities';
+import { getChampionsMap } from '$/lib/utilities';
+import { conn } from '$/types/connection';
 import { Locale } from 'discord.js';
 import { z } from 'zod';
 import {
@@ -21,16 +31,6 @@ import {
     savePersistant,
     toMMSS
 } from '../utilities';
-import { Blank } from '$/lib/Imaging/Blank';
-import { Text } from '$/lib/Imaging/Text';
-import { getLocale } from '$/lib/langs';
-import { Color } from '$/lib/Imaging/types';
-import { Image } from '$/lib/Imaging/Image';
-import { getMatchStatus, MatchStatus } from '$/lib/Riot/utilities';
-import { conn } from '$/types/connection';
-import api from '$/lib/Riot/api';
-import { updateLpForUser } from '$/crons/lp';
-import { getChampionsMap } from '$/lib/utilities';
 
 export type MatchData = {
     region: Region;
@@ -503,8 +503,8 @@ export default async (data: MatchData) => {
         const primary = new Image(
             (await getAsset(AssetType.DDRAGON_IMG, mainRune.icon))!,
             {
-                x: 0,
-                y: 0
+                x: imageSpacing,
+                y: imageSpacing
             }
         );
         await primary.resize({
@@ -513,19 +513,37 @@ export default async (data: MatchData) => {
         RuneSumms.addElement(primary);
 
         //Secondary
-        const secondaryTree = getRuneTree(runesReforged, player, 1);
 
-        const secondary = new Image(
-            (await getAsset(AssetType.DDRAGON_IMG, secondaryTree.icon))!,
-            {
-                x: imageSpacing * 2,
-                y: Math.floor(playerHeight / 2) + imageSpacing * 3
-            }
-        );
-        await secondary.resize({
-            width: Math.floor(playerHeight / 2) - imageSpacing * 5
-        });
-        RuneSumms.addElement(secondary);
+        if (player.roleBoundItem) {
+            //QUEST
+            const questImage = (await getAsset(
+                AssetType.DDRAGON_ITEM,
+                `${player.roleBoundItem}.png`
+            ))!;
+
+            const secondary = new Image(questImage, {
+                x: imageSpacing,
+                y: Math.floor(playerHeight / 2) + imageSpacing
+            });
+            await secondary.resize({
+                width: Math.floor(playerHeight / 2) - imageSpacing
+            });
+            RuneSumms.addElement(secondary);
+        } else {
+            const secondaryTree = getRuneTree(runesReforged, player, 1);
+
+            const secondary = new Image(
+                (await getAsset(AssetType.DDRAGON_IMG, secondaryTree.icon))!,
+                {
+                    x: imageSpacing * 2,
+                    y: Math.floor(playerHeight / 2) + imageSpacing * 2
+                }
+            );
+            await secondary.resize({
+                width: Math.floor(playerHeight / 2) - imageSpacing * 4
+            });
+            RuneSumms.addElement(secondary);
+        }
 
         //Summs
         await putSumms(

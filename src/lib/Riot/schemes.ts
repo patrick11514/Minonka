@@ -137,6 +137,7 @@ export const ParticipantSchema = z.object({
         .or(z.literal('SOLO'))
         .or(z.literal('CARRY'))
         .or(z.literal('SUPPORT')),
+    roleBoundItem: z.number().optional(), //Basically quest -> its item
     summoner1Id: z.number(),
     summoner2Id: z.number(),
     teamEarlySurrendered: z.boolean(),

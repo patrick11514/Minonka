@@ -1,9 +1,9 @@
-import { env } from '$/types/env';
-import { z } from 'zod';
-import Logger from '../logger';
-import fetch from 'node-fetch';
 import template from '$/lib/langs/_template';
+import { env } from '$/types/env';
+import fetch from 'node-fetch';
+import { z } from 'zod';
 import { replacePlaceholders } from '../langs';
+import Logger from '../logger';
 
 type StatusCode = 400 | 401 | 403 | 404 | 405 | 415 | 429 | 500 | 502 | 503 | 504;
 
@@ -50,6 +50,7 @@ export const baseRequest = async <$ResponseData>(
         }
 
         const data = await response.json();
+
         const parse = schema.safeParse(data);
 
         if (!parse.success) {
