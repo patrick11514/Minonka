@@ -236,5 +236,12 @@ export default template.parse({
     spectator: {
         not_in_game: 'Account %1#%2 is not in any game',
         reload: 'Reload'
+    },
+    graph: {
+        title: 'LP Graph',
+        currentRank: 'Current Rank',
+        change: 'Total Change',
+        dataPoints: 'Data Points',
+        noData: 'No LP data available. Play some ranked games first!'
     }
 } satisfies z.infer<typeof template>);

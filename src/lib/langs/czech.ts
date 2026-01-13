@@ -236,5 +236,12 @@ export default template.parse({
     spectator: {
         not_in_game: 'Účet %1#%2 není v žádné hře',
         reload: 'Obnovit'
+    },
+    graph: {
+        title: 'LP Graf',
+        currentRank: 'Aktuální Rank',
+        change: 'Celková Změna',
+        dataPoints: 'Datových Bodů',
+        noData: 'Žádná LP data nejsou k dispozici. Nejdříve zahraj nějaké rankované hry!'
     }
 } satisfies z.infer<typeof template>);
