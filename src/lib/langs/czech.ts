@@ -244,7 +244,8 @@ export default template.parse({
         },
         defaults: {
             current: 'Současné přednastavení pro %1: ```json\n%2\n```',
-            updated: 'Přednastavení pro %1 aktualizováno. %2'
+            updated: 'Přednastavení pro %1 aktualizováno. %2',
+            reset: 'Přednastavení pro %1 bylo resetováno.'
         }
     }
 } satisfies z.infer<typeof template>);

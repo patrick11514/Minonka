@@ -72,18 +72,22 @@ export class UserSettings {
         let presets = existing ? (existing.command_presets as Record<string, any>) : {};
         if (typeof presets !== 'object' || presets === null) presets = {};
 
-        presets[command] = { ...(presets[command] || {}), ...data };
-
-        // Remove keys with null values
-        for (const k in presets[command]) {
-            if (presets[command][k] === null) {
-                delete presets[command][k];
-            }
-        }
-
-        // Remove empty command entries
-        if (Object.keys(presets[command]).length === 0) {
+        if (Object.keys(data).length === 0) {
             delete presets[command];
+        } else {
+            presets[command] = { ...(presets[command] || {}), ...data };
+
+            // Remove keys with null values
+            for (const k in presets[command]) {
+                if (presets[command][k] === null) {
+                    delete presets[command][k];
+                }
+            }
+
+            // Remove empty command entries
+            if (Object.keys(presets[command]).length === 0) {
+                delete presets[command];
+            }
         }
 
         const presetsString = JSON.stringify(presets);

@@ -49,7 +49,10 @@ export default class Settings extends Command {
         );
 
         const defaultHistory = new DefaultHistory();
+        const resetDefault = new ResetDefault();
+
         defaultGroup.addSubCommand(defaultHistory);
+        defaultGroup.addSubCommand(resetDefault);
         this.addSubCommandGroup(defaultGroup);
 
         this.handlers['language'] = {
@@ -57,7 +60,8 @@ export default class Settings extends Command {
             reset: resetLanguage.handler.bind(resetLanguage)
         };
         this.handlers['default'] = {
-            history: defaultHistory.handler.bind(defaultHistory)
+            history: defaultHistory.handler.bind(defaultHistory),
+            reset: resetDefault.handler.bind(resetDefault)
         };
 
         this.events['interactionCreate'] = [this.handleAutocomplete.bind(this)];
@@ -207,6 +211,42 @@ class DefaultHistory extends SubCommand {
                 'history',
                 `Queue: ${queue}`
             ),
+            flags: MessageFlags.Ephemeral
+        });
+    }
+}
+
+class ResetDefault extends SubCommand {
+    constructor() {
+        super('reset', 'Reset default options for a command');
+        this.addLocalization(
+            Locale.Czech,
+            'resetovat',
+            'Resetuj výchozí možnosti pro příkaz'
+        );
+        this.addOption({
+            type: 'STRING',
+            name: 'command',
+            localizedName: {
+                [Locale.Czech]: 'prikaz'
+            },
+            description: 'The command to reset defaults for',
+            localizedDescription: {
+                [Locale.Czech]: 'Příkaz pro který resetovat výchozí nastavení'
+            },
+            required: true,
+            choices: [{ name: 'history', value: 'history' }]
+        });
+    }
+
+    async handler(interaction: ChatInputCommandInteraction) {
+        const command = interaction.options.getString('command', true);
+        await userSettings.setDefaults(interaction.user.id, command, {});
+
+        const lang = getLocale(interaction.locale);
+
+        await interaction.reply({
+            content: replacePlaceholders(lang.settings.defaults.reset, command),
             flags: MessageFlags.Ephemeral
         });
     }

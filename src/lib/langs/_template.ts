@@ -172,7 +172,8 @@ export default o({
         }),
         defaults: o({
             current: _,
-            updated: _
+            updated: _,
+            reset: _
         })
     })
 });

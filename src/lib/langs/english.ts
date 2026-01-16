@@ -244,7 +244,8 @@ export default template.parse({
         },
         defaults: {
             current: 'Current defaults for %1: ```json\n%2\n```',
-            updated: 'Updated defaults for %1. %2'
+            updated: 'Updated defaults for %1. %2',
+            reset: 'Defaults for %1 decided to take a vacation. Reset complete.'
         }
     }
 } satisfies z.infer<typeof template>);
