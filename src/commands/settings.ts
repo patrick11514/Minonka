@@ -64,7 +64,7 @@ export default class Settings extends Command {
             reset: resetDefault.handler.bind(resetDefault)
         };
 
-        this.events['interactionCreate'] = [this.handleAutocomplete.bind(this)];
+        this.on('interactionCreate', this.handleAutocomplete.bind(this));
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
@@ -198,6 +198,14 @@ class DefaultHistory extends SubCommand {
     async handler(interaction: ChatInputCommandInteraction) {
         const queue = interaction.options.getString('queue');
         const lang = getLocale(interaction.locale);
+
+        if (queue && !queues.some((q) => q.queueId.toString() === queue)) {
+            await interaction.reply({
+                content: 'Invalid queue specified. Please select a valid queue.',
+                flags: MessageFlags.Ephemeral
+            });
+            return;
+        }
 
         if (queue === null) {
             const userConf = await userSettings.get(interaction.user.id);

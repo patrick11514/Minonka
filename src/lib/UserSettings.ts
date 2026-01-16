@@ -28,23 +28,25 @@ export class UserSettings {
 
         if (settings) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            parsedSettings = { ...settings } as any;
+            const mutableSettings = { ...settings } as any as ParsedUserSettings;
 
             // Parse JSON if it comes back as string (depends on driver config)
-            if (typeof parsedSettings!.command_presets === 'string') {
+            if (typeof mutableSettings.command_presets === 'string') {
                 try {
-                    parsedSettings!.command_presets = JSON.parse(
-                        parsedSettings!.command_presets
+                    mutableSettings.command_presets = JSON.parse(
+                        mutableSettings.command_presets
                     );
                 } catch (error) {
                     this.logger.error(
-                        `Failed to parse command_presets for user_settings ${discordId} ${parsedSettings!.command_presets} ${error}`
+                        `Failed to parse command_presets for user_settings ${discordId} ${mutableSettings.command_presets} ${error}`
                     );
-                    parsedSettings!.command_presets = {};
+                    mutableSettings.command_presets = {};
                 }
-            } else if (!parsedSettings!.command_presets) {
-                parsedSettings!.command_presets = {};
+            } else if (!mutableSettings.command_presets) {
+                mutableSettings.command_presets = {};
             }
+
+            parsedSettings = mutableSettings;
         }
 
         this.cache.set(discordId, parsedSettings);

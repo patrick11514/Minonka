@@ -131,7 +131,7 @@ export class DiscordBot extends EventEmitter<Events> {
                                             const defaultValue = defaults[name];
                                             if (defaultValue !== undefined) {
                                                 // Validate the default type based on the accessor being used.
-                                                let isValid = true;
+                                                let isValid: boolean;
 
                                                 switch (prop) {
                                                     case 'getString':
@@ -170,6 +170,15 @@ export class DiscordBot extends EventEmitter<Events> {
                             }
                         };
 
+                        // Wrap `interaction.options` in a Proxy so we can transparently inject
+                        // user-defined default option values while still delegating to the
+                        // original implementation. This intentionally changes the runtime
+                        // type of `interaction.options`, so any code relying on
+                        // `instanceof` checks or strict type comparisons against the
+                        // original options class may observe different behavior. At the
+                        // time of writing this Proxy is only used by our own command
+                        // handlers, which treat `options` as a duck-typed interface rather
+                        // than relying on its concrete class.
                         const proxy = new Proxy(originalOptions, handler);
                         Object.defineProperty(interaction, 'options', {
                             value: proxy
