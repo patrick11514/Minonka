@@ -30,7 +30,7 @@ Bootstrap the repository with these exact commands:
 
 - `pnpm run migrate` - run database migrations (REQUIRES valid DATABASE_URL)
 - `pnpm run genDatabaseSchema` - generate database types from schema (run after migrate)
-- `./script/createMigration.sh` - create new migration file
+- `pnpm run migration:create <name>` - create new migration file (e.g., `pnpm run migration:create user_add`)
 
 ### Application Modes
 

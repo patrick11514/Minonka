@@ -1,5 +1,11 @@
 #!/bin/bash
-read -p "Enter migration name: " NAME
+
+# Check first argument for name
+if [ -n "$1" ]; then
+  NAME="$1"
+else
+  read -p "Enter migration name: " NAME
+fi
 
 
 # Convert name to lowercase and replace spaces with underscores
