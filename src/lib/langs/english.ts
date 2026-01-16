@@ -236,5 +236,19 @@ export default template.parse({
     spectator: {
         not_in_game: 'Account %1#%2 is not in any game',
         reload: 'Reload'
+    },
+    settings: {
+        invalid_command: 'Invalid settings command. Please try again.',
+        unknown_queue: 'Unknown Queue',
+        invalid_queue: 'Invalid queue specified. Please select a valid queue.',
+        language: {
+            set: 'Language set to %1',
+            reset: 'Language reset to default'
+        },
+        defaults: {
+            current: 'Current defaults for %1: ```json\n%2\n```',
+            updated: 'Updated defaults for %1. %2',
+            reset: 'Defaults for %1 decided to take a vacation. Reset complete.'
+        }
     }
 } satisfies z.infer<typeof template>);

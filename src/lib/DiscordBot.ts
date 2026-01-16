@@ -6,6 +6,7 @@ import {
     CacheType,
     Client,
     CommandInteractionOption,
+    CommandInteractionOptionResolver,
     GatewayIntentBits,
     REST,
     Routes
@@ -15,6 +16,7 @@ import Path from 'node:path';
 import { Command } from './Command';
 import { EventEmitter } from './EventEmitter';
 import Logger from './logger';
+import { userSettings } from './UserSettings';
 
 type Events = {
     login: (client: Client<true>) => void;
@@ -80,13 +82,117 @@ export class DiscordBot extends EventEmitter<Events> {
             });
 
         //register handlers
-        this.client.on('interactionCreate', (interaction) => {
+        this.client.on('interactionCreate', async (interaction) => {
             if (!interaction.isChatInputCommand()) return;
 
             const command = instances.find(
                 (c) => c.slashCommand.name === interaction.commandName
             );
             if (!command) return;
+
+            try {
+                const settings = await userSettings.get(interaction.user.id);
+                if (settings) {
+                    if (settings.language) {
+                        const originalLocale = interaction.locale;
+                        Object.defineProperty(interaction, 'locale', {
+                            get() {
+                                return settings.language ?? originalLocale;
+                            },
+                            configurable: true
+                        });
+                    }
+
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const presets = settings.command_presets as any;
+                    if (presets && presets[interaction.commandName]) {
+                        const defaults = presets[interaction.commandName];
+
+                        const originalOptions = interaction.options;
+                        const handler = {
+                            get(
+                                target: CommandInteractionOptionResolver,
+                                prop: string,
+                                receiver: unknown
+                            ) {
+                                const originalValue = Reflect.get(target, prop, receiver);
+
+                                if (
+                                    typeof originalValue === 'function' &&
+                                    prop.startsWith('get')
+                                ) {
+                                    return function (
+                                        ...args: [name: string, required?: boolean]
+                                    ) {
+                                        const name = args[0];
+                                        const required = args[1];
+
+                                        const result = originalValue.apply(target, args);
+
+                                        if (
+                                            (result === null || result === undefined) &&
+                                            !required
+                                        ) {
+                                            const defaultValue = defaults[name];
+                                            if (defaultValue !== undefined) {
+                                                // Validate the default type based on the accessor being used.
+                                                let isValid: boolean;
+
+                                                switch (prop) {
+                                                    case 'getString':
+                                                    case 'getLocalizedString':
+                                                        isValid =
+                                                            typeof defaultValue ===
+                                                            'string';
+                                                        break;
+                                                    case 'getInteger':
+                                                    case 'getNumber':
+                                                        isValid =
+                                                            typeof defaultValue ===
+                                                            'number';
+                                                        break;
+                                                    case 'getBoolean':
+                                                        isValid =
+                                                            typeof defaultValue ===
+                                                            'boolean';
+                                                        break;
+                                                    default:
+                                                        // For other getters (e.g. getUser, getChannel),
+                                                        // do not inject defaults unless explicitly supported.
+                                                        isValid = false;
+                                                        break;
+                                                }
+
+                                                if (isValid) {
+                                                    return defaultValue;
+                                                }
+                                            }
+                                        }
+                                        return result;
+                                    }.bind(target);
+                                }
+                                return originalValue;
+                            }
+                        };
+
+                        // Wrap `interaction.options` in a Proxy so we can transparently inject
+                        // user-defined default option values while still delegating to the
+                        // original implementation. This intentionally changes the runtime
+                        // type of `interaction.options`, so any code relying on
+                        // `instanceof` checks or strict type comparisons against the
+                        // original options class may observe different behavior. At the
+                        // time of writing this Proxy is only used by our own command
+                        // handlers, which treat `options` as a duck-typed interface rather
+                        // than relying on its concrete class.
+                        const proxy = new Proxy(originalOptions, handler);
+                        Object.defineProperty(interaction, 'options', {
+                            value: proxy
+                        });
+                    }
+                }
+            } catch (e) {
+                this.handleError(e, interaction);
+            }
 
             command.handler(interaction).catch((error) => {
                 this.handleError(error, interaction);

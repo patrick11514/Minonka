@@ -164,5 +164,19 @@ export default o({
     spectator: o({
         not_in_game: _,
         reload: _
+    }),
+    settings: o({
+        invalid_command: _,
+        unknown_queue: _,
+        invalid_queue: _,
+        language: o({
+            set: _,
+            reset: _
+        }),
+        defaults: o({
+            current: _,
+            updated: _,
+            reset: _
+        })
     })
 });

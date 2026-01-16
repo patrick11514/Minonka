@@ -1,0 +1,277 @@
+import {
+    ChatInputCommandInteraction,
+    Interaction,
+    Locale,
+    MessageFlags
+} from 'discord.js';
+import { Command } from '../lib/Command';
+import { queues } from '../lib/Riot/types';
+import { SubCommand } from '../lib/SubCommand';
+import { SubCommandGroup } from '../lib/SubCommandGroup';
+import { userSettings } from '../lib/UserSettings';
+import { getLocale, replacePlaceholders } from '../lib/langs';
+
+export default class Settings extends Command {
+    private handlers: Record<
+        string,
+        Record<string, (interaction: ChatInputCommandInteraction) => Promise<void>>
+    > = {};
+
+    constructor() {
+        super('settings', 'Manage your user settings');
+        this.addLocalization(
+            Locale.Czech,
+            'nastaveni',
+            'Spravuj svá uživatelská nastavení'
+        );
+
+        const languageGroup = new SubCommandGroup(
+            'language',
+            'Manage your language settings'
+        );
+        languageGroup.addLocalization(Locale.Czech, 'jazyk', 'Spravuj nastavení jazyka');
+
+        const setLanguage = new SetLanguage();
+        const resetLanguage = new ResetLanguage();
+
+        languageGroup.addSubCommand(setLanguage);
+        languageGroup.addSubCommand(resetLanguage);
+        this.addSubCommandGroup(languageGroup);
+
+        const defaultGroup = new SubCommandGroup(
+            'default',
+            'Manage default command arguments'
+        );
+        defaultGroup.addLocalization(
+            Locale.Czech,
+            'vychozi',
+            'Spravuj výchozí argumenty příkazů'
+        );
+
+        const defaultHistory = new DefaultHistory();
+        const resetDefault = new ResetDefault();
+
+        defaultGroup.addSubCommand(defaultHistory);
+        defaultGroup.addSubCommand(resetDefault);
+        this.addSubCommandGroup(defaultGroup);
+
+        this.handlers['language'] = {
+            set: setLanguage.handler.bind(setLanguage),
+            reset: resetLanguage.handler.bind(resetLanguage)
+        };
+        this.handlers['default'] = {
+            history: defaultHistory.handler.bind(defaultHistory),
+            reset: resetDefault.handler.bind(resetDefault)
+        };
+
+        this.on('interactionCreate', this.handleAutocomplete.bind(this));
+    }
+
+    async handler(interaction: ChatInputCommandInteraction) {
+        const group = interaction.options.getSubcommandGroup();
+        const sub = interaction.options.getSubcommand();
+
+        if (group && sub && this.handlers[group] && this.handlers[group][sub]) {
+            await this.handlers[group][sub](interaction);
+        } else {
+            const lang = getLocale(interaction.locale);
+            await interaction.reply({
+                content: lang.settings.invalid_command,
+                flags: MessageFlags.Ephemeral
+            });
+        }
+    }
+
+    async handleAutocomplete(interaction: Interaction) {
+        if (!interaction.isAutocomplete()) return;
+        if (interaction.commandName !== 'settings') return;
+
+        const group = interaction.options.getSubcommandGroup();
+        const sub = interaction.options.getSubcommand();
+
+        if (group === 'default' && sub === 'history') {
+            const lang = getLocale(interaction.locale);
+            const focused = interaction.options.getFocused(true);
+            if (focused.name === 'queue') {
+                const options = queues
+                    .map((queue) => {
+                        const key = queue.queueId;
+                        const name =
+                            key in lang.queues
+                                ? lang.queues[key]
+                                : lang.settings.unknown_queue;
+
+                        return {
+                            name,
+                            value: queue.queueId.toString()
+                        };
+                    })
+                    .filter(
+                        (opt) =>
+                            opt.name !== undefined &&
+                            opt.name !== null &&
+                            opt.name.toLowerCase().includes(focused.value.toLowerCase())
+                    );
+
+                await interaction.respond(options.slice(0, 25));
+            }
+        }
+    }
+}
+
+class SetLanguage extends SubCommand {
+    constructor() {
+        super('set', 'Set your preferred language');
+        this.addLocalization(Locale.Czech, 'nastavit', 'Nastav svůj preferovaný jazyk');
+        this.addOption({
+            type: 'STRING',
+            name: 'language',
+            localizedName: {
+                [Locale.Czech]: 'jazyk'
+            },
+            description: 'The language to set',
+            localizedDescription: {
+                [Locale.Czech]: 'Jazyk k nastavení'
+            },
+            required: true,
+            choices: [
+                { name: 'English', value: 'en-US' },
+                { name: 'Čeština', value: 'cs' }
+            ]
+        });
+    }
+
+    async handler(interaction: ChatInputCommandInteraction) {
+        const langString = interaction.options.getString('language', true);
+        await userSettings.setLanguage(interaction.user.id, langString);
+
+        const targetLang = getLocale(langString as Locale);
+        const langName = langString === 'cs' ? 'Čeština' : 'English';
+
+        const content = replacePlaceholders(targetLang.settings.language.set, langName);
+
+        await interaction.reply({
+            content,
+            flags: MessageFlags.Ephemeral
+        });
+    }
+}
+
+class ResetLanguage extends SubCommand {
+    constructor() {
+        super('reset', 'Reset your language to Discord default');
+        this.addLocalization(
+            Locale.Czech,
+            'resetovat',
+            'Resetuj nastavení jazyka na výchozí'
+        );
+    }
+
+    async handler(interaction: ChatInputCommandInteraction) {
+        await userSettings.setLanguage(interaction.user.id, null);
+        const lang = getLocale(interaction.locale);
+
+        await interaction.reply({
+            content: lang.settings.language.reset,
+            flags: MessageFlags.Ephemeral
+        });
+    }
+}
+
+class DefaultHistory extends SubCommand {
+    constructor() {
+        super('history', 'Set default options for history command');
+        this.addLocalization(
+            Locale.Czech,
+            'historie',
+            'Nastav výchozí možnosti pro příkaz historie'
+        );
+        this.addOption({
+            name: 'queue',
+            description: 'Default queue filter',
+            localizedName: {
+                [Locale.Czech]: 'fronta'
+            },
+            localizedDescription: {
+                [Locale.Czech]: 'Výběr fronty pro filtrování'
+            },
+            type: 'STRING',
+            required: false,
+            autocomplete: true
+        });
+    }
+
+    async handler(interaction: ChatInputCommandInteraction) {
+        const queue = interaction.options.getString('queue');
+        const lang = getLocale(interaction.locale);
+
+        if (queue && !queues.some((q) => q.queueId.toString() === queue)) {
+            await interaction.reply({
+                content: lang.settings.invalid_queue,
+                flags: MessageFlags.Ephemeral
+            });
+            return;
+        }
+
+        if (queue === null) {
+            const userConf = await userSettings.get(interaction.user.id);
+            const current = userConf?.command_presets?.history || {};
+            await interaction.reply({
+                content: replacePlaceholders(
+                    lang.settings.defaults.current,
+                    'history',
+                    JSON.stringify(current, null, 2)
+                ),
+                flags: MessageFlags.Ephemeral
+            });
+            return;
+        }
+
+        await userSettings.setDefaults(interaction.user.id, 'history', { queue });
+
+        await interaction.reply({
+            content: replacePlaceholders(
+                lang.settings.defaults.updated,
+                'history',
+                `Queue: ${queue}`
+            ),
+            flags: MessageFlags.Ephemeral
+        });
+    }
+}
+
+class ResetDefault extends SubCommand {
+    constructor() {
+        super('reset', 'Reset default options for a command');
+        this.addLocalization(
+            Locale.Czech,
+            'resetovat',
+            'Resetuj výchozí možnosti pro příkaz'
+        );
+        this.addOption({
+            type: 'STRING',
+            name: 'command',
+            localizedName: {
+                [Locale.Czech]: 'prikaz'
+            },
+            description: 'The command to reset defaults for',
+            localizedDescription: {
+                [Locale.Czech]: 'Příkaz pro který resetovat výchozí nastavení'
+            },
+            required: true,
+            choices: [{ name: 'history', value: 'history' }]
+        });
+    }
+
+    async handler(interaction: ChatInputCommandInteraction) {
+        const command = interaction.options.getString('command', true);
+        await userSettings.setDefaults(interaction.user.id, command, {});
+
+        const lang = getLocale(interaction.locale);
+
+        await interaction.reply({
+            content: replacePlaceholders(lang.settings.defaults.reset, command),
+            flags: MessageFlags.Ephemeral
+        });
+    }
+}

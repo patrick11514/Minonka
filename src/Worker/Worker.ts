@@ -21,7 +21,6 @@ if (InstanceId) {
 }
 
 const l = new Logger('Worker' + InstanceId, 'yellow');
-l.start('Connecting to server');
 
 // Register crons for remote workers (only version updates)
 if (isRemoteWorker) {
@@ -45,6 +44,8 @@ process.discordBot = {
 process.isUpdating = false;
 
 const setupWebSocket = () => {
+    l.start('Connecting to server');
+
     const websocket = new WebSocket(`${env.WEBSOCKET_HOST}:${env.WEBSOCKET_PORT}`);
 
     websocket.on('error', (err) => {

@@ -236,5 +236,19 @@ export default template.parse({
     spectator: {
         not_in_game: 'Účet %1#%2 není v žádné hře',
         reload: 'Obnovit'
+    },
+    settings: {
+        invalid_command: 'Neplatný příkaz nastavení. Zkuste to prosím znovu.',
+        unknown_queue: 'Neznámá fronta',
+        invalid_queue: 'Zadána neplatná fronta. Vyberte prosím platnou frontu.',
+        language: {
+            set: 'Jazyk nastaven na %1',
+            reset: 'Jazyk resetován na výchozí'
+        },
+        defaults: {
+            current: 'Současné přednastavení pro %1: ```json\n%2\n```',
+            updated: 'Přednastavení pro %1 aktualizováno. %2',
+            reset: 'Přednastavení pro %1 bylo resetováno.'
+        }
     }
 } satisfies z.infer<typeof template>);
