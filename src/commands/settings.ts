@@ -97,10 +97,7 @@ export default class Settings extends Command {
 
                 const options = queues
                     .map((queue) => ({
-                        name:
-                            lang.queues[
-                                queue.queueId as unknown as keyof typeof lang.queues
-                            ] || lang.settings.unknown_queue,
+                        name: lang.queues[queue.queueId] || lang.settings.unknown_queue,
                         value: queue.queueId.toString()
                     }))
                     .filter(
