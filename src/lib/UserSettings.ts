@@ -1,6 +1,7 @@
 import { Selectable } from 'kysely';
 import { conn } from '../types/connection';
 import { UserSettings as DBUserSettings } from '../types/database';
+import Logger from './logger';
 
 export interface ParsedUserSettings
     extends Omit<Selectable<DBUserSettings>, 'command_presets'> {
@@ -10,10 +11,11 @@ export interface ParsedUserSettings
 
 export class UserSettings {
     private cache: Map<string, ParsedUserSettings | null> = new Map();
+    private logger = new Logger('UserSettings');
 
     async get(discordId: string): Promise<ParsedUserSettings | null> {
         if (this.cache.has(discordId)) {
-            return this.cache.get(discordId)!;
+            return this.cache.get(discordId) ?? null;
         }
 
         const settings = await conn
@@ -34,7 +36,10 @@ export class UserSettings {
                     parsedSettings!.command_presets = JSON.parse(
                         parsedSettings!.command_presets
                     );
-                } catch {
+                } catch (error) {
+                    this.logger.error(
+                        `Failed to parse command_presets for user_settings ${discordId} ${parsedSettings!.command_presets} ${error}`
+                    );
                     parsedSettings!.command_presets = {};
                 }
             } else if (!parsedSettings!.command_presets) {
@@ -47,6 +52,8 @@ export class UserSettings {
     }
 
     async setLanguage(discordId: string, lang: string | null): Promise<void> {
+        // We use empty object for presets because we don't want to overwrite existing presets
+        // if the user already has them (this will happen on onDuplicateKeyUpdate)
         await conn
             .insertInto('user_settings')
             .values({

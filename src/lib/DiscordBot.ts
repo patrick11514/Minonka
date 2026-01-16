@@ -93,9 +93,12 @@ export class DiscordBot extends EventEmitter<Events> {
                 const settings = await userSettings.get(interaction.user.id);
                 if (settings) {
                     if (settings.language) {
+                        const originalLocale = interaction.locale;
                         Object.defineProperty(interaction, 'locale', {
-                            value: settings.language,
-                            writable: true
+                            get() {
+                                return settings.language ?? originalLocale;
+                            },
+                            configurable: true
                         });
                     }
 
@@ -125,8 +128,39 @@ export class DiscordBot extends EventEmitter<Events> {
                                             (result === null || result === undefined) &&
                                             !required
                                         ) {
-                                            if (defaults[name] !== undefined) {
-                                                return defaults[name];
+                                            const defaultValue = defaults[name];
+                                            if (defaultValue !== undefined) {
+                                                // Validate the default type based on the accessor being used.
+                                                let isValid = true;
+
+                                                switch (prop) {
+                                                    case 'getString':
+                                                    case 'getLocalizedString':
+                                                        isValid =
+                                                            typeof defaultValue ===
+                                                            'string';
+                                                        break;
+                                                    case 'getInteger':
+                                                    case 'getNumber':
+                                                        isValid =
+                                                            typeof defaultValue ===
+                                                            'number';
+                                                        break;
+                                                    case 'getBoolean':
+                                                        isValid =
+                                                            typeof defaultValue ===
+                                                            'boolean';
+                                                        break;
+                                                    default:
+                                                        // For other getters (e.g. getUser, getChannel),
+                                                        // do not inject defaults unless explicitly supported.
+                                                        isValid = false;
+                                                        break;
+                                                }
+
+                                                if (isValid) {
+                                                    return defaultValue;
+                                                }
                                             }
                                         }
                                         return result;
@@ -143,8 +177,7 @@ export class DiscordBot extends EventEmitter<Events> {
                     }
                 }
             } catch (e) {
-                // eslint-disable-next-line no-console
-                console.error('Failed to apply settings', e);
+                this.handleError(e, interaction);
             }
 
             command.handler(interaction).catch((error) => {

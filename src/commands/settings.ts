@@ -73,6 +73,11 @@ export default class Settings extends Command {
 
         if (group && sub && this.handlers[group] && this.handlers[group][sub]) {
             await this.handlers[group][sub](interaction);
+        } else {
+            await interaction.reply({
+                content: 'Invalid settings command. Please try again.',
+                flags: MessageFlags.Ephemeral
+            });
         }
     }
 
@@ -87,7 +92,7 @@ export default class Settings extends Command {
             const lang = getLocale(interaction.locale);
             const focused = interaction.options.getFocused(true);
             if (focused.name === 'queue') {
-                const value = focused.value.toLowerCase();
+                const value = String(focused.value ?? '').toLowerCase();
 
                 const options = queues
                     .map((queue) => ({
@@ -95,7 +100,12 @@ export default class Settings extends Command {
                         name: (lang.queues as any)[queue.queueId] || 'Unknown Queue',
                         value: queue.queueId.toString()
                     }))
-                    .filter((opt) => opt.name && opt.name.toLowerCase().includes(value));
+                    .filter(
+                        (opt) =>
+                            opt.name !== undefined &&
+                            opt.name !== null &&
+                            opt.name.toLowerCase().includes(value)
+                    );
 
                 await interaction.respond(options.slice(0, 25));
             }
