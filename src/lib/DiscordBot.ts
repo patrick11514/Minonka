@@ -15,6 +15,7 @@ import Path from 'node:path';
 import { Command } from './Command';
 import { EventEmitter } from './EventEmitter';
 import Logger from './logger';
+import { userSettings } from './UserSettings';
 
 type Events = {
     login: (client: Client<true>) => void;
@@ -80,13 +81,71 @@ export class DiscordBot extends EventEmitter<Events> {
             });
 
         //register handlers
-        this.client.on('interactionCreate', (interaction) => {
+        this.client.on('interactionCreate', async (interaction) => {
             if (!interaction.isChatInputCommand()) return;
 
             const command = instances.find(
                 (c) => c.slashCommand.name === interaction.commandName
             );
             if (!command) return;
+
+            try {
+                const settings = await userSettings.get(interaction.user.id);
+                if (settings) {
+                    if (settings.language) {
+                        Object.defineProperty(interaction, 'locale', {
+                            value: settings.language,
+                            writable: true
+                        });
+                    }
+
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const presets = settings.command_presets as any;
+                    if (presets && presets[interaction.commandName]) {
+                        const defaults = presets[interaction.commandName];
+
+                        const originalOptions = interaction.options;
+                        const handler = {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            get(target: any, prop: string, receiver: any) {
+                                const originalValue = Reflect.get(target, prop, receiver);
+
+                                if (
+                                    typeof originalValue === 'function' &&
+                                    prop.startsWith('get')
+                                ) {
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    return function (...args: any[]) {
+                                        const name = args[0];
+                                        const required = args[1];
+
+                                        const result = originalValue.apply(target, args);
+
+                                        if (
+                                            (result === null || result === undefined) &&
+                                            !required
+                                        ) {
+                                            if (defaults[name] !== undefined) {
+                                                return defaults[name];
+                                            }
+                                        }
+                                        return result;
+                                    }.bind(target);
+                                }
+                                return originalValue;
+                            }
+                        };
+
+                        const proxy = new Proxy(originalOptions, handler);
+                        Object.defineProperty(interaction, 'options', {
+                            value: proxy
+                        });
+                    }
+                }
+            } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error('Failed to apply settings', e);
+            }
 
             command.handler(interaction).catch((error) => {
                 this.handleError(error, interaction);

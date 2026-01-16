@@ -236,5 +236,15 @@ export default template.parse({
     spectator: {
         not_in_game: 'Účet %1#%2 není v žádné hře',
         reload: 'Obnovit'
+    },
+    settings: {
+        language: {
+            set: 'Jazyk nastaven na %1',
+            reset: 'Jazyk resetován na výchozí'
+        },
+        defaults: {
+            current: 'Současné přednastavení pro %1: ```json\n%2\n```',
+            updated: 'Přednastavení pro %1 aktualizováno. %2'
+        }
     }
 } satisfies z.infer<typeof template>);

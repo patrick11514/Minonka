@@ -29,6 +29,7 @@ Bootstrap the repository with these exact commands:
 ### Database Operations
 
 - `pnpm run migrate` - run database migrations (REQUIRES valid DATABASE_URL)
+- `pnpm run genDatabaseSchema` - generate database types from schema (run after migrate)
 - `./script/createMigration.sh` - create new migration file
 
 ### Application Modes
@@ -193,7 +194,14 @@ Commands extend base classes:
 - `AccountCommand` - Commands requiring linked Riot accounts
 - `AccountCommandGroup` - Grouped commands (me/name/mention patterns)
 
-Always update command help text and localizations when modifying commands.
+ALWAYS update command help text and localizations when modifying commands.
+
+- Use proper `addLocalization` for command and parameter names/descriptions.
+- For response messages (replies), use the localization system in `src/lib/langs`.
+    - Define schema in `_template.ts`.
+    - Provide translations in `english.ts` and `czech.ts`.
+    - Access via `getLocale(interaction.locale).your.key`.
+- Use `MessageFlags` enum from `discord.js` for flags (e.g. `MessageFlags.Ephemeral` instead of 64).
 
 ### Database Schema
 
@@ -203,6 +211,7 @@ Tables managed via migrations:
 - `lp` - Historical LP tracking for ranked players
 - `in_memory` - Temporary data storage
 - `emoji` - Custom emoji mappings
+- `user_settings` - User specific settings
 
 ### Debugging
 

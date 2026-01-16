@@ -38,7 +38,7 @@ export interface Lp {
     queue: string;
     rank: string;
     tier: string;
-    time: Generated<Date>;
+    time: Generated<Date | null>;
 }
 
 export interface MatchLp {
@@ -49,10 +49,17 @@ export interface MatchLp {
     matchId: string;
 }
 
+export interface UserSettings {
+    command_presets: Generated<string | null>;
+    discord_id: string;
+    language: Generated<string | null>;
+}
+
 export interface DB {
     account: Account;
     emoji: Emoji;
     in_memory: InMemory;
     lp: Lp;
     match_lp: MatchLp;
+    user_settings: UserSettings;
 }

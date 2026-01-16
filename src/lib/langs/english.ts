@@ -236,5 +236,15 @@ export default template.parse({
     spectator: {
         not_in_game: 'Account %1#%2 is not in any game',
         reload: 'Reload'
+    },
+    settings: {
+        language: {
+            set: 'Language set to %1',
+            reset: 'Language reset to default'
+        },
+        defaults: {
+            current: 'Current defaults for %1: ```json\n%2\n```',
+            updated: 'Updated defaults for %1. %2'
+        }
     }
 } satisfies z.infer<typeof template>);
