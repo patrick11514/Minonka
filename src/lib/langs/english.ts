@@ -238,6 +238,9 @@ export default template.parse({
         reload: 'Reload'
     },
     settings: {
+        invalid_command: 'Invalid settings command. Please try again.',
+        unknown_queue: 'Unknown Queue',
+        invalid_queue: 'Invalid queue specified. Please select a valid queue.',
         language: {
             set: 'Language set to %1',
             reset: 'Language reset to default'

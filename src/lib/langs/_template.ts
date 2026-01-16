@@ -166,6 +166,9 @@ export default o({
         reload: _
     }),
     settings: o({
+        invalid_command: _,
+        unknown_queue: _,
+        invalid_queue: _,
         language: o({
             set: _,
             reset: _

@@ -238,6 +238,9 @@ export default template.parse({
         reload: 'Obnovit'
     },
     settings: {
+        invalid_command: 'Neplatný příkaz nastavení. Zkuste to prosím znovu.',
+        unknown_queue: 'Neznámá fronta',
+        invalid_queue: 'Zadána neplatná fronta. Vyberte prosím platnou frontu.',
         language: {
             set: 'Jazyk nastaven na %1',
             reset: 'Jazyk resetován na výchozí'

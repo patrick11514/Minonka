@@ -74,8 +74,9 @@ export default class Settings extends Command {
         if (group && sub && this.handlers[group] && this.handlers[group][sub]) {
             await this.handlers[group][sub](interaction);
         } else {
+            const lang = getLocale(interaction.locale);
             await interaction.reply({
-                content: 'Invalid settings command. Please try again.',
+                content: lang.settings.invalid_command,
                 flags: MessageFlags.Ephemeral
             });
         }
@@ -96,8 +97,10 @@ export default class Settings extends Command {
 
                 const options = queues
                     .map((queue) => ({
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        name: (lang.queues as any)[queue.queueId] || 'Unknown Queue',
+                        name:
+                            lang.queues[
+                                queue.queueId as unknown as keyof typeof lang.queues
+                            ] || lang.settings.unknown_queue,
                         value: queue.queueId.toString()
                     }))
                     .filter(
@@ -201,7 +204,7 @@ class DefaultHistory extends SubCommand {
 
         if (queue && !queues.some((q) => q.queueId.toString() === queue)) {
             await interaction.reply({
-                content: 'Invalid queue specified. Please select a valid queue.',
+                content: lang.settings.invalid_queue,
                 flags: MessageFlags.Ephemeral
             });
             return;
