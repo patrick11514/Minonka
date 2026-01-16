@@ -5,8 +5,7 @@ import Logger from './logger';
 
 export interface ParsedUserSettings
     extends Omit<Selectable<DBUserSettings>, 'command_presets'> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    command_presets: any;
+    command_presets: Record<string, Record<string, unknown>>;
 }
 
 export class UserSettings {
@@ -71,14 +70,13 @@ export class UserSettings {
         this.cache.delete(discordId);
     }
 
-    /* eslint-disable @typescript-eslint/no-explicit-any */
     async setDefaults(
         discordId: string,
         command: string,
-        data: Record<string, any>
+        data: Record<string, unknown>
     ): Promise<void> {
         const existing = await this.get(discordId);
-        let presets = existing ? (existing.command_presets as Record<string, any>) : {};
+        let presets = existing ? existing.command_presets : {};
         if (typeof presets !== 'object' || presets === null) presets = {};
 
         if (Object.keys(data).length === 0) {

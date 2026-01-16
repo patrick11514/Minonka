@@ -6,6 +6,7 @@ import {
     CacheType,
     Client,
     CommandInteractionOption,
+    CommandInteractionOptionResolver,
     GatewayIntentBits,
     REST,
     Routes
@@ -109,8 +110,11 @@ export class DiscordBot extends EventEmitter<Events> {
 
                         const originalOptions = interaction.options;
                         const handler = {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            get(target: any, prop: string, receiver: any) {
+                            get(
+                                target: CommandInteractionOptionResolver,
+                                prop: string,
+                                receiver: unknown
+                            ) {
                                 const originalValue = Reflect.get(target, prop, receiver);
 
                                 if (
