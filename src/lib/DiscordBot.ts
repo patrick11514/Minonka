@@ -121,8 +121,9 @@ export class DiscordBot extends EventEmitter<Events> {
                                     typeof originalValue === 'function' &&
                                     prop.startsWith('get')
                                 ) {
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    return function (...args: [name: string, required?: boolean]) {
+                                    return function (
+                                        ...args: [name: string, required?: boolean]
+                                    ) {
                                         const name = args[0];
                                         const required = args[1];
 

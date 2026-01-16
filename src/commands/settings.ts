@@ -93,11 +93,12 @@ export default class Settings extends Command {
             const lang = getLocale(interaction.locale);
             const focused = interaction.options.getFocused(true);
             if (focused.name === 'queue') {
+                const options = queues
                     .map((queue) => {
-                        const key = String(queue.queueId);
+                        const key = queue.queueId;
                         const name =
                             key in lang.queues
-                                ? lang.queues[key as keyof typeof lang.queues]
+                                ? lang.queues[key]
                                 : lang.settings.unknown_queue;
 
                         return {
@@ -109,7 +110,7 @@ export default class Settings extends Command {
                         (opt) =>
                             opt.name !== undefined &&
                             opt.name !== null &&
-                            opt.name.toLowerCase().includes(value)
+                            opt.name.toLowerCase().includes(focused.value.toLowerCase())
                     );
 
                 await interaction.respond(options.slice(0, 25));
