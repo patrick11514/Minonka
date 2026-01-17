@@ -96,7 +96,7 @@ export default async (data: MatchData) => {
     // 1. PLAYER: WARD+ITEMS/GOLD+DAMAGE+MINIONS SUMM1/SUMM2 RUNE1/RUNE2 KDA NAME (champion + lvl)
     // ....
 
-    const STATSWidth = 500;
+    const STATSWidth = 450;
 
     //Bans
     const BansHeight = 70;
@@ -357,6 +357,30 @@ export default async (data: MatchData) => {
     const sword = (await getAsset(AssetType.OTHER, 'sword.png'))!;
     const coins = (await getAsset(AssetType.OTHER, 'coins.png'))!;
 
+    const SPLIT_NAME = (name: string): [string, string | undefined] => {
+        //limit = 16 length
+        //lowercase +1, uppercase +1.5, others +2
+        let length = 0;
+        for (let i = 0; i < name.length; ++i) {
+            const char = name.charAt(i);
+            if (char >= 'a' && char <= 'z') {
+                length += 1;
+            } else if (char >= 'A' && char <= 'Z') {
+                length += 1.5;
+            } else {
+                length += 2;
+            }
+
+            if (length > 16.5) {
+                if (i === 0) {
+                    return [name.substring(0, 1), name.substring(1)];
+                }
+                return [name.substring(0, i), name.substring(i)];
+            }
+        }
+        return [name, undefined];
+    };
+
     for (let i = 0; i < playerCount; ++i) {
         const player = data.info.participants[i];
         const teamIdx = player.teamId === 100 ? 0 : 1;
@@ -427,9 +451,12 @@ export default async (data: MatchData) => {
 
         const imageSize = await image.getSize();
 
+        const [riotName, nameToTag] = SPLIT_NAME(player.riotIdGameName);
+        const riotTag = (nameToTag ?? '') + '#' + player.riotIdTagline;
+
         //name
         const name = new Text(
-            player.riotIdGameName.toLowerCase(),
+            riotName,
             {
                 x: imageSize.width,
                 y: 0
@@ -444,7 +471,7 @@ export default async (data: MatchData) => {
         );
         playerBlank.addElement(name);
         const tag = new Text(
-            '#' + player.riotIdTagline,
+            riotTag,
             {
                 x: imageSize.width,
                 y: 20

@@ -1,14 +1,16 @@
 import { ZodSchema } from 'zod';
 
+export type RouteConfig = {
+    type: 'regional' | 'routing' | 'account';
+    endOfUrl: string;
+    schema: ZodSchema<unknown>;
+};
+
 export class ApiSet<
     $Inner extends Record<
         string,
         //eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (...params: any[]) => {
-            regional: boolean;
-            endOfUrl: string;
-            schema: ZodSchema<unknown>;
-        }
+        (...params: any[]) => RouteConfig
     >
 > {
     constructor(

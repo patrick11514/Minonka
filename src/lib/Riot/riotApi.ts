@@ -1,5 +1,5 @@
-import { z, ZodSchema } from 'zod';
-import { ApiSet } from './apiSet';
+import { z } from 'zod';
+import { ApiSet, RouteConfig } from './apiSet';
 import { baseRequest } from './baseRequest';
 
 type DataObject = {
@@ -24,7 +24,8 @@ type ReturnObject<$Data extends DataObject> = {
 const transform = <$Data extends DataObject>(
     data: $Data,
     regionRoot: string,
-    routingRoot: string
+    routingRoot: string,
+    accountRoot: string
 ): ReturnObject<$Data> => {
     type UnknownHell = {
         [key: string]: UnknownHell | unknown;
@@ -32,12 +33,19 @@ const transform = <$Data extends DataObject>(
 
     const resultObject = {} as UnknownHell;
 
+    const prefix = {
+        regional: regionRoot,
+        routing: routingRoot,
+        account: accountRoot
+    };
+
     for (const [key, value] of Object.entries(data as UnknownHell)) {
         if (!(value instanceof ApiSet)) {
             resultObject[key] = transform(
                 value as DataObject,
                 `${regionRoot}/${key}`,
-                `${routingRoot}/${key}`
+                `${routingRoot}/${key}`,
+                `${accountRoot}/${key}`
             );
 
             continue;
@@ -47,15 +55,12 @@ const transform = <$Data extends DataObject>(
 
         for (const [innerKey, data] of Object.entries(value.inner)) {
             (resultObject[key] as UnknownHell)[innerKey] = async (...args: unknown[]) => {
-                const { endOfUrl, schema, regional } = (
-                    data as (...params: unknown[]) => {
-                        regional: boolean;
-                        endOfUrl: string;
-                        schema: ZodSchema<unknown>;
-                    }
+                const { endOfUrl, schema, type } = (
+                    data as (...params: unknown[]) => RouteConfig
                 )(...args);
+
                 return await baseRequest(
-                    `${regional ? regionRoot : routingRoot}${value.subBaseUrl}${endOfUrl}`,
+                    `${prefix[type]}${value.subBaseUrl}${endOfUrl}`,
                     schema
                 );
             };
