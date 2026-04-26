@@ -9,14 +9,10 @@ import { SummonerData } from '$/Worker/tasks/summoner';
 import {
     CacheType,
     ChatInputCommandInteraction,
-    DMChannel,
     Locale,
     Message,
     MessageFlags,
-    NewsChannel,
-    RepliableInteraction,
-    TextChannel,
-    ThreadChannel
+    RepliableInteraction
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import fs from 'node:fs/promises';
@@ -107,11 +103,8 @@ export default class Summoner extends AccountCommand {
         let publicMessage: Message<boolean> | undefined = undefined;
         if (
             interaction.isStringSelectMenu() &&
-            interaction.channel &&
-            (interaction.channel instanceof TextChannel ||
-                interaction.channel instanceof DMChannel ||
-                interaction.channel instanceof ThreadChannel ||
-                interaction.channel instanceof NewsChannel)
+            interaction.channel?.isTextBased() &&
+            interaction.channel.isSendable()
         ) {
             publicMessage = await interaction.channel.send({
                 content: header + `Generating summoner image...`

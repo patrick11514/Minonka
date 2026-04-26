@@ -13,15 +13,11 @@ import {
     ButtonStyle,
     CacheType,
     ChatInputCommandInteraction,
-    DMChannel,
     Interaction,
     Locale,
     Message,
     MessageFlags,
-    NewsChannel,
-    RepliableInteraction,
-    TextChannel,
-    ThreadChannel
+    RepliableInteraction
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import crypto from 'node:crypto';
@@ -359,11 +355,8 @@ export default class History extends AccountCommand<CustomData> {
         let publicMessage: Message<boolean> | undefined = undefined;
         if (
             interaction.isStringSelectMenu() &&
-            interaction.channel &&
-            (interaction.channel instanceof TextChannel ||
-                interaction.channel instanceof DMChannel ||
-                interaction.channel instanceof ThreadChannel ||
-                interaction.channel instanceof NewsChannel)
+            interaction.channel?.isTextBased() &&
+            interaction.channel.isSendable()
         ) {
             publicMessage = await interaction.channel.send({
                 content:
@@ -379,6 +372,8 @@ export default class History extends AccountCommand<CustomData> {
                 flags: MessageFlags.Ephemeral
             });
             await interaction.deleteReply();
+        } else {
+            await interaction.deferReply();
         }
 
         const result = await this.getFiles(

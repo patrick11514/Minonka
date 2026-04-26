@@ -15,14 +15,10 @@ import {
     ButtonStyle,
     CacheType,
     ChatInputCommandInteraction,
-    DMChannel,
     Locale,
     Message,
     MessageFlags,
-    NewsChannel,
-    RepliableInteraction,
-    TextChannel,
-    ThreadChannel
+    RepliableInteraction
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import fs from 'node:fs/promises';
@@ -206,7 +202,7 @@ export default class Clash extends Command {
         }
 
         const header = `<@${interaction.user.id}> ${account.gameName}#${account.tagLine} (${region}):\n`;
-        this.handleTeam(interaction, team.data[0].teamId, region, header);
+        await this.handleTeam(interaction, team.data[0].teamId, region, header);
     }
 
     private async handleTeam(
@@ -277,11 +273,8 @@ export default class Clash extends Command {
         let publicMessage: Message<boolean> | undefined = undefined;
         if (
             interaction.isStringSelectMenu() &&
-            interaction.channel &&
-            (interaction.channel instanceof TextChannel ||
-                interaction.channel instanceof DMChannel ||
-                interaction.channel instanceof ThreadChannel ||
-                interaction.channel instanceof NewsChannel)
+            interaction.channel?.isTextBased() &&
+            interaction.channel.isSendable()
         ) {
             publicMessage = await interaction.channel.send({
                 content: headerPrefix + `Generating team image...`

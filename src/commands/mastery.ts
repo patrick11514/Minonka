@@ -13,15 +13,11 @@ import {
     APISelectMenuOption,
     CacheType,
     ChatInputCommandInteraction,
-    DMChannel,
     Interaction,
     Locale,
     MessageFlags,
-    NewsChannel,
     RepliableInteraction,
-    StringSelectMenuBuilder,
-    TextChannel,
-    ThreadChannel
+    StringSelectMenuBuilder
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import crypto from 'node:crypto';
@@ -180,11 +176,8 @@ export default class Mastery extends AccountCommand {
 
         if (
             interaction.isStringSelectMenu() &&
-            interaction.channel &&
-            (interaction.channel instanceof TextChannel ||
-                interaction.channel instanceof DMChannel ||
-                interaction.channel instanceof ThreadChannel ||
-                interaction.channel instanceof NewsChannel)
+            interaction.channel?.isTextBased() &&
+            interaction.channel.isSendable()
         ) {
             await interaction.channel.send({
                 content: header,

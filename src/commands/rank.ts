@@ -9,15 +9,11 @@ import { RankData } from '$/Worker/tasks/rank';
 import {
     CacheType,
     ChatInputCommandInteraction,
-    DMChannel,
     Interaction,
     Locale,
     Message,
     MessageFlags,
-    NewsChannel,
-    RepliableInteraction,
-    TextChannel,
-    ThreadChannel
+    RepliableInteraction
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import fs from 'node:fs/promises';
@@ -121,11 +117,8 @@ export default class Rank extends AccountCommand {
         let publicMessage: Message<boolean> | undefined = undefined;
         if (
             interaction.isStringSelectMenu() &&
-            interaction.channel &&
-            (interaction.channel instanceof TextChannel ||
-                interaction.channel instanceof DMChannel ||
-                interaction.channel instanceof ThreadChannel ||
-                interaction.channel instanceof NewsChannel)
+            interaction.channel?.isTextBased() &&
+            interaction.channel.isSendable()
         ) {
             publicMessage = await interaction.channel.send({
                 content: header + `Generating rank image...`
