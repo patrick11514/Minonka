@@ -60,6 +60,8 @@ export default template.parse({
             RANKED_SOLO_5x5: 'Solo/Duo',
             RANKED_FLEX_SR: 'Flex'
         },
+        generatingImage: 'Generating rank image...',
+        sentToChannel: 'Sent to channel',
         tiers: {
             IRON: 'Iron',
             BRONZE: 'Bronze',
@@ -87,6 +89,7 @@ export default template.parse({
         buttonInfoText: 'Showing %1-%2 last matches',
         place: 'Place',
         team: 'Team',
+        sentToChannel: 'Sent to channel',
         subTeam: {
             sentinel: 'Sentinel',
             minions: 'Minion',
@@ -105,6 +108,8 @@ export default template.parse({
         registration: 'Registration',
         start: 'Start',
         successMessage: "Here's the team id: `%1`",
+        generatingImage: 'Generating team image...',
+        sentToChannel: 'Sent to channel',
         canceled: 'Canceled',
         noTeam: "This player isn't in any team",
         positions: {
@@ -231,11 +236,18 @@ export default template.parse({
         next: 'Next level',
         prev: 'Previous level',
         lastPlayed: 'Last played',
-        atTime: 'at'
+        atTime: 'at',
+        sentToChannel: 'Sent to channel'
     },
     spectator: {
         not_in_game: 'Account %1#%2 is not in any game',
-        reload: 'Reload'
+        reload: 'Reload',
+        generatingImage: 'Generating spectator image...',
+        sentToChannel: 'Sent to channel'
+    },
+    summoner: {
+        generatingImage: 'Generating summoner image...',
+        sentToChannel: 'Sent to channel'
     },
     settings: {
         invalid_command: 'Invalid settings command. Please try again.',

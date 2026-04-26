@@ -32,6 +32,7 @@ type ButtonData = {
     queue: string | null;
     count: number;
     offset: number;
+    header: string;
 };
 
 type CustomData = {
@@ -243,11 +244,14 @@ export default class History extends AccountCommand<CustomData> {
         interaction: RepliableInteraction<CacheType>,
         jobIds: OmitUnion<DePromise<ReturnType<typeof this.getFiles>>, string>,
         row: ActionRowBuilder<ButtonBuilder>,
-        lang: ReturnType<typeof getLocale>
+        lang: ReturnType<typeof getLocale>,
+        contentPrefix: string
     ) {
-        await interaction.deferReply({
-            flags: editMessage instanceof Message ? MessageFlags.Ephemeral : undefined
-        });
+        if (!interaction.deferred && !interaction.replied) {
+            await interaction.deferReply({
+                flags: editMessage instanceof Message ? MessageFlags.Ephemeral : undefined
+            });
+        }
 
         let dontUpdate = false;
 
@@ -259,32 +263,41 @@ export default class History extends AccountCommand<CustomData> {
                 jobIds.map(async (jobId) => {
                     const start = Date.now();
                     const path = await process.workerServer.wait(jobId);
-                    if (!dontUpdate && Date.now() - start > 100)
-                        await interaction.editReply({
-                            content: replacePlaceholders(
+                    if (!dontUpdate && Date.now() - start > 100) {
+                        const content =
+                            contentPrefix +
+                            replacePlaceholders(
                                 lang.match.loading,
                                 (++progress).toString(),
                                 max.toString()
-                            )
-                        });
+                            );
+                        if (editMessage instanceof Message) {
+                            await editMessage.edit({ content });
+                        } else {
+                            await interaction.editReply({ content });
+                        }
+                    }
                     return path;
                 })
             );
 
-            await interaction.editReply({
-                content: lang.match.uploading
-            });
+            const uploadingContent = contentPrefix + lang.match.uploading;
+            if (editMessage instanceof Message) {
+                await editMessage.edit({ content: uploadingContent });
+            } else {
+                await interaction.editReply({ content: uploadingContent });
+            }
 
             if (editMessage instanceof Message) {
                 await editMessage.edit({
-                    content: '',
+                    content: contentPrefix,
                     files,
                     components: [row]
                 });
-                await interaction.deleteReply();
+                if (interaction.deferred) await interaction.deleteReply();
             } else {
                 await editMessage.editReply({
-                    content: '',
+                    content: contentPrefix,
                     files,
                     components: [row]
                 });
@@ -296,17 +309,33 @@ export default class History extends AccountCommand<CustomData> {
 
             if (e instanceof Error) {
                 l.error(e);
-                await interaction.editReply({
-                    content: replacePlaceholders(lang.workerError, e.message)
-                });
+                const content =
+                    contentPrefix + replacePlaceholders(lang.workerError, e.message);
+
+                if (editMessage instanceof Message) {
+                    await editMessage.edit({
+                        content
+                    });
+                } else {
+                    await interaction.editReply({
+                        content
+                    });
+                }
 
                 process.discordBot.handleError(e, interaction);
                 return;
             }
 
-            await interaction.editReply({
-                content: lang.genericError
-            });
+            const content = contentPrefix + lang.genericError;
+            if (editMessage instanceof Message) {
+                await editMessage.edit({
+                    content
+                });
+            } else {
+                await interaction.editReply({
+                    content
+                });
+            }
 
             process.discordBot.handleError(e, interaction);
             return;
@@ -321,6 +350,31 @@ export default class History extends AccountCommand<CustomData> {
     ) {
         const lang = getLocale(interaction.locale);
         const { queue, count, offset } = customData;
+        const header = `<@${interaction.user.id}> ${account.gameName}#${account.tagLine} (${lang.regions[region] ?? region}):\n`;
+
+        let publicMessage: Message<boolean> | undefined = undefined;
+        if (
+            interaction.isStringSelectMenu() &&
+            interaction.channel?.isTextBased() &&
+            interaction.channel.isSendable()
+        ) {
+            publicMessage = await interaction.channel.send({
+                content:
+                    header +
+                    replacePlaceholders(
+                        lang.match.loading,
+                        '0',
+                        customData.count.toString()
+                    )
+            });
+            await interaction.reply({
+                content: lang.match.sentToChannel,
+                flags: MessageFlags.Ephemeral
+            });
+            await interaction.deleteReply();
+        } else {
+            await interaction.deferReply();
+        }
 
         const result = await this.getFiles(
             interaction.locale,
@@ -332,10 +386,14 @@ export default class History extends AccountCommand<CustomData> {
         );
 
         if (typeof result === 'string') {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: result
-            });
+            const payload = {
+                content: header + result
+            };
+            if (publicMessage) {
+                await publicMessage.edit(payload);
+            } else {
+                await interaction.editReply(payload);
+            }
             return;
         }
 
@@ -348,12 +406,31 @@ export default class History extends AccountCommand<CustomData> {
             region,
             queue: queue || '',
             count,
-            offset
+            offset,
+            header
         });
 
         const row = this.generateButtonRow(lang, key, count, offset, result.length);
 
-        await this.handleMessages(interaction, interaction, result, row, lang);
+        if (publicMessage) {
+            await this.handleMessages(
+                publicMessage,
+                interaction,
+                result,
+                row,
+                lang,
+                header
+            );
+        } else {
+            await this.handleMessages(
+                interaction,
+                interaction,
+                result,
+                row,
+                lang,
+                header
+            );
+        }
     }
 
     async handler(interaction: ChatInputCommandInteraction) {
@@ -417,7 +494,7 @@ export default class History extends AccountCommand<CustomData> {
         }
 
         let { offset } = data;
-        const { count, puuid, region, queue } = data;
+        const { count, puuid, region, queue, header } = data;
 
         const command = id[2];
         const originalOffset = offset;
@@ -444,7 +521,8 @@ export default class History extends AccountCommand<CustomData> {
             region,
             queue: queue || '',
             count,
-            offset
+            offset,
+            header
         });
 
         const result = await this.getFiles(
@@ -474,6 +552,13 @@ export default class History extends AccountCommand<CustomData> {
 
         const row = this.generateButtonRow(lang, key, count, offset, result.length);
 
-        await this.handleMessages(interaction.message, interaction, result, row, lang);
+        await this.handleMessages(
+            interaction.message,
+            interaction,
+            result,
+            row,
+            lang,
+            header
+        );
     }
 }

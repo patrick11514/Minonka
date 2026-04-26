@@ -16,6 +16,7 @@ import {
     CacheType,
     ChatInputCommandInteraction,
     Locale,
+    Message,
     MessageFlags,
     RepliableInteraction
 } from 'discord.js';
@@ -183,11 +184,12 @@ export default class Clash extends Command {
         account: Selectable<Account>,
         region: Region
     ) {
+        const lang = getLocale(interaction.locale);
         const team = await api[region].clash.players(account.puuid);
         if (!team.status) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(getLocale(interaction.locale), team)
+                content: formatErrorResponse(lang, team)
             });
             return;
         }
@@ -195,18 +197,20 @@ export default class Clash extends Command {
         if (team.data.length === 0) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
-                content: getLocale(interaction.locale).clash.noTeam
+                content: lang.clash.noTeam
             });
             return;
         }
 
-        this.handleTeam(interaction, team.data[0].teamId, region);
+        const header = `<@${interaction.user.id}> ${account.gameName}#${account.tagLine} (${lang.regions[region] ?? region}):\n`;
+        await this.handleTeam(interaction, team.data[0].teamId, region, header);
     }
 
     private async handleTeam(
         interaction: RepliableInteraction<CacheType>,
         teamId: string,
-        region: Region
+        region: Region,
+        headerPrefix: string = ''
     ) {
         const lang = getLocale(interaction.locale);
 
@@ -267,7 +271,23 @@ export default class Clash extends Command {
             return;
         }
 
-        await interaction.deferReply();
+        let publicMessage: Message<boolean> | undefined = undefined;
+        if (
+            interaction.isStringSelectMenu() &&
+            interaction.channel?.isTextBased() &&
+            interaction.channel.isSendable()
+        ) {
+            publicMessage = await interaction.channel.send({
+                content: headerPrefix + lang.clash.generatingImage
+            });
+            await interaction.reply({
+                content: lang.clash.sentToChannel,
+                flags: MessageFlags.Ephemeral
+            });
+            await interaction.deleteReply();
+        } else {
+            await interaction.deferReply();
+        }
 
         try {
             const result = await process.workerServer.addJobWait('team', {
@@ -294,30 +314,50 @@ export default class Clash extends Command {
                 )
             );
 
-            await interaction.editReply({
-                content: replacePlaceholders(lang.clash.successMessage, team.data.id),
+            const payload = {
+                content:
+                    headerPrefix +
+                    replacePlaceholders(lang.clash.successMessage, team.data.id),
                 files: [result],
                 components: [rankRow, clashHistoryRow]
-            });
+            };
+
+            if (publicMessage) {
+                await publicMessage.edit(payload);
+            } else {
+                await interaction.editReply(payload);
+            }
 
             await fs.unlink(result);
         } catch (e) {
             if (e instanceof Error) {
                 l.error(e);
-                await interaction.editReply({
-                    content: replacePlaceholders(
+                const content =
+                    headerPrefix +
+                    replacePlaceholders(
                         getLocale(interaction.locale).workerError,
                         e.message
-                    )
-                });
+                    );
+                if (publicMessage) {
+                    await publicMessage.edit({ content });
+                } else {
+                    await interaction.editReply({
+                        content
+                    });
+                }
 
                 process.discordBot.handleError(e, interaction);
                 return;
             }
 
-            await interaction.editReply({
-                content: getLocale(interaction.locale).genericError
-            });
+            const content = headerPrefix + getLocale(interaction.locale).genericError;
+            if (publicMessage) {
+                await publicMessage.edit({ content });
+            } else {
+                await interaction.editReply({
+                    content
+                });
+            }
 
             process.discordBot.handleError(e, interaction);
             return;

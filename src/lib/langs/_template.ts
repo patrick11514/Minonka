@@ -67,6 +67,8 @@ export default o({
             RANKED_SOLO_5x5: _,
             RANKED_FLEX_SR: _
         }),
+        generatingImage: _,
+        sentToChannel: _,
         tiers: o(
             Object.fromEntries(tier.map((tier) => [tier, _])) as Record<
                 (typeof tier)[number],
@@ -88,6 +90,7 @@ export default o({
         team: _,
         loading: _,
         uploading: _,
+        sentToChannel: _,
         subTeam: o({
             poros: _,
             minions: _,
@@ -106,6 +109,8 @@ export default o({
         registration: _,
         start: _,
         successMessage: _,
+        generatingImage: _,
+        sentToChannel: _,
         canceled: _,
         noTeam: _,
         positions: o(
@@ -159,11 +164,18 @@ export default o({
         next: _,
         prev: _,
         lastPlayed: _,
-        atTime: _
+        atTime: _,
+        sentToChannel: _
     }),
     spectator: o({
         not_in_game: _,
-        reload: _
+        reload: _,
+        generatingImage: _,
+        sentToChannel: _
+    }),
+    summoner: o({
+        generatingImage: _,
+        sentToChannel: _
     }),
     settings: o({
         invalid_command: _,

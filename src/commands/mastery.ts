@@ -9,15 +9,15 @@ import { Region } from '$/lib/Riot/types';
 import { discordLocaleToJSLocale, getChampionsMap } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import {
-    RepliableInteraction,
+    ActionRowBuilder,
+    APISelectMenuOption,
     CacheType,
     ChatInputCommandInteraction,
-    Locale,
-    ActionRowBuilder,
-    StringSelectMenuBuilder,
     Interaction,
-    APISelectMenuOption,
-    MessageFlags
+    Locale,
+    MessageFlags,
+    RepliableInteraction,
+    StringSelectMenuBuilder
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import crypto from 'node:crypto';
@@ -30,6 +30,7 @@ type InMemory = {
     puuid: string;
     region: Region;
     offset: number;
+    header: string;
 };
 
 export default class Mastery extends AccountCommand {
@@ -146,13 +147,16 @@ export default class Mastery extends AccountCommand {
             return;
         }
 
+        const header = `<@${interaction.user.id}> ${user.gameName}#${user.tagLine} (${lang.regions[region] ?? region}):\n`;
+
         const key = crypto.randomBytes(16).toString('hex');
         const memory = process.inMemory.getInstance<InMemory>();
         memory.set(key, {
             discordId: interaction.user.id,
             puuid: user.puuid,
             region: region,
-            offset: 0
+            offset: 0,
+            header: header
         });
 
         const row = await this.generateComponents(
@@ -170,9 +174,26 @@ export default class Mastery extends AccountCommand {
             return;
         }
 
-        await interaction.reply({
-            components: [row]
-        });
+        if (
+            interaction.isStringSelectMenu() &&
+            interaction.channel?.isTextBased() &&
+            interaction.channel.isSendable()
+        ) {
+            await interaction.channel.send({
+                content: header,
+                components: [row]
+            });
+            await interaction.reply({
+                content: lang.mastery.sentToChannel,
+                flags: MessageFlags.Ephemeral
+            });
+            await interaction.deleteReply();
+        } else {
+            await interaction.reply({
+                content: header,
+                components: [row]
+            });
+        }
     }
 
     private async onSelectMenu(interaction: Interaction) {
@@ -283,7 +304,7 @@ export default class Mastery extends AccountCommand {
 **${lang.mastery.lastPlayed}**: ${date.toLocaleDateString(locale)} ${lang.mastery.atTime} ${date.toLocaleTimeString(locale)}`;
 
         await interaction.message.edit({
-            content: message
+            content: data.header + message
         });
 
         await interaction.deferUpdate();
