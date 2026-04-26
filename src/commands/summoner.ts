@@ -9,9 +9,14 @@ import { SummonerData } from '$/Worker/tasks/summoner';
 import {
     CacheType,
     ChatInputCommandInteraction,
+    DMChannel,
     Locale,
+    Message,
     MessageFlags,
-    RepliableInteraction
+    NewsChannel,
+    RepliableInteraction,
+    TextChannel,
+    ThreadChannel
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import fs from 'node:fs/promises';
@@ -97,30 +102,65 @@ export default class Summoner extends AccountCommand {
             locale: interaction.locale
         } satisfies SummonerData;
 
-        await interaction.deferReply();
+        const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${region}):\n`;
+
+        let publicMessage: Message<boolean> | undefined = undefined;
+        if (
+            interaction.isStringSelectMenu() &&
+            interaction.channel &&
+            (interaction.channel instanceof TextChannel ||
+                interaction.channel instanceof DMChannel ||
+                interaction.channel instanceof ThreadChannel ||
+                interaction.channel instanceof NewsChannel)
+        ) {
+            publicMessage = await interaction.channel.send({
+                content: header + `Generating summoner image...`
+            });
+            await interaction.reply({
+                content: 'Sent to channel',
+                flags: MessageFlags.Ephemeral
+            });
+            await interaction.deleteReply();
+        } else {
+            await interaction.deferReply();
+        }
 
         try {
             const result = await process.workerServer.addJobWait('summoner', data);
 
-            await interaction.editReply({
-                files: [result]
-            });
+            if (publicMessage) {
+                await publicMessage.edit({
+                    content: header,
+                    files: [result]
+                });
+            } else {
+                await interaction.editReply({
+                    content: header,
+                    files: [result]
+                });
+            }
 
             await fs.unlink(result);
         } catch (e) {
             if (e instanceof Error) {
                 l.error(e);
-                await interaction.editReply({
-                    content: replacePlaceholders(lang.workerError, e.message)
-                });
+                const content = header + replacePlaceholders(lang.workerError, e.message);
+                if (publicMessage) {
+                    await publicMessage.edit({ content });
+                } else {
+                    await interaction.editReply({ content });
+                }
 
                 process.discordBot.handleError(e, interaction);
                 return;
             }
 
-            await interaction.editReply({
-                content: lang.genericError
-            });
+            const content = header + lang.genericError;
+            if (publicMessage) {
+                await publicMessage.edit({ content });
+            } else {
+                await interaction.editReply({ content });
+            }
 
             process.discordBot.handleError(e, interaction);
             return;
