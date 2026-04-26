@@ -53,6 +53,8 @@ export default template.parse({
             RANKED_SOLO_5x5: 'Solo/Tandem',
             RANKED_FLEX_SR: 'Flex'
         },
+        generatingImage: 'Generuji rank obrázek...',
+        sentToChannel: 'Odesláno do kanálu',
         tiers: {
             IRON: 'Železná',
             BRONZE: 'Bronzová',
@@ -80,6 +82,7 @@ export default template.parse({
         buttonInfoText: 'Zobrazuji %1-%2 posledních zápasů',
         place: 'Místo',
         team: 'Tým',
+        sentToChannel: 'Odesláno do kanálu',
         subTeam: {
             wolves: 'Vlk',
             gromp: 'Ropušák',
@@ -98,6 +101,8 @@ export default template.parse({
         registration: 'Registrace',
         start: 'Začátek',
         successMessage: 'Zde je id týmu: `%1`',
+        generatingImage: 'Generuji týmový obrázek...',
+        sentToChannel: 'Odesláno do kanálu',
         canceled: 'Zrušený',
         noTeam: 'Tento hráč není v žádném týmu',
         positions: {
@@ -231,11 +236,18 @@ export default template.parse({
         next: 'Další stránka',
         prev: 'Předchozí stránka',
         lastPlayed: 'Naposledy hrán',
-        atTime: 'v'
+        atTime: 'v',
+        sentToChannel: 'Odesláno do kanálu'
     },
     spectator: {
         not_in_game: 'Účet %1#%2 není v žádné hře',
-        reload: 'Obnovit'
+        reload: 'Obnovit',
+        generatingImage: 'Generuji spectator obrázek...',
+        sentToChannel: 'Odesláno do kanálu'
+    },
+    summoner: {
+        generatingImage: 'Generuji summoner obrázek...',
+        sentToChannel: 'Odesláno do kanálu'
     },
     settings: {
         invalid_command: 'Neplatný příkaz nastavení. Zkuste to prosím znovu.',

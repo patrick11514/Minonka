@@ -130,7 +130,7 @@ export default class Spectator extends AccountCommand {
             mapId: spectator.data.mapId
         } satisfies SpectatorData;
 
-        const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${region}):\n`;
+        const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
         if (
@@ -139,10 +139,10 @@ export default class Spectator extends AccountCommand {
             interaction.channel.isSendable()
         ) {
             publicMessage = await interaction.channel.send({
-                content: header + `Generating spectator image...`
+                content: header + lang.spectator.generatingImage
             });
             await interaction.reply({
-                content: 'Sent to channel',
+                content: lang.spectator.sentToChannel,
                 flags: MessageFlags.Ephemeral
             });
             await interaction.deleteReply();

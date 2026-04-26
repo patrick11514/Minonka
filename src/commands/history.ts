@@ -350,7 +350,7 @@ export default class History extends AccountCommand<CustomData> {
     ) {
         const lang = getLocale(interaction.locale);
         const { queue, count, offset } = customData;
-        const header = `<@${interaction.user.id}> ${account.gameName}#${account.tagLine} (${region}):\n`;
+        const header = `<@${interaction.user.id}> ${account.gameName}#${account.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
         if (
@@ -368,7 +368,7 @@ export default class History extends AccountCommand<CustomData> {
                     )
             });
             await interaction.reply({
-                content: 'Sent to channel',
+                content: lang.match.sentToChannel,
                 flags: MessageFlags.Ephemeral
             });
             await interaction.deleteReply();
@@ -392,10 +392,7 @@ export default class History extends AccountCommand<CustomData> {
             if (publicMessage) {
                 await publicMessage.edit(payload);
             } else {
-                await interaction.reply({
-                    flags: MessageFlags.Ephemeral,
-                    ...payload
-                });
+                await interaction.editReply(payload);
             }
             return;
         }

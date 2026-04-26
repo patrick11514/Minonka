@@ -184,11 +184,12 @@ export default class Clash extends Command {
         account: Selectable<Account>,
         region: Region
     ) {
+        const lang = getLocale(interaction.locale);
         const team = await api[region].clash.players(account.puuid);
         if (!team.status) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(getLocale(interaction.locale), team)
+                content: formatErrorResponse(lang, team)
             });
             return;
         }
@@ -196,12 +197,12 @@ export default class Clash extends Command {
         if (team.data.length === 0) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
-                content: getLocale(interaction.locale).clash.noTeam
+                content: lang.clash.noTeam
             });
             return;
         }
 
-        const header = `<@${interaction.user.id}> ${account.gameName}#${account.tagLine} (${region}):\n`;
+        const header = `<@${interaction.user.id}> ${account.gameName}#${account.tagLine} (${lang.regions[region] ?? region}):\n`;
         await this.handleTeam(interaction, team.data[0].teamId, region, header);
     }
 
@@ -277,10 +278,10 @@ export default class Clash extends Command {
             interaction.channel.isSendable()
         ) {
             publicMessage = await interaction.channel.send({
-                content: headerPrefix + `Generating team image...`
+                content: headerPrefix + lang.clash.generatingImage
             });
             await interaction.reply({
-                content: 'Sent to channel',
+                content: lang.clash.sentToChannel,
                 flags: MessageFlags.Ephemeral
             });
             await interaction.deleteReply();

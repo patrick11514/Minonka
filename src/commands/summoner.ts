@@ -98,7 +98,7 @@ export default class Summoner extends AccountCommand {
             locale: interaction.locale
         } satisfies SummonerData;
 
-        const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${region}):\n`;
+        const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
         if (
@@ -107,10 +107,10 @@ export default class Summoner extends AccountCommand {
             interaction.channel.isSendable()
         ) {
             publicMessage = await interaction.channel.send({
-                content: header + `Generating summoner image...`
+                content: header + lang.summoner.generatingImage
             });
             await interaction.reply({
-                content: 'Sent to channel',
+                content: lang.summoner.sentToChannel,
                 flags: MessageFlags.Ephemeral
             });
             await interaction.deleteReply();

@@ -147,7 +147,7 @@ export default class Mastery extends AccountCommand {
             return;
         }
 
-        const header = `<@${interaction.user.id}> ${user.gameName}#${user.tagLine} (${region}):\n`;
+        const header = `<@${interaction.user.id}> ${user.gameName}#${user.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         const key = crypto.randomBytes(16).toString('hex');
         const memory = process.inMemory.getInstance<InMemory>();
@@ -184,7 +184,7 @@ export default class Mastery extends AccountCommand {
                 components: [row]
             });
             await interaction.reply({
-                content: 'Sent to channel',
+                content: lang.mastery.sentToChannel,
                 flags: MessageFlags.Ephemeral
             });
             await interaction.deleteReply();

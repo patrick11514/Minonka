@@ -112,7 +112,7 @@ export default class Rank extends AccountCommand {
             locale: interaction.locale
         } satisfies RankData;
 
-        const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${region}):\n`;
+        const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
         if (
@@ -121,10 +121,10 @@ export default class Rank extends AccountCommand {
             interaction.channel.isSendable()
         ) {
             publicMessage = await interaction.channel.send({
-                content: header + `Generating rank image...`
+                content: header + lang.rank.generatingImage
             });
             await interaction.reply({
-                content: 'Sent to channel',
+                content: lang.rank.sentToChannel,
                 flags: MessageFlags.Ephemeral
             });
             await interaction.deleteReply();
