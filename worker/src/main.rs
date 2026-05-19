@@ -1,9 +1,14 @@
+use std::fs;
+
 use futures_util::{SinkExt, StreamExt};
+use serde_json::json;
 use tokio::time::{Duration, sleep};
 use tokio_tungstenite::{
     connect_async,
     tungstenite::{client::IntoClientRequest, protocol::Message},
 };
+
+use worker::tasks;
 
 #[tokio::main]
 async fn main() {
@@ -58,22 +63,26 @@ async fn setup_websocket(url: &str) -> Result<(), Box<dyn std::error::Error>> {
             let str_data = parts[3];
 
             println!("Got job '{}' with id '{}'", job_name, job_id);
-            println!("Job data: {}", str_data);
 
-            // TODO: Route the job to your image processing modules here
-            // Example:
-            // let result = handle_job(job_name, str_data).await;
+            fs::write(format!("test_files/{}.json", job_name), str_data).ok();
 
-            // For now, we simulate a successful empty completion
-            let mock_result_json = "\"{}\""; // In reality, this is the saved file path
-
-            let response = format!("completed;{};{};{}", job_id, mock_result_json, start_date);
+            let response = match tasks::dispatch(job_name, str_data) {
+                Ok(result) => {
+                    let json = serde_json::to_string(&result)
+                        .unwrap_or_else(|_| json!({ "type": "temp", "data": "" }).to_string());
+                    format!("completed;{};{};{}", job_id, json, start_date)
+                }
+                Err(err) => {
+                    let message = err.to_string().replace(';', ",");
+                    format!("error;{};{};;{}", job_id, message, start_date)
+                }
+            };
 
             // Send the result back to the server
             if let Err(e) = write.send(Message::Text(response.into())).await {
                 eprintln!("Failed to send job completion: {}", e);
             } else {
-                println!("Job '{}' with id '{}' completed", job_name, job_id);
+                println!("Job '{}' with id '{}' finished", job_name, job_id);
             }
         }
     }

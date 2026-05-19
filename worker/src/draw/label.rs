@@ -1,5 +1,5 @@
-use crate::lib::draw::color::Color;
-use crate::lib::draw::renderable::Renderable;
+use crate::draw::color::Color;
+use crate::draw::renderable::Renderable;
 use ab_glyph::{FontRef, PxScale};
 use image::RgbaImage;
 use imageproc::drawing::{draw_text_mut, text_size};

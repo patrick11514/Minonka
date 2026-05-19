@@ -1,6 +1,8 @@
-use crate::lib::draw::{container::Container, renderable::Renderable};
+use crate::draw::{container::Container, renderable::Renderable};
 use ab_glyph::FontRef;
+use image::DynamicImage;
 use image::RgbaImage;
+use std::io::Cursor;
 
 pub struct MasterCanvas<'a> {
     background: RgbaImage,
@@ -32,5 +34,21 @@ impl<'a> MasterCanvas<'a> {
 
     pub fn save(&self, path: &str) {
         self.background.save(path).unwrap();
+    }
+
+    pub fn save_checked(&self, path: &str) -> Result<(), image::ImageError> {
+        self.background.save(path)
+    }
+
+    pub fn to_png_bytes(&self) -> Result<Vec<u8>, image::ImageError> {
+        let mut bytes = Vec::new();
+        let mut cursor = Cursor::new(&mut bytes);
+        DynamicImage::ImageRgba8(self.background.clone())
+            .write_to(&mut cursor, image::ImageFormat::Png)?;
+        Ok(bytes)
+    }
+
+    pub fn dimensions(&self) -> (u32, u32) {
+        (self.background.width(), self.background.height())
     }
 }

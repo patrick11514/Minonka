@@ -1,4 +1,4 @@
-use crate::lib::draw::renderable::Renderable;
+use crate::draw::renderable::Renderable;
 
 pub struct Container {
     x: u32,

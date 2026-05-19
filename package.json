@@ -13,6 +13,7 @@
         "start:register": "NODE_ENV=production node ./build/index.js --register",
         "start:worker": "NODE_ENV=production node ./build/Worker/Worker.js",
         "start:worker:remote": "NODE_ENV=production WORKER_MODE=remote node ./build/Worker/Worker.js",
+        "worker:export-bindings": "cd worker && cargo test export_bindings",
         "genDatabaseSchema": "kysely-codegen --out-file ./src/types/database.ts",
         "format": "prettier --write .",
         "lint": "prettier --check . && eslint src",
