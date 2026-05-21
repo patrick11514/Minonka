@@ -6,6 +6,7 @@ pub enum TaskError {
     UnknownJob(String),
     NotImplemented(&'static str),
     Runtime(String),
+    Reqwest(reqwest::Error),
 }
 
 impl std::fmt::Display for TaskError {
@@ -17,6 +18,7 @@ impl std::fmt::Display for TaskError {
             Self::UnknownJob(job) => write!(f, "Unknown job '{job}'"),
             Self::NotImplemented(task) => write!(f, "Task '{task}' is not implemented yet"),
             Self::Runtime(message) => write!(f, "Runtime error: {message}"),
+            Self::Reqwest(err) => write!(f, "Reqwest error: {err}"),
         }
     }
 }
@@ -38,6 +40,12 @@ impl From<std::io::Error> for TaskError {
 impl From<image::ImageError> for TaskError {
     fn from(value: image::ImageError) -> Self {
         Self::Image(value)
+    }
+}
+
+impl From<reqwest::Error> for TaskError {
+    fn from(value: reqwest::Error) -> Self {
+        Self::Reqwest(value)
     }
 }
 

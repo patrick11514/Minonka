@@ -38,12 +38,6 @@ impl WorkerJob {
 pub enum FileResult {
     #[serde(rename = "temp")]
     Temp { data: String },
-    #[serde(rename = "persistent")]
-    Persistent {
-        name: String,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        data: Option<String>,
-    },
     #[serde(rename = "local")]
     Local { path: String },
 }

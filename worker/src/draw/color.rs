@@ -12,7 +12,6 @@ pub enum Color {
 }
 
 impl Color {
-    /// Resolves the color instantly for the render engine
     #[inline(always)]
     pub fn to_rgba(self) -> Rgba<u8> {
         match self {
@@ -25,7 +24,6 @@ impl Color {
         }
     }
 
-    /// Parses a hex string into raw bytes DURING INITIALIZATION, not rendering
     pub fn from_hex(hex: &str) -> Self {
         let hex = hex.trim_start_matches('#');
         if hex.len() == 6 {
@@ -34,7 +32,6 @@ impl Color {
             let b = u8::from_str_radix(&hex[4..6], 16).unwrap_or(255);
             Color::Rgba(r, g, b, 255)
         } else {
-            // Fallback or handle alpha channels if needed
             Color::White
         }
     }

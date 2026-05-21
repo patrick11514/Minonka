@@ -255,14 +255,14 @@ impl Task for RankTask {
                 0.0
             };
 
-            column.add_child(Box::new(Label::new(
+            column.child(Label::new(
                 format!("WR: {:.2}%", wr),
                 40,
                 if wr >= 50.0 { Color::Green } else { Color::Red },
                 Alignment::Middle,
                 column_width / 2,
                 icon_bottom + 80,
-            )));
+            ));
 
             column.add_child(Box::new(Label::new(
                 format!("Wins - {}", rank.wins),

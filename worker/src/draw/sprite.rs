@@ -67,4 +67,8 @@ impl Renderable for Sprite {
             new_offset_y as i64,
         );
     }
+
+    fn size(&self, font: &ab_glyph::FontRef) -> (u32, u32) {
+        (self.image.width(), self.image.height())
+    }
 }

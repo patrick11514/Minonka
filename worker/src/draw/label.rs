@@ -17,25 +17,45 @@ pub struct Label {
     alignment: Alignment,
     x: u32,
     y: u32,
+    bold: bool,
 }
 
 impl Label {
-    pub fn new(
-        text: String,
-        text_size: u32,
-        color: Color,
-        alignment: Alignment,
-        x: u32,
-        y: u32,
-    ) -> Self {
+    pub fn new(text: impl Into<String>) -> Self {
         Self {
-            text,
-            text_size,
-            color,
-            alignment,
-            x,
-            y,
+            text: text.into(),
+            text_size: 24,
+            color: Color::White,
+            alignment: Alignment::Start,
+            x: 0,
+            y: 0,
+            bold: false,
         }
+    }
+
+    pub fn size(mut self, size: u32) -> Self {
+        self.text_size = size;
+        self
+    }
+    pub fn color(mut self, color: Color) -> Self {
+        self.color = color;
+        self
+    }
+    pub fn align(mut self, align: Alignment) -> Self {
+        self.alignment = align;
+        self
+    }
+    pub fn x(mut self, x: u32) -> Self {
+        self.x = x;
+        self
+    }
+    pub fn y(mut self, y: u32) -> Self {
+        self.y = y;
+        self
+    }
+    pub fn bold(mut self) -> Self {
+        self.bold = true;
+        self
     }
 }
 
@@ -71,5 +91,16 @@ impl Renderable for Label {
             font,
             &self.text,
         );
+    }
+
+    fn size(&self, font: &FontRef) -> (u32, u32) {
+        imageproc::drawing::text_size(
+            PxScale {
+                x: self.text_size as f32,
+                y: self.text_size as f32,
+            },
+            font,
+            &self.text,
+        )
     }
 }

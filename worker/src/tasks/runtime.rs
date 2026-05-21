@@ -11,22 +11,16 @@ use crate::draw::master_canvas::MasterCanvas;
 use crate::tasks::error::{TaskError, TaskResult};
 use crate::tasks::types::FileResult;
 
-fn unique_id() -> String {
-    let nanos = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map_or(0, |duration| duration.as_nanos());
-    format!("{:x}-{:x}", nanos, std::process::id())
-}
-
 pub fn resolve_existing(paths: &[&str]) -> Option<PathBuf> {
-    paths
-        .iter()
-        .map(PathBuf::from)
-        .find(|path| path.exists())
+    paths.iter().map(PathBuf::from).find(|path| path.exists())
 }
 
 fn resolve_background_path() -> PathBuf {
-    resolve_existing(&["assets/other/background.png", "../assets/other/background.png"]).unwrap_or_else(|| PathBuf::from("assets/other/background.png"))
+    resolve_existing(&[
+        "assets/other/background.png",
+        "../assets/other/background.png",
+    ])
+    .unwrap_or_else(|| PathBuf::from("assets/other/background.png"))
 }
 
 fn resolve_font_path() -> PathBuf {
@@ -58,24 +52,24 @@ pub fn build_summary_canvas<'a>(
         MasterCanvas::new(image, font_data)
     };
 
-    canvas.container.add_child(Box::new(Label::new(
-        title.to_string(),
-        56,
-        Color::White,
-        Alignment::Middle,
-        960,
-        80,
-    )));
+    canvas.container.child(
+        Label::new(title.to_string())
+            .size(56)
+            .color(Color::White)
+            .align(Alignment::Middle)
+            .x(960)
+            .y(80),
+    );
 
     for (index, line) in lines.iter().enumerate() {
-        canvas.container.add_child(Box::new(Label::new(
-            line.clone(),
-            34,
-            Color::White,
-            Alignment::Start,
-            120,
-            220 + (index as u32 * 54),
-        )));
+        canvas.container.child(
+            Label::new(line.clone())
+                .size(34)
+                .color(Color::White)
+                .align(Alignment::Start)
+                .x(120)
+                .y(220 + (index as u32 * 54)),
+        );
     }
 
     Ok(canvas)
@@ -86,57 +80,11 @@ pub fn load_font_data() -> TaskResult<Vec<u8>> {
     Ok(fs::read(&font_path)?)
 }
 
-pub fn save_temp_canvas(mut canvas: MasterCanvas<'_>) -> TaskResult<FileResult> {
-    canvas.render();
-
-    let cache_path = std::env::var("CACHE_PATH").unwrap_or_else(|_| "/tmp".to_string());
-    let cache_dir = PathBuf::from(cache_path);
-    ensure_dir(&cache_dir)?;
-
-    let file_path = cache_dir.join(format!("{}.png", unique_id()));
-    canvas.save_checked(file_path.to_string_lossy().as_ref())?;
-
-    Ok(FileResult::Local {
-        path: file_path.to_string_lossy().to_string(),
-    })
-}
-
-pub fn save_persistent_canvas(
-    mut canvas: MasterCanvas<'_>,
-    image_name: &str,
-) -> TaskResult<FileResult> {
-    canvas.render();
-
-    let persistent_path =
-        std::env::var("PERSISTANT_CACHE_PATH").unwrap_or_else(|_| "cache".to_string());
-    let persistent_dir = PathBuf::from(persistent_path);
-    ensure_dir(&persistent_dir)?;
-
-    let file_path = persistent_dir.join(image_name);
-    canvas.save_checked(file_path.to_string_lossy().as_ref())?;
-
-    Ok(FileResult::Local {
-        path: file_path.to_string_lossy().to_string(),
-    })
-}
-
-pub fn get_persistent_result(image_name: &str) -> TaskResult<Option<FileResult>> {
-    let persistent_path =
-        std::env::var("PERSISTANT_CACHE_PATH").unwrap_or_else(|_| "cache".to_string());
-    let file_path = PathBuf::from(persistent_path).join(image_name);
-
-    if !file_path.exists() {
-        return Ok(None);
-    }
-
-    Ok(Some(FileResult::Local {
-        path: file_path.to_string_lossy().to_string(),
-    }))
-}
-
 pub fn required_text(value: &str, field: &str) -> TaskResult<String> {
     if value.is_empty() {
-        return Err(TaskError::Runtime(format!("missing required field: {field}")));
+        return Err(TaskError::Runtime(format!(
+            "missing required field: {field}"
+        )));
     }
     Ok(value.to_string())
 }

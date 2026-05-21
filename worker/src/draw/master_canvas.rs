@@ -1,35 +1,38 @@
 use crate::draw::{container::Container, renderable::Renderable};
+use ab_glyph::Font;
+use ab_glyph::FontArc;
 use ab_glyph::FontRef;
 use image::DynamicImage;
 use image::RgbaImage;
 use std::io::Cursor;
 
-pub struct MasterCanvas<'a> {
+pub struct MasterCanvas {
     background: RgbaImage,
     pub container: Container,
-    font: FontRef<'a>,
+    font: FontArc,
 }
 
-impl<'a> MasterCanvas<'a> {
-    pub fn new(background: RgbaImage, font_data: &'a [u8]) -> Self {
-        let font = FontRef::try_from_slice(font_data).expect("Failed to parse font data");
+impl MasterCanvas {
+    pub fn new(background: RgbaImage, font: FontArc) -> Self {
         Self {
             background,
-            container: Container::new(0, 0),
+            container: Container::new(),
             font,
         }
     }
 
-    pub fn from_path(path: &str, font_data: &'a [u8]) -> Self {
+    pub fn from_path(path: &str, font: FontArc) -> Self {
         let background = image::open(path)
             .expect("Failed to open background image")
             .to_rgba8();
-        Self::new(background, font_data)
+        Self::new(background, font)
     }
 
     pub fn render(&mut self) {
-        self.container
-            .render(&mut self.background, &self.font, 0, 0);
+        let font_data = self.font.font_data();
+        let font = FontRef::try_from_slice(font_data).expect("Failed to load font");
+
+        self.container.render(&mut self.background, &font, 0, 0);
     }
 
     pub fn save(&self, path: &str) {

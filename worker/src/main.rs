@@ -38,7 +38,8 @@ async fn setup_websocket(url: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("Connected to server!");
 
     // Split the stream into a sender (to send results back) and a receiver (to get jobs)
-    let (mut write, mut read) = ws_stream.split();
+    let (write, mut read) = ws_stream.split();
+    let write_stream = std::sync::Arc::new(tokio::sync::Mutex::new(write));
 
     // Listen for incoming messages
     while let Some(msg) = read.next().await {
@@ -57,33 +58,36 @@ async fn setup_websocket(url: &str) -> Result<(), Box<dyn std::error::Error>> {
                 continue;
             }
 
-            let job_name = parts[0];
-            let job_id = parts[1];
-            let start_date = parts[2];
-            let str_data = parts[3];
+            let job_name = parts[0].to_string();
+            let job_id = parts[1].to_string();
+            let start_date = parts[2].to_string();
+            let str_data = parts[3].to_string();
 
             println!("Got job '{}' with id '{}'", job_name, job_id);
 
-            fs::write(format!("test_files/{}.json", job_name), str_data).ok();
+            // fs::write(format!("test_files/{}.json", job_name), &str_data).ok();
 
-            let response = match tasks::dispatch(job_name, str_data) {
-                Ok(result) => {
-                    let json = serde_json::to_string(&result)
-                        .unwrap_or_else(|_| json!({ "type": "temp", "data": "" }).to_string());
-                    format!("completed;{};{};{}", job_id, json, start_date)
-                }
-                Err(err) => {
-                    let message = err.to_string().replace(';', ",");
-                    format!("error;{};{};;{}", job_id, message, start_date)
-                }
-            };
+            let write_clone = std::sync::Arc::clone(&write_stream);
+            tokio::spawn(async move {
+                let response = match tasks::dispatch(&job_name, &str_data) {
+                    Ok(result) => {
+                        let json = serde_json::to_string(&result)
+                            .unwrap_or_else(|_| json!({ "type": "temp", "data": "" }).to_string());
+                        format!("completed;{};{};{}", job_id, json, start_date)
+                    }
+                    Err(err) => {
+                        let message = err.to_string().replace(';', ",");
+                        format!("error;{};{};;{}", job_id, message, start_date)
+                    }
+                };
 
-            // Send the result back to the server
-            if let Err(e) = write.send(Message::Text(response.into())).await {
-                eprintln!("Failed to send job completion: {}", e);
-            } else {
-                println!("Job '{}' with id '{}' finished", job_name, job_id);
-            }
+                let mut writer = write_clone.lock().await;
+                if let Err(e) = writer.send(Message::Text(response.into())).await {
+                    eprintln!("Failed to send job completion: {}", e);
+                } else {
+                    println!("Job '{}' with id '{}' finished", job_name, job_id);
+                }
+            });
         }
     }
 
