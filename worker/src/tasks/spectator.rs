@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use crate::context::AppContext;
 use crate::tasks::{
     error::TaskResult,
-    runtime,
-    task::Task,
-    types::{DefaultParametersInput, FileResult, WorkerJob},
+    task::{Task, TaskOutcome},
+    types::{DefaultParametersInput, WorkerJob},
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -50,29 +50,7 @@ impl Task for SpectatorTask {
     const NAME: &'static str = "spectator";
     const JOB: WorkerJob = WorkerJob::Spectator;
 
-    fn run(input: Self::Input) -> TaskResult<FileResult> {
-        let font = runtime::load_font_data()?;
-        let team_count = input
-            .participants
-            .iter()
-            .map(|participant| participant.team_id)
-            .collect::<std::collections::BTreeSet<_>>()
-            .len();
-        let lines = vec![
-            format!(
-                "Summoner: {}#{}",
-                input.default.game_name, input.default.tag_line
-            ),
-            format!("Queue: {} | Map: {}", input.queue_id, input.map_id),
-            format!("Game length: {}s", input.game_length),
-            format!(
-                "Participants: {} across {} teams",
-                input.participants.len(),
-                team_count
-            ),
-        ];
-
-        let canvas = runtime::build_summary_canvas("Spectator", &lines, &font)?;
-        runtime::save_temp_canvas(canvas)
+    async fn run(_input: Self::Input, _context: AppContext) -> TaskResult<TaskOutcome> {
+        todo!()
     }
 }

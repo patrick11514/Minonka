@@ -1,4 +1,5 @@
 use crate::draw::{container::Container, renderable::Renderable};
+use crate::utils::assets::{Asset, asset_path};
 use ab_glyph::Font;
 use ab_glyph::FontArc;
 use ab_glyph::FontRef;
@@ -7,7 +8,7 @@ use image::RgbaImage;
 use std::io::Cursor;
 
 pub struct MasterCanvas {
-    background: RgbaImage,
+    pub background: RgbaImage,
     pub container: Container,
     font: FontArc,
 }
@@ -23,6 +24,19 @@ impl MasterCanvas {
 
     pub fn from_path(path: &str, font: FontArc) -> Self {
         let background = image::open(path)
+            .expect("Failed to open background image")
+            .to_rgba8();
+        Self::new(background, font)
+    }
+
+    pub async fn from_asset(asset: Asset, font: FontArc) -> Self {
+        println!("Loading background asset: {:?}", asset);
+
+        let path = asset_path(&asset).await.expect("Failed to get asset path");
+
+        println!("Background asset path: {:?}", path);
+
+        let background = image::open(&path)
             .expect("Failed to open background image")
             .to_rgba8();
         Self::new(background, font)

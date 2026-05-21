@@ -2,16 +2,19 @@ use std::{env::current_dir, path::PathBuf};
 
 use crate::{tasks::error::TaskResult, utils::get_cache_folder};
 
+#[derive(Debug, Clone)]
 pub enum OnlineAsset {
     CommunityDragon,
 }
 
+#[derive(Debug, Clone)]
 pub enum AssetType {
     Banner,
     Crest,
     DDragon,
     Lanes,
     Mastery,
+    Fonts,
     Other,
     Ranks,
     Online(OnlineAsset),
@@ -49,23 +52,29 @@ async fn get_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<PathBuf
     Ok(path)
 }
 
-async fn asset_path(asset: &Asset) -> TaskResult<PathBuf> {
+pub async fn asset_path(asset: &Asset) -> TaskResult<PathBuf> {
     let asset = match &asset.asset_type {
-        AssetType::Banner => format!("../assets/banners/{}.png", asset.name),
-        AssetType::Crest => format!("../assets/crests/{}.png", asset.name),
-        AssetType::DDragon => format!("../assets/ddragon/{}.png", asset.name),
-        AssetType::Lanes => format!("../assets/lanes/{}.png", asset.name),
-        AssetType::Mastery => format!("../assets/masteries/{}.png", asset.name),
-        AssetType::Other => format!("../assets/other/{}.png", asset.name),
-        AssetType::Ranks => format!("../assets/ranks/{}.png", asset.name),
+        AssetType::Banner => format!("../assets/banners/{}", asset.name),
+        AssetType::Crest => format!("../assets/crests/{}", asset.name),
+        AssetType::DDragon => format!("../assets/ddragon/{}", asset.name),
+        AssetType::Lanes => format!("../assets/lanes/{}", asset.name),
+        AssetType::Mastery => format!("../assets/masteries/{}", asset.name),
+        AssetType::Other => format!("../assets/other/{}", asset.name),
+        AssetType::Ranks => format!("../assets/ranks/{}", asset.name),
         AssetType::Online(online_asset) => {
             return Ok(get_online_asset(&asset.name, &online_asset).await?);
         }
+        AssetType::Fonts => format!("../assets/fonts/{}", asset.name),
     };
 
     Ok(current_dir()?.join(asset))
 }
 
+pub fn get_background_asset() -> Asset {
+    Asset::new(AssetType::Other, "background.png")
+}
+
+#[derive(Debug, Clone)]
 pub struct Asset {
     pub asset_type: AssetType,
     pub name: String,

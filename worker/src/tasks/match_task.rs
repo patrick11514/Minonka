@@ -2,11 +2,11 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use ts_rs::TS;
 
+use crate::context::AppContext;
 use crate::tasks::{
     error::TaskResult,
-    runtime,
-    task::Task,
-    types::{FileResult, MatchMetadataInput, WorkerJob},
+    task::{Task, TaskOutcome},
+    types::{MatchMetadataInput, WorkerJob},
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -30,41 +30,7 @@ impl Task for MatchTask {
     const NAME: &'static str = "match";
     const JOB: WorkerJob = WorkerJob::Match;
 
-    fn run(input: Self::Input) -> TaskResult<FileResult> {
-        let image_name = format!(
-            "{}_{}_{}.png",
-            input.metadata.match_id, input.my_puuid, input.locale
-        );
-
-        if let Some(existing) = runtime::get_persistent_result(&image_name)? {
-            return Ok(existing);
-        }
-
-        let font = runtime::load_font_data()?;
-        let queue_id = input
-            .info
-            .get("queueId")
-            .and_then(|value| value.as_i64())
-            .unwrap_or_default();
-        let duration = input
-            .info
-            .get("gameDuration")
-            .and_then(|value| value.as_i64())
-            .unwrap_or_default();
-
-        let lines = vec![
-            format!("Match ID: {}", input.metadata.match_id),
-            format!("Region: {} | Queue: {}", input.region, queue_id),
-            format!("Duration: {}s", duration),
-            format!(
-                "LP Delta: {}",
-                input
-                    .lp_gain
-                    .map_or_else(|| "Unknown".to_string(), |lp| lp.to_string())
-            ),
-        ];
-
-        let canvas = runtime::build_summary_canvas("Match", &lines, &font)?;
-        runtime::save_persistent_canvas(canvas, &image_name)
+    async fn run(_input: Self::Input, _context: AppContext) -> TaskResult<TaskOutcome> {
+        todo!()
     }
 }

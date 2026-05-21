@@ -1,5 +1,3 @@
-use std::fs;
-
 use futures_util::{SinkExt, StreamExt};
 use serde_json::json;
 use tokio::time::{Duration, sleep};
@@ -8,7 +6,7 @@ use tokio_tungstenite::{
     tungstenite::{client::IntoClientRequest, protocol::Message},
 };
 
-use worker::tasks;
+use worker::{context::AppContext, tasks};
 
 #[tokio::main]
 async fn main() {
@@ -34,6 +32,9 @@ async fn main() {
 }
 
 async fn setup_websocket(url: &str) -> Result<(), Box<dyn std::error::Error>> {
+    //app state
+    let context = AppContext::new().await;
+
     let (ws_stream, _) = connect_async(url.into_client_request().unwrap()).await?;
     println!("Connected to server!");
 
@@ -68,8 +69,10 @@ async fn setup_websocket(url: &str) -> Result<(), Box<dyn std::error::Error>> {
             // fs::write(format!("test_files/{}.json", job_name), &str_data).ok();
 
             let write_clone = std::sync::Arc::clone(&write_stream);
+            let context_clone = context.clone();
+
             tokio::spawn(async move {
-                let response = match tasks::dispatch(&job_name, &str_data) {
+                let response = match tasks::dispatch(&job_name, &str_data, context_clone).await {
                     Ok(result) => {
                         let json = serde_json::to_string(&result)
                             .unwrap_or_else(|_| json!({ "type": "temp", "data": "" }).to_string());

@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use crate::context::AppContext;
 use crate::tasks::{
     error::TaskResult,
     rank::RankQueueEntryInput,
-    runtime,
-    task::Task,
-    types::{FileResult, WorkerJob},
+    task::{Task, TaskOutcome},
+    types::WorkerJob,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -54,23 +54,7 @@ impl Task for TeamTask {
     const NAME: &'static str = "team";
     const JOB: WorkerJob = WorkerJob::Team;
 
-    fn run(input: Self::Input) -> TaskResult<FileResult> {
-        let font = runtime::load_font_data()?;
-        let captain = input
-            .players
-            .iter()
-            .find(|player| player.role == "CAPTAIN")
-            .map(|player| format!("{}#{}", player.game_name, player.tag_line))
-            .unwrap_or_else(|| "Unknown".to_string());
-
-        let lines = vec![
-            format!("Team: {} | {}", input.abbreviation, input.name),
-            format!("Tier: {} | Icon: {}", input.tier, input.icon_id),
-            format!("Captain: {captain}"),
-            format!("Players: {}", input.players.len()),
-        ];
-
-        let canvas = runtime::build_summary_canvas("Clash Team", &lines, &font)?;
-        runtime::save_temp_canvas(canvas)
+    async fn run(_input: Self::Input, _context: AppContext) -> TaskResult<TaskOutcome> {
+        todo!()
     }
 }

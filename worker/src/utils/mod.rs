@@ -7,8 +7,9 @@ use tokio::fs;
 
 use crate::tasks::error::TaskResult;
 
-mod assets;
-mod storage;
+pub mod assets;
+pub mod storage;
+pub mod test;
 
 pub fn get_cache_folder() -> PathBuf {
     std::env::var("CACHE_PATH")

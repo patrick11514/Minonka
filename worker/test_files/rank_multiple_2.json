@@ -1,0 +1,37 @@
+{
+    "puuid": "qVMjop4aosgqXgK2B9hwCa5wRBeB1nnmWxvSN4qaHVrYWSZMWyEyxghWmieNny83HJrOUroXQoDEMO",
+    "region": "EUN1",
+    "gameName": "LightUpMyHole",
+    "tagLine": "Czech",
+    "profileIconId": 3584,
+    "level": 565,
+    "ranks": [
+        {
+            "leagueId": "01c6fe76-c9c1-44cb-a0a3-48c362490251",
+            "queueType": "RANKED_SOLO_5x5",
+            "tier": "IRON",
+            "rank": "IV",
+            "leaguePoints": 0,
+            "wins": 0,
+            "losses": 666,
+            "hotStreak": true,
+            "veteran": false,
+            "freshBlood": false,
+            "inactive": false
+        },
+        {
+            "leagueId": "01c6fe76-c9c1-44cb-a0a3-48c362490251",
+            "queueType": "RANKED_FLEX_SR",
+            "tier": "DIAMOND",
+            "rank": "I",
+            "leaguePoints": 99,
+            "wins": 999,
+            "losses": 0,
+            "hotStreak": false,
+            "veteran": false,
+            "freshBlood": false,
+            "inactive": false
+        }
+    ],
+    "locale": "en_US"
+}
