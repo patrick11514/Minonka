@@ -1,8 +1,9 @@
-use ab_glyph::FontRef;
 use image::RgbaImage;
 
-pub trait Renderable: Send {
-    fn render(&self, canvas: &mut RgbaImage, font: &FontRef, offset_x: u32, offset_y: u32);
+use crate::context::font_registry::FontRegistry;
 
-    fn size(&self, font: &FontRef) -> (u32, u32);
+pub trait Renderable: Send {
+    fn render(&self, canvas: &mut RgbaImage, fonts: &FontRegistry, offset_x: u32, offset_y: u32);
+
+    fn size(&self, fonts: &FontRegistry) -> (u32, u32);
 }

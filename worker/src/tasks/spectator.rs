@@ -10,7 +10,7 @@ use crate::tasks::{
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct SpectatorPerksInput {
     pub perk_ids: Vec<u32>,
     pub perk_style: u32,
@@ -19,7 +19,7 @@ pub struct SpectatorPerksInput {
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct SpectatorParticipantInput {
     pub team_id: u32,
     pub champion_id: u32,
@@ -32,7 +32,7 @@ pub struct SpectatorParticipantInput {
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct SpectatorTaskInput {
     #[serde(flatten)]
     pub default: DefaultParametersInput,

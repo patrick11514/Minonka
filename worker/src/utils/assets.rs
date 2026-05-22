@@ -74,6 +74,75 @@ pub fn get_background_asset() -> Asset {
     Asset::new(AssetType::Other, "background.png")
 }
 
+pub async fn get_profile_icon(id: u32) -> TaskResult<Asset> {
+    let asset = Asset::new(
+        AssetType::DDragon,
+        format!("_ROOT_/img/profileicon/{}.png", id),
+    );
+
+    if !asset.exists().await? {
+        //ID 29 => fallback icon
+        Ok(Asset::new(
+            AssetType::DDragon,
+            "_ROOT_/img/profileicon/29.png",
+        ))
+    } else {
+        Ok(asset)
+    }
+}
+
+pub enum Rank {
+    Challenger,
+    Grandmaster,
+    Master,
+    Diamond,
+    Emerald,
+    Platinum,
+    Gold,
+    Silver,
+    Bronze,
+    Iron,
+}
+
+impl From<&String> for Rank {
+    fn from(s: &String) -> Self {
+        match s.to_uppercase().as_str() {
+            "CHALLENGER" => Rank::Challenger,
+            "GRANDMASTER" => Rank::Grandmaster,
+            "MASTER" => Rank::Master,
+            "DIAMOND" => Rank::Diamond,
+            "EMERALD" => Rank::Emerald,
+            "PLATINUM" => Rank::Platinum,
+            "GOLD" => Rank::Gold,
+            "SILVER" => Rank::Silver,
+            "BRONZE" => Rank::Bronze,
+            "IRON" => Rank::Iron,
+            _ => panic!("Unknown rank: {}", s),
+        }
+    }
+}
+
+pub fn get_rank_asset(rank: &Rank) -> Asset {
+    let name = match rank {
+        Rank::Challenger => "Challenger.png",
+        Rank::Grandmaster => "Grandmaster.png",
+        Rank::Master => "Master.png",
+        Rank::Diamond => "Diamond.png",
+        Rank::Emerald => "Emerald.png",
+        Rank::Platinum => "Platinum.png",
+        Rank::Gold => "Gold.png",
+        Rank::Silver => "Silver.png",
+        Rank::Bronze => "Bronze.png",
+        Rank::Iron => "Iron.png",
+    };
+
+    // assets/ranks/Ranked Emblems Latest/Rank=%.png
+    Asset::new(
+        AssetType::Ranks,
+        format!("Ranked Emblems Latest/Rank={}", name),
+    )
+}
+
 #[derive(Debug, Clone)]
 pub struct Asset {
     pub asset_type: AssetType,
@@ -86,5 +155,10 @@ impl Asset {
             asset_type,
             name: name.into(),
         }
+    }
+
+    pub async fn exists(&self) -> TaskResult<bool> {
+        let path = asset_path(self).await?;
+        Ok(path.exists())
     }
 }

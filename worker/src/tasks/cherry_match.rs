@@ -11,7 +11,7 @@ use crate::tasks::{
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct CherryMatchTaskInput {
     pub region: String,
     pub locale: String,

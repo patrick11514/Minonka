@@ -8,6 +8,7 @@ use tokio::fs;
 use crate::tasks::error::TaskResult;
 
 pub mod assets;
+pub mod locale;
 pub mod storage;
 pub mod test;
 
@@ -39,4 +40,15 @@ pub fn unique_id() -> String {
         .duration_since(UNIX_EPOCH)
         .map_or(0, |duration| duration.as_nanos());
     format!("{:x}-{:x}", nanos, std::process::id())
+}
+
+pub fn first_upper(value: &str) -> String {
+    if value.is_empty() {
+        return String::new();
+    }
+
+    let lower = value.to_ascii_lowercase();
+    let mut chars = lower.chars();
+    let first = chars.next().unwrap_or_default().to_ascii_uppercase();
+    format!("{first}{}", chars.collect::<String>())
 }

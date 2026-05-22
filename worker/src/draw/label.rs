@@ -1,6 +1,7 @@
+use crate::context::font_registry::{FontRegistry, FontType};
 use crate::draw::color::Color;
 use crate::draw::renderable::Renderable;
-use ab_glyph::{FontRef, PxScale};
+use ab_glyph::PxScale;
 use image::RgbaImage;
 use imageproc::drawing::{draw_text_mut, text_size};
 
@@ -60,7 +61,7 @@ impl Label {
 }
 
 impl Renderable for Label {
-    fn render(&self, canvas: &mut RgbaImage, font: &FontRef, offset_x: u32, offset_y: u32) {
+    fn render(&self, canvas: &mut RgbaImage, fonts: &FontRegistry, offset_x: u32, offset_y: u32) {
         let scale = PxScale {
             x: self.text_size as f32,
             y: self.text_size as f32,
@@ -73,7 +74,15 @@ impl Renderable for Label {
         match self.alignment {
             Alignment::Start => {}
             Alignment::Middle | Alignment::End => {
-                let (w, _h) = text_size(scale, font, &self.text);
+                let (w, _h) = text_size(
+                    scale,
+                    if self.bold {
+                        fonts.get(FontType::Bold)
+                    } else {
+                        fonts.get(FontType::Regular)
+                    },
+                    &self.text,
+                );
                 if matches!(self.alignment, Alignment::Middle) {
                     final_x = final_x.saturating_sub(w / 2);
                 } else {
@@ -88,18 +97,26 @@ impl Renderable for Label {
             final_x as i32,
             final_y as i32,
             scale,
-            font,
+            if self.bold {
+                fonts.get(FontType::Bold)
+            } else {
+                fonts.get(FontType::Regular)
+            },
             &self.text,
         );
     }
 
-    fn size(&self, font: &FontRef) -> (u32, u32) {
+    fn size(&self, fonts: &FontRegistry) -> (u32, u32) {
         imageproc::drawing::text_size(
             PxScale {
                 x: self.text_size as f32,
                 y: self.text_size as f32,
             },
-            font,
+            if self.bold {
+                fonts.get(FontType::Bold)
+            } else {
+                fonts.get(FontType::Regular)
+            },
             &self.text,
         )
     }

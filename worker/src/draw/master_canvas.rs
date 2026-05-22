@@ -1,8 +1,6 @@
+use crate::context::font_registry::FontRegistry;
 use crate::draw::{container::Container, renderable::Renderable};
 use crate::utils::assets::{Asset, asset_path};
-use ab_glyph::Font;
-use ab_glyph::FontArc;
-use ab_glyph::FontRef;
 use image::DynamicImage;
 use image::RgbaImage;
 use std::io::Cursor;
@@ -10,43 +8,45 @@ use std::io::Cursor;
 pub struct MasterCanvas {
     pub background: RgbaImage,
     pub container: Container,
-    font: FontArc,
+    fonts: FontRegistry,
 }
 
 impl MasterCanvas {
-    pub fn new(background: RgbaImage, font: FontArc) -> Self {
+    pub fn new(background: RgbaImage, fonts: FontRegistry) -> Self {
+        // Automatically tie the root layout boundaries to the physical asset size
+        let (w, h) = (background.width(), background.height());
+
         Self {
             background,
-            container: Container::new(),
-            font,
+            container: Container::new().width(w).height(h),
+            fonts,
         }
     }
 
-    pub fn from_path(path: &str, font: FontArc) -> Self {
+    pub fn from_path(path: &str, fonts: FontRegistry) -> Self {
         let background = image::open(path)
             .expect("Failed to open background image")
             .to_rgba8();
-        Self::new(background, font)
+        Self::new(background, fonts)
     }
 
-    pub async fn from_asset(asset: Asset, font: FontArc) -> Self {
-        println!("Loading background asset: {:?}", asset);
-
+    pub async fn from_asset(asset: Asset, fonts: FontRegistry) -> Self {
         let path = asset_path(&asset).await.expect("Failed to get asset path");
-
-        println!("Background asset path: {:?}", path);
-
         let background = image::open(&path)
             .expect("Failed to open background image")
             .to_rgba8();
-        Self::new(background, font)
+        Self::new(background, fonts)
+    }
+
+    /// Fluently configures the automatically sized root container via a builder closure.
+    pub fn with_layout(mut self, configurator: impl FnOnce(Container) -> Container) -> Self {
+        self.container = configurator(self.container);
+        self
     }
 
     pub fn render(&mut self) {
-        let font_data = self.font.font_data();
-        let font = FontRef::try_from_slice(font_data).expect("Failed to load font");
-
-        self.container.render(&mut self.background, &font, 0, 0);
+        self.container
+            .render(&mut self.background, &self.fonts, 0, 0);
     }
 
     pub fn save(&self, path: &str) {

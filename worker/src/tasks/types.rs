@@ -3,7 +3,7 @@ use ts_rs::TS;
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub enum WorkerJob {
     #[serde(rename = "cherryMatch")]
     CherryMatch,
@@ -34,7 +34,7 @@ impl WorkerJob {
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase", tag = "type")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub enum FileResult {
     #[serde(rename = "temp")]
     Temp { data: String },
@@ -44,7 +44,7 @@ pub enum FileResult {
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct DefaultParametersInput {
     pub puuid: String,
     pub region: String,
@@ -57,7 +57,7 @@ pub struct DefaultParametersInput {
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct MatchMetadataInput {
     pub match_id: String,
 }

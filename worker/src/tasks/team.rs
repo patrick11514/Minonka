@@ -11,7 +11,7 @@ use crate::tasks::{
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct TeamMasteryInput {
     pub champion_id: u32,
     pub champion_level: u16,
@@ -20,7 +20,7 @@ pub struct TeamMasteryInput {
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct TeamPlayerInput {
     pub puuid: String,
     pub position: String,
@@ -35,7 +35,7 @@ pub struct TeamPlayerInput {
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct TeamTaskInput {
     pub abbreviation: String,
     pub name: String,

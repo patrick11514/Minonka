@@ -4,3 +4,4 @@ pub mod label;
 pub mod master_canvas;
 pub mod renderable;
 pub mod sprite;
+pub mod stack;

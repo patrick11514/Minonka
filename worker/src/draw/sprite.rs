@@ -1,6 +1,11 @@
 use image::{RgbaImage, imageops};
 
-use crate::draw::renderable::Renderable;
+use crate::{
+    context::font_registry::FontRegistry,
+    draw::renderable::Renderable,
+    tasks::error::{TaskError, TaskResult},
+    utils::assets::Asset,
+};
 
 pub struct Sprite {
     image: RgbaImage,
@@ -23,6 +28,11 @@ impl Sprite {
     pub fn from_path_checked(path: &str, x: u32, y: u32) -> Result<Self, image::ImageError> {
         let image = image::open(path)?.to_rgba8();
         Ok(Self::new(image, x, y))
+    }
+
+    pub async fn from_asset(asset: &Asset, x: u32, y: u32) -> TaskResult<Self> {
+        let path = crate::utils::assets::asset_path(asset).await?;
+        Ok(Self::from_path_checked(&path.to_string_lossy(), x, y)?)
     }
 
     pub fn resize_to_width(&mut self, width: u32) {
@@ -50,13 +60,7 @@ impl Sprite {
 }
 
 impl Renderable for Sprite {
-    fn render(
-        &self,
-        canvas: &mut RgbaImage,
-        _font: &ab_glyph::FontRef,
-        offset_x: u32,
-        offset_y: u32,
-    ) {
+    fn render(&self, canvas: &mut RgbaImage, _fonts: &FontRegistry, offset_x: u32, offset_y: u32) {
         let new_offset_x = offset_x + self.x;
         let new_offset_y = offset_y + self.y;
 
@@ -68,7 +72,7 @@ impl Renderable for Sprite {
         );
     }
 
-    fn size(&self, font: &ab_glyph::FontRef) -> (u32, u32) {
+    fn size(&self, _fonts: &FontRegistry) -> (u32, u32) {
         (self.image.width(), self.image.height())
     }
 }

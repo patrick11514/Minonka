@@ -10,7 +10,7 @@ use crate::tasks::{
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct SummonerChallengeInput {
     pub challenge_id: u64,
     pub level: String,
@@ -18,7 +18,7 @@ pub struct SummonerChallengeInput {
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
-#[ts(export)]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct SummonerTaskInput {
     #[serde(flatten)]
     pub default: DefaultParametersInput,
