@@ -1,5 +1,6 @@
 use crate::context::font_registry::FontRegistry;
 use crate::draw::{container::Container, renderable::Renderable};
+use crate::tasks::error::{TaskError, TaskResult};
 use crate::utils::assets::{Asset, asset_path};
 use image::DynamicImage;
 use image::RgbaImage;
@@ -23,19 +24,17 @@ impl MasterCanvas {
         }
     }
 
-    pub fn from_path(path: &str, fonts: FontRegistry) -> Self {
-        let background = image::open(path)
-            .expect("Failed to open background image")
-            .to_rgba8();
-        Self::new(background, fonts)
+    #[tracing::instrument(skip(fonts), fields(path = %path))]
+    pub fn from_path(path: &str, fonts: FontRegistry) -> TaskResult<Self> {
+        let background = image::open(path).map_err(TaskError::Image)?.to_rgba8();
+        Ok(Self::new(background, fonts))
     }
 
-    pub async fn from_asset(asset: Asset, fonts: FontRegistry) -> Self {
-        let path = asset_path(&asset).await.expect("Failed to get asset path");
-        let background = image::open(&path)
-            .expect("Failed to open background image")
-            .to_rgba8();
-        Self::new(background, fonts)
+    #[tracing::instrument(skip(fonts, asset), fields(asset = %asset.name))]
+    pub async fn from_asset(asset: Asset, fonts: FontRegistry) -> TaskResult<Self> {
+        let path = asset_path(&asset).await?;
+        let background = image::open(&path).map_err(TaskError::Image)?.to_rgba8();
+        Ok(Self::new(background, fonts))
     }
 
     /// Fluently configures the automatically sized root container via a builder closure.
@@ -49,8 +48,8 @@ impl MasterCanvas {
             .render(&mut self.background, &self.fonts, 0, 0);
     }
 
-    pub fn save(&self, path: &str) {
-        self.background.save(path).unwrap();
+    pub fn save(&self, path: &str) -> Result<(), image::ImageError> {
+        self.background.save(path)
     }
 
     pub fn save_checked(&self, path: &str) -> Result<(), image::ImageError> {

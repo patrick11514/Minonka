@@ -4,7 +4,11 @@ use ab_glyph::FontArc;
 
 use crate::{
     context::font_registry::{FontRegistry, FontType},
-    utils::assets::{Asset, AssetType, asset_path},
+    tasks::error::{TaskError, TaskResult},
+    utils::{
+        assets::{Asset, AssetType, asset_path},
+        ddragon_cache,
+    },
 };
 
 pub mod font_registry;
@@ -15,31 +19,33 @@ pub struct AppContext {
 }
 
 impl AppContext {
-    pub async fn new() -> Self {
+    pub async fn new() -> TaskResult<Self> {
+        let regular_font = Self::load_font("beaufortforlolja-regular.ttf").await?;
+        let bold_font = Self::load_font("beaufortforlolja-bold.ttf").await?;
+
         let fonts = HashMap::from([
-            (
-                FontType::Regular,
-                Self::load_font("beaufortforlolja-regular.ttf").await,
-            ),
-            (
-                FontType::Bold,
-                Self::load_font("beaufortforlolja-bold.ttf").await,
-            ),
+            (FontType::Regular, regular_font),
+            (FontType::Bold, bold_font),
         ]);
 
-        Self {
+        Ok(Self {
             fonts: FontRegistry::new(fonts),
-        }
+            ddragon_cache: ddragon_cache::DdragonCache::new(),
+        })
     }
 
-    async fn load_font(name: &str) -> FontArc {
+    async fn load_font(name: &str) -> TaskResult<FontArc> {
         let asset = Asset::new(AssetType::Fonts, name);
-        let path = asset_path(&asset)
-            .await
-            .unwrap_or_else(|_| panic!("Failed to get path for font asset: {}", name));
+        let path = asset_path(&asset).await.map_err(|err| {
+            TaskError::Runtime(format!("Failed to get path for font asset {name}: {err}"))
+        })?;
 
-        FontArc::try_from_vec(std::fs::read(path).expect("Failed to read font file"))
-            .expect("Failed to load font")
+        let bytes = std::fs::read(&path).map_err(|err| {
+            TaskError::Runtime(format!("Failed to read font file {path:?}: {err}"))
+        })?;
+
+        FontArc::try_from_vec(bytes)
+            .map_err(|err| TaskError::Runtime(format!("Failed to load font {path:?}: {err}")))
     }
 }
 

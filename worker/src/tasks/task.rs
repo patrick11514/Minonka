@@ -1,4 +1,5 @@
 use serde::de::DeserializeOwned;
+use tracing::Instrument;
 use ts_rs::TS;
 
 use crate::{
@@ -40,6 +41,8 @@ pub trait Task {
         payload: &str,
         context: AppContext,
     ) -> impl std::future::Future<Output = TaskResult<FileResult>> + Send {
+        let span = tracing::info_span!("task_run", task = Self::NAME);
+
         async move {
             let input = Self::parse_input(payload)?;
 
@@ -53,5 +56,6 @@ pub trait Task {
                 },
             }
         }
+        .instrument(span)
     }
 }

@@ -1,6 +1,9 @@
-use std::{env::current_dir, path::PathBuf};
+use std::path::PathBuf;
 
-use crate::{tasks::error::TaskResult, utils::get_cache_folder};
+use crate::{
+    tasks::error::TaskResult,
+    utils::{get_cache_folder, get_current_dir, rank::Tier},
+};
 
 #[derive(Debug, Clone)]
 pub enum OnlineAsset {
@@ -48,26 +51,28 @@ async fn get_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<PathBuf
     }
 
     let data = fetch_online_asset(name, asset).await?;
+    if let Some(parent) = path.parent() {
+        tokio::fs::create_dir_all(parent).await?;
+    }
     tokio::fs::write(&path, data).await?;
     Ok(path)
 }
 
 pub async fn asset_path(asset: &Asset) -> TaskResult<PathBuf> {
     let asset = match &asset.asset_type {
-        AssetType::Banner => format!("../assets/banners/{}", asset.name),
-        AssetType::Crest => format!("../assets/crests/{}", asset.name),
-        AssetType::DDragon => format!("../assets/ddragon/{}", asset.name),
-        AssetType::Lanes => format!("../assets/lanes/{}", asset.name),
-        AssetType::Mastery => format!("../assets/masteries/{}", asset.name),
-        AssetType::Other => format!("../assets/other/{}", asset.name),
-        AssetType::Ranks => format!("../assets/ranks/{}", asset.name),
+        AssetType::Crest => format!("assets/crests/{}", asset.name),
+        AssetType::DDragon => format!("assets/ddragon/{}", asset.name),
+        AssetType::Lanes => format!("assets/lanes/{}", asset.name),
+        AssetType::Mastery => format!("assets/masteries/{}", asset.name),
+        AssetType::Other => format!("assets/other/{}", asset.name),
+        AssetType::Ranks => format!("assets/ranks/{}", asset.name),
         AssetType::Online(online_asset) => {
             return Ok(get_online_asset(&asset.name, &online_asset).await?);
         }
-        AssetType::Fonts => format!("../assets/fonts/{}", asset.name),
+        AssetType::Fonts => format!("assets/fonts/{}", asset.name),
     };
 
-    Ok(current_dir()?.join(asset))
+    Ok(get_current_dir().join(asset))
 }
 
 pub fn get_background_asset() -> Asset {

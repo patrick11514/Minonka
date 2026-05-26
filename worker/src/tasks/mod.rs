@@ -9,6 +9,7 @@ pub mod team;
 pub mod types;
 
 use crate::context::AppContext;
+use tracing::instrument;
 
 use self::cherry_match::CherryMatchTask;
 use self::match_task::MatchTask;
@@ -19,6 +20,7 @@ use self::task::Task;
 use self::team::TeamTask;
 use self::types::FileResult;
 
+#[instrument(skip(payload, context), fields(job_name = %job_name))]
 pub async fn dispatch(
     job_name: &str,
     payload: &str,

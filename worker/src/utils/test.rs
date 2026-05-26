@@ -8,7 +8,9 @@ macro_rules! assert_task_save {
         let input = (<$task_type as $crate::tasks::task::Task>::parse_input)(&payload)
             .expect("Failed to parse task input JSON");
 
-        let context = $crate::context::AppContext::new().await;
+        let context = $crate::context::AppContext::new()
+            .await
+            .expect("Failed to initialize worker context");
 
         let outcome = (<$task_type as $crate::tasks::task::Task>::run)(input, context)
             .await
@@ -37,7 +39,9 @@ macro_rules! assert_task_visual {
         let input = (<$task_type as $crate::tasks::task::Task>::parse_input)(&payload)
             .expect("Failed to parse task input JSON");
 
-        let context = $crate::context::AppContext::new().await;
+        let context = $crate::context::AppContext::new()
+            .await
+            .expect("Failed to initialize worker context");
 
         let outcome = (<$task_type as $crate::tasks::task::Task>::run)(input, context)
             .await

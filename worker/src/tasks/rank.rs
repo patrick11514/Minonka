@@ -62,7 +62,7 @@ impl Task for RankTask {
             resolved_ranks.push((rank_entry, rank_path));
         }
 
-        let mut avatar_sprite = Sprite::from_path(&avatar_path.to_string_lossy(), 0, 16);
+        let mut avatar_sprite = Sprite::from_path(&avatar_path.to_string_lossy(), 0, 16)?;
         avatar_sprite.resize_to_width(360);
 
         let level_background = Asset::new(AssetType::Other, "level.png");
@@ -110,7 +110,7 @@ impl Task for RankTask {
             .gap(240);
 
         for (rank_entry, rank_path) in resolved_ranks {
-            let mut rank_sprite = Sprite::from_path(&rank_path.to_string_lossy(), 0, 0);
+            let mut rank_sprite = Sprite::from_path(&rank_path.to_string_lossy(), 0, 0)?;
             rank_sprite.resize_to_width(250);
 
             let total_games = rank_entry.wins + rank_entry.losses;
@@ -163,7 +163,7 @@ impl Task for RankTask {
         }
 
         let canvas = MasterCanvas::from_asset(get_background_asset(), context.into())
-            .await
+            .await?
             .with_layout(|root| {
                 root.padding(10)
                     .direction(FlexDirection::Row)

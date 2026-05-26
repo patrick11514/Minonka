@@ -18,11 +18,10 @@ impl Sprite {
         Self { image, x, y }
     }
 
-    pub fn from_path(path: &str, x: u32, y: u32) -> Self {
-        let image = image::open(path)
-            .expect("Failed to open sprite image")
-            .to_rgba8();
-        Self::new(image, x, y)
+    #[tracing::instrument(fields(path = %path))]
+    pub fn from_path(path: &str, x: u32, y: u32) -> TaskResult<Self> {
+        let image = image::open(path).map_err(TaskError::Image)?.to_rgba8();
+        Ok(Self::new(image, x, y))
     }
 
     pub fn from_path_checked(path: &str, x: u32, y: u32) -> Result<Self, image::ImageError> {
@@ -30,6 +29,7 @@ impl Sprite {
         Ok(Self::new(image, x, y))
     }
 
+    #[tracing::instrument(skip(asset), fields(asset = %asset.name))]
     pub async fn from_asset(asset: &Asset, x: u32, y: u32) -> TaskResult<Self> {
         let path = crate::utils::assets::asset_path(asset).await?;
         Ok(Self::from_path_checked(&path.to_string_lossy(), x, y)?)
