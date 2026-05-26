@@ -18,6 +18,7 @@ use crate::utils::assets::{
     Asset, AssetType, Rank, asset_path, get_background_asset, get_profile_icon, get_rank_asset,
 };
 use crate::utils::locale::AppLocale;
+use crate::utils::rank_to_label;
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -41,22 +42,6 @@ pub struct RankTaskInput {
 }
 
 pub struct RankTask;
-
-fn rank_color(tier: &str) -> Color {
-    match tier {
-        "CHALLENGER" => Color::from_hex("#E8CD7F"),
-        "GRANDMASTER" => Color::from_hex("#D34C5C"),
-        "MASTER" => Color::from_hex("#9F5FE0"),
-        "DIAMOND" => Color::from_hex("#58B9E8"),
-        "EMERALD" => Color::from_hex("#4CCF9A"),
-        "PLATINUM" => Color::from_hex("#42B7AA"),
-        "GOLD" => Color::from_hex("#D9B14A"),
-        "SILVER" => Color::from_hex("#BDC3C7"),
-        "BRONZE" => Color::from_hex("#B27A50"),
-        "IRON" => Color::from_hex("#9A8F8F"),
-        _ => Color::White,
-    }
-}
 
 impl Task for RankTask {
     type Input = RankTaskInput;
@@ -146,14 +131,9 @@ impl Task for RankTask {
                             .bold(),
                     )
                     .child(
-                        Label::new(format!(
-                            "{} {}",
-                            locale.tier_label(&rank_entry.tier),
-                            rank_entry.rank
-                        ))
-                        .size(60)
-                        .bold()
-                        .color(rank_color(&rank_entry.tier)),
+                        rank_to_label(&rank_entry.tier, &rank_entry.rank, &locale)
+                            .size(60)
+                            .bold(),
                     )
                     .child(rank_sprite)
                     .child(

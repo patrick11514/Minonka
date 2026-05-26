@@ -5,7 +5,11 @@ use std::{
 
 use tokio::fs;
 
-use crate::tasks::error::TaskResult;
+use crate::{
+    draw::{color::Color, label::Label},
+    tasks::error::TaskResult,
+    utils::locale::AppLocale,
+};
 
 pub mod assets;
 pub mod locale;
@@ -51,4 +55,29 @@ pub fn first_upper(value: &str) -> String {
     let mut chars = lower.chars();
     let first = chars.next().unwrap_or_default().to_ascii_uppercase();
     format!("{first}{}", chars.collect::<String>())
+}
+
+pub fn rank_color(tier: &str) -> Color {
+    match tier {
+        "CHALLENGER" => Color::from_hex("#E8CD7F"),
+        "GRANDMASTER" => Color::from_hex("#D34C5C"),
+        "MASTER" => Color::from_hex("#9F5FE0"),
+        "DIAMOND" => Color::from_hex("#58B9E8"),
+        "EMERALD" => Color::from_hex("#4CCF9A"),
+        "PLATINUM" => Color::from_hex("#42B7AA"),
+        "GOLD" => Color::from_hex("#D9B14A"),
+        "SILVER" => Color::from_hex("#BDC3C7"),
+        "BRONZE" => Color::from_hex("#B27A50"),
+        "IRON" => Color::from_hex("#9A8F8F"),
+        _ => Color::White,
+    }
+}
+
+pub fn rank_to_label(tier: &str, rank: &str, locale: &AppLocale) -> Label {
+    Label::new(if matches!(tier, "MASTER" | "GRANDMASTER" | "CHALLENGER") {
+        locale.tier_label(tier)
+    } else {
+        format!("{} {}", locale.tier_label(tier), rank)
+    })
+    .color(rank_color(tier))
 }
