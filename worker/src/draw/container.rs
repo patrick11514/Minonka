@@ -21,7 +21,7 @@ impl Padding {
 }
 
 #[derive(Default, Clone, Copy)]
-pub enum FlexDirection {
+pub enum ContainerDirection {
     #[default]
     Row,
     Column,
@@ -48,7 +48,7 @@ pub struct Container {
     children: Vec<Box<dyn Renderable>>,
     width: Option<u32>,
     height: Option<u32>,
-    direction: FlexDirection,
+    direction: ContainerDirection,
     justify: JustifyContent,
     align_items: AlignItems,
     gap: u32,
@@ -63,7 +63,7 @@ impl Container {
             y: 0,
             width: None,
             height: None,
-            direction: FlexDirection::Row,
+            direction: ContainerDirection::Row,
             justify: JustifyContent::Start,
             align_items: AlignItems::Start,
             gap: 0,
@@ -94,7 +94,7 @@ impl Container {
         self.height = Some(dimensions.1);
         self
     }
-    pub fn direction(mut self, dir: FlexDirection) -> Self {
+    pub fn direction(mut self, dir: ContainerDirection) -> Self {
         self.direction = dir;
         self
     }
@@ -185,11 +185,11 @@ impl Container {
             let (cw, ch) = child.size(fonts);
 
             match self.direction {
-                FlexDirection::Row => {
+                ContainerDirection::Row => {
                     content_w += cw;
                     content_h = content_h.max(ch);
                 }
-                FlexDirection::Column => {
+                ContainerDirection::Column => {
                     content_w = content_w.max(cw);
                     content_h += ch;
                 }
@@ -199,8 +199,8 @@ impl Container {
         if !self.children.is_empty() {
             let total_gaps = (self.children.len() as u32 - 1) * self.gap;
             match self.direction {
-                FlexDirection::Row => content_w += total_gaps,
-                FlexDirection::Column => content_h += total_gaps,
+                ContainerDirection::Row => content_w += total_gaps,
+                ContainerDirection::Column => content_h += total_gaps,
             }
         }
 
@@ -226,12 +226,12 @@ impl Renderable for Container {
 
         if self.splits.is_empty() {
             match self.direction {
-                FlexDirection::Row => {
+                ContainerDirection::Row => {
                     if matches!(self.justify, JustifyContent::Center) && inner_w > content_w {
                         cursor_x += ((inner_w - content_w) / 2) as i32;
                     }
                 }
-                FlexDirection::Column => {
+                ContainerDirection::Column => {
                     if matches!(self.justify, JustifyContent::Center) && inner_h > content_h {
                         cursor_y += ((inner_h - content_h) / 2) as i32;
                     }
@@ -249,14 +249,14 @@ impl Renderable for Container {
 
             if !self.splits.is_empty() && i < self.splits.len() {
                 match self.direction {
-                    FlexDirection::Row => {
+                    ContainerDirection::Row => {
                         let available_w = inner_w.saturating_sub(total_gaps);
                         cell_w = (available_w * self.splits[i]) / 100;
                         if cell_w > cw {
                             cell_align_x = (cell_w - cw) / 2;
                         }
                     }
-                    FlexDirection::Column => {
+                    ContainerDirection::Column => {
                         let available_h = inner_h.saturating_sub(total_gaps);
                         cell_h = (available_h * self.splits[i]) / 100;
                         if cell_h > ch {
@@ -270,12 +270,12 @@ impl Renderable for Container {
             let mut cross_offset_y = 0;
 
             match self.direction {
-                FlexDirection::Row => {
+                ContainerDirection::Row => {
                     if matches!(self.align_items, AlignItems::Center) && inner_h > ch {
                         cross_offset_y = (inner_h - ch) / 2;
                     }
                 }
-                FlexDirection::Column => {
+                ContainerDirection::Column => {
                     if matches!(self.align_items, AlignItems::Center) && inner_w > cw {
                         cross_offset_x = (inner_w - cw) / 2;
                     }
@@ -290,10 +290,10 @@ impl Renderable for Container {
                 let raw_content_h = content_h.saturating_sub(total_gaps);
 
                 match self.direction {
-                    FlexDirection::Row => {
+                    ContainerDirection::Row => {
                         (inner_w.saturating_sub(raw_content_w)) / (num_children as u32 - 1)
                     }
-                    FlexDirection::Column => {
+                    ContainerDirection::Column => {
                         (inner_h.saturating_sub(raw_content_h)) / (num_children as u32 - 1)
                     }
                 }
@@ -310,8 +310,8 @@ impl Renderable for Container {
 
             if i < num_children - 1 {
                 match self.direction {
-                    FlexDirection::Row => cursor_x += (cell_w + current_gap) as i32,
-                    FlexDirection::Column => cursor_y += (cell_h + current_gap) as i32,
+                    ContainerDirection::Row => cursor_x += (cell_w + current_gap) as i32,
+                    ContainerDirection::Column => cursor_y += (cell_h + current_gap) as i32,
                 }
             }
         }

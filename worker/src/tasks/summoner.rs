@@ -1,4 +1,3 @@
-use futures::stream::select_all::IterMut;
 use futures::{StreamExt, stream};
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
@@ -7,7 +6,7 @@ use crate::cache::ddragon::DdragonCache;
 use crate::cache::json::JsonCache;
 use crate::context::AppContext;
 use crate::draw::color::Color;
-use crate::draw::container::{AlignItems, Container, FlexDirection};
+use crate::draw::container::{AlignItems, Container, ContainerDirection};
 use crate::draw::label::{Alignment, Label};
 use crate::draw::master_canvas::MasterCanvas;
 use crate::draw::sprite::Sprite;
@@ -275,7 +274,7 @@ impl Task for SummonerTask {
                 locale.region(&input.default.region),
             )?
             .with_layout(|root| {
-                root.direction(FlexDirection::Column)
+                root.direction(ContainerDirection::Column)
                     .align_items(AlignItems::Center)
                     .gap(35)
                     .child(
@@ -307,7 +306,7 @@ impl Task for SummonerTask {
                     .child(
                         Container::new()
                             .y(10)
-                            .direction(FlexDirection::Column)
+                            .direction(ContainerDirection::Column)
                             .align_items(AlignItems::Center)
                             .child(
                                 Label::new(format!(
@@ -321,7 +320,7 @@ impl Task for SummonerTask {
                     )
                     .child(
                         Container::new()
-                            .direction(FlexDirection::Row)
+                            .direction(ContainerDirection::Row)
                             .gap(10)
                             .align_items(AlignItems::Center)
                             .childs(

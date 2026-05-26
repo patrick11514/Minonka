@@ -3,7 +3,7 @@ use ts_rs::TS;
 
 use crate::context::AppContext;
 use crate::draw::color::Color;
-use crate::draw::container::{AlignItems, Container, FlexDirection, JustifyContent};
+use crate::draw::container::{AlignItems, Container, ContainerDirection, JustifyContent};
 use crate::draw::label::{Alignment, Label};
 use crate::draw::master_canvas::MasterCanvas;
 use crate::draw::sprite::Sprite;
@@ -72,13 +72,13 @@ impl Task for RankTask {
         let center_of_level_background = level_background.dimensions().0 / 2;
 
         let left_column = Container::new()
-            .direction(FlexDirection::Column)
+            .direction(ContainerDirection::Column)
             .align_items(AlignItems::Center)
             .gap(40)
             .x(80)
             .child(
                 Container::new()
-                    .direction(FlexDirection::Column)
+                    .direction(ContainerDirection::Column)
                     .align_items(AlignItems::Center)
                     .child(
                         Label::new(locale.region(&input.default.region).to_ascii_uppercase())
@@ -106,7 +106,7 @@ impl Task for RankTask {
             );
 
         let mut ranks_row = Container::new()
-            .direction(FlexDirection::Row)
+            .direction(ContainerDirection::Row)
             .justify(JustifyContent::Center)
             .gap(240);
 
@@ -123,7 +123,7 @@ impl Task for RankTask {
 
             ranks_row = ranks_row.child(
                 Container::new()
-                    .direction(FlexDirection::Column)
+                    .direction(ContainerDirection::Column)
                     .align_items(AlignItems::Center)
                     .gap(4)
                     .child(
@@ -167,7 +167,7 @@ impl Task for RankTask {
             .await?
             .with_layout(|root| {
                 root.padding(10)
-                    .direction(FlexDirection::Row)
+                    .direction(ContainerDirection::Row)
                     .justify(JustifyContent::SpaceBetween)
                     .align_items(AlignItems::Center)
                     .splits(vec![30, 70])
