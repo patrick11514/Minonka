@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use crate::{
     tasks::error::TaskResult,
-    utils::{get_cache_folder, get_current_dir, rank::Tier},
+    utils::{get_cache_folder, rank::Tier},
 };
 
 #[derive(Debug, Clone)]
@@ -12,7 +12,6 @@ pub enum OnlineAsset {
 
 #[derive(Debug, Clone)]
 pub enum AssetType {
-    Banner,
     Crest,
     DDragon,
     Lanes,
@@ -60,12 +59,12 @@ async fn get_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<PathBuf
 
 pub async fn asset_path(asset: &Asset) -> TaskResult<PathBuf> {
     let asset = match &asset.asset_type {
-        AssetType::Crest => format!("assets/crests/{}", asset.name),
-        AssetType::DDragon => format!("assets/ddragon/{}", asset.name),
-        AssetType::Lanes => format!("assets/lanes/{}", asset.name),
-        AssetType::Mastery => format!("assets/masteries/{}", asset.name),
-        AssetType::Other => format!("assets/other/{}", asset.name),
-        AssetType::Ranks => format!("assets/ranks/{}", asset.name),
+        AssetType::Crest => format!("../assets/crests/{}", asset.name),
+        AssetType::DDragon => format!("../assets/ddragon/{}", asset.name),
+        AssetType::Lanes => format!("../assets/lanes/{}", asset.name),
+        AssetType::Mastery => format!("../assets/masteries/{}", asset.name),
+        AssetType::Other => format!("../assets/other/{}", asset.name),
+        AssetType::Ranks => format!("../assets/ranks/{}", asset.name),
         AssetType::Online(online_asset) => {
             return Ok(get_online_asset(&asset.name, &online_asset).await?);
         }
@@ -96,49 +95,18 @@ pub async fn get_profile_icon(id: u32) -> TaskResult<Asset> {
     }
 }
 
-pub enum Rank {
-    Challenger,
-    Grandmaster,
-    Master,
-    Diamond,
-    Emerald,
-    Platinum,
-    Gold,
-    Silver,
-    Bronze,
-    Iron,
-}
-
-impl From<&String> for Rank {
-    fn from(s: &String) -> Self {
-        match s.to_uppercase().as_str() {
-            "CHALLENGER" => Rank::Challenger,
-            "GRANDMASTER" => Rank::Grandmaster,
-            "MASTER" => Rank::Master,
-            "DIAMOND" => Rank::Diamond,
-            "EMERALD" => Rank::Emerald,
-            "PLATINUM" => Rank::Platinum,
-            "GOLD" => Rank::Gold,
-            "SILVER" => Rank::Silver,
-            "BRONZE" => Rank::Bronze,
-            "IRON" => Rank::Iron,
-            _ => panic!("Unknown rank: {}", s),
-        }
-    }
-}
-
-pub fn get_rank_asset(rank: &Rank) -> Asset {
+pub fn get_rank_asset(rank: &Tier) -> Asset {
     let name = match rank {
-        Rank::Challenger => "Challenger.png",
-        Rank::Grandmaster => "Grandmaster.png",
-        Rank::Master => "Master.png",
-        Rank::Diamond => "Diamond.png",
-        Rank::Emerald => "Emerald.png",
-        Rank::Platinum => "Platinum.png",
-        Rank::Gold => "Gold.png",
-        Rank::Silver => "Silver.png",
-        Rank::Bronze => "Bronze.png",
-        Rank::Iron => "Iron.png",
+        Tier::Challenger => "Challenger.png",
+        Tier::Grandmaster => "Grandmaster.png",
+        Tier::Master => "Master.png",
+        Tier::Diamond => "Diamond.png",
+        Tier::Emerald => "Emerald.png",
+        Tier::Platinum => "Platinum.png",
+        Tier::Gold => "Gold.png",
+        Tier::Silver => "Silver.png",
+        Tier::Bronze => "Bronze.png",
+        Tier::Iron => "Iron.png",
     };
 
     // assets/ranks/Ranked Emblems Latest/Rank=%.png

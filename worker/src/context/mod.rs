@@ -6,16 +6,26 @@ use crate::{
     context::font_registry::{FontRegistry, FontType},
     tasks::error::{TaskError, TaskResult},
     utils::{
-        assets::{Asset, AssetType, asset_path},
         ddragon_cache,
+        {
+            assets::{Asset, AssetType, asset_path},
+            ddragon_cache,
+        },
     },
 };
 
 pub mod font_registry;
 
+/// AppContext is cloned on each job, the inside objects should be
+/// simple to clone, to for heavy objects, use Arc inside.
+///
+/// Don't forget to implement Into<T> for any field inside for
+/// easy access in tasks. (beacuse in future the job might accept
+/// From<AppContext> instead of AppContext directly)
 #[derive(Debug, Clone)]
 pub struct AppContext {
     fonts: FontRegistry,
+    ddragon_cache: ddragon_cache::DdragonCache,
 }
 
 impl AppContext {
@@ -30,6 +40,7 @@ impl AppContext {
 
         Ok(Self {
             fonts: FontRegistry::new(fonts),
+            ddragon_cache: ddragon_cache::DdragonCache::new(),
             ddragon_cache: ddragon_cache::DdragonCache::new(),
         })
     }
@@ -52,5 +63,11 @@ impl AppContext {
 impl Into<FontRegistry> for AppContext {
     fn into(self) -> FontRegistry {
         self.fonts
+    }
+}
+
+impl Into<ddragon_cache::DdragonCache> for AppContext {
+    fn into(self) -> ddragon_cache::DdragonCache {
+        self.ddragon_cache
     }
 }

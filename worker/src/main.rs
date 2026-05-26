@@ -1,3 +1,5 @@
+use std::fs;
+
 use futures_util::{SinkExt, StreamExt};
 use serde_json::json;
 use tokio::time::{Duration, sleep};
@@ -93,7 +95,7 @@ async fn setup_websocket(url: &str) -> Result<(), Box<dyn std::error::Error>> {
 
             info!(target = "worker", job_name = %job_name, job_id = %job_id, "received job");
 
-            // fs::write(format!("test_files/{}.json", job_name), &str_data).ok();
+            fs::write(format!("test_files/{}.json", job_name), &str_data).ok();
 
             let write_clone = std::sync::Arc::clone(&write_stream);
             let context_clone = context.clone();

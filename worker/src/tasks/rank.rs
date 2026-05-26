@@ -15,9 +15,10 @@ use crate::tasks::{
     types::{DefaultParametersInput, WorkerJob},
 };
 use crate::utils::assets::{
-    Asset, AssetType, Rank, asset_path, get_background_asset, get_profile_icon, get_rank_asset,
+    Asset, AssetType, asset_path, get_background_asset, get_profile_icon, get_rank_asset,
 };
 use crate::utils::locale::AppLocale;
+use crate::utils::rank::Tier;
 use crate::utils::rank_to_label;
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -57,7 +58,7 @@ impl Task for RankTask {
 
         let mut resolved_ranks = Vec::new();
         for rank_entry in input.ranks {
-            let rank_asset = get_rank_asset(&Rank::from(&rank_entry.tier));
+            let rank_asset = get_rank_asset(&Tier::from(&rank_entry.tier));
             let rank_path = asset_path(&rank_asset).await?;
             resolved_ranks.push((rank_entry, rank_path));
         }

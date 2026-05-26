@@ -44,7 +44,7 @@ export const ChallengeSchema = z.object({
     ),
     challenges: z.array(
         z.object({
-            challengeId: z.number(),
+            challengeId: z.coerce.bigint(),
             percentile: z.number(),
             level: ChallengeTier,
             value: z.number(),
@@ -57,7 +57,7 @@ export const ChallengeSchema = z.object({
         .object({
             bannerAccent: z.coerce.number(),
             title: z.string(),
-            challengeIds: z.array(z.number()),
+            challengeIds: z.array(z.coerce.bigint()),
             crestBorder: z.coerce.number(),
             prestigeCrestBorderLevel: z.coerce.number()
         })

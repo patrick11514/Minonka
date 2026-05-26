@@ -1,3 +1,4 @@
+import { RankTier } from '$/types/worker/RankTier';
 import { z } from 'zod';
 import { getLocale } from '../langs';
 
@@ -92,6 +93,16 @@ export class Rank {
 
     isTiered() {
         return this.tierIndex < 7;
+    }
+
+    toRust(): RankTier {
+        return {
+            tierIndex: this.tierIndex,
+            tier: this.getTier(),
+            rankIndex: this.rankIndex,
+            rank: this.getRank(),
+            lp: this.lp
+        };
     }
 }
 

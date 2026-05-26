@@ -57,6 +57,63 @@ impl Sprite {
     pub fn into_image(self) -> RgbaImage {
         self.image
     }
+
+    pub fn roundify(&mut self, radius: f32) {
+        let (width, height) = self.dimensions();
+        if width == 0 || height == 0 || radius <= 0.0 {
+            return;
+        }
+
+        // SVG automatically clamps the radius to half the width/height to prevent visual bugs.
+        // We do the same here.
+        let radius = radius.min(width as f32 / 2.0).min(height as f32 / 2.0);
+
+        for (x, y, pixel) in self.image.enumerate_pixels_mut() {
+            // Add 0.5 to measure from the center of the pixel
+            let px = x as f32 + 0.5;
+            let py = y as f32 + 0.5;
+
+            // Determine if the pixel is inside one of the 4 corner regions
+            let cx = if px < radius {
+                radius
+            } else if px > (width as f32 - radius) {
+                width as f32 - radius
+            } else {
+                continue; // Pixel is in a safe middle zone horizontally
+            };
+
+            let cy = if py < radius {
+                radius
+            } else if py > (height as f32 - radius) {
+                height as f32 - radius
+            } else {
+                continue; // Pixel is in a safe middle zone vertically
+            };
+
+            // Calculate distance to the corner's radial center
+            let dx = px - cx;
+            let dy = py - cy;
+            let distance = (dx * dx + dy * dy).sqrt();
+
+            if distance > radius {
+                // Pixel is completely outside the rounded corner
+                pixel[3] = 0;
+            } else if distance > radius - 1.0 {
+                // Anti-aliasing: smooth out the jagged pixel edges along the curve
+                let alpha_factor = radius - distance;
+                pixel[3] = (pixel[3] as f32 * alpha_factor) as u8;
+            }
+        }
+    }
+
+    /// Helper method: Turns the sprite into a perfect circle
+    /// (Extremely common for Profile Icons and Champion Portraits)
+    pub fn roundify_circle(&mut self) {
+        let (width, height) = self.dimensions();
+        // A perfect circle's radius is half of the shortest side
+        let max_radius = (width.min(height) as f32) / 2.0;
+        self.roundify(max_radius);
+    }
 }
 
 impl Renderable for Sprite {

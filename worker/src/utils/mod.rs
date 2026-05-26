@@ -12,7 +12,9 @@ use crate::{
 };
 
 pub mod assets;
+pub mod ddragon_cache;
 pub mod locale;
+pub mod rank;
 pub mod storage;
 pub mod test;
 

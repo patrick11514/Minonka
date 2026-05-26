@@ -2,6 +2,9 @@ use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 use crate::context::AppContext;
+use crate::draw::master_canvas::MasterCanvas;
+use crate::draw::sprite::Sprite;
+use crate::tasks::task::SaveStrategy;
 use crate::tasks::{
     error::TaskResult,
     task::{Task, TaskOutcome},
@@ -10,14 +13,22 @@ use crate::tasks::{
 use crate::utils::assets::{Asset, AssetType, OnlineAsset, get_profile_icon};
 use crate::utils::ddragon_cache::DdragonCache;
 use crate::utils::locale::AppLocale;
-use crate::utils::rank::RankTier;
+use crate::utils::rank::{RankTier, Tier};
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(feature = "export-ts", ts(export))]
 pub struct SummonerChallengeInput {
-    pub challenge_id: u64,
+    pub challenge_id: i64,
     pub level: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "export-ts", ts(export))]
+pub enum BannerType {
+    Default(u32),
+    Ranked,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -29,8 +40,9 @@ pub struct SummonerTaskInput {
     pub title_id: Option<String>,
     pub crest: u32,
     pub prestige_crest: u32,
-    pub banner: u32,
-    pub challenges: Vec<u64>,
+    pub banner: BannerType,
+    pub highest_rank: Option<RankTier>,
+    pub challenges: Vec<i64>,
     pub user_challenges: Vec<SummonerChallengeInput>,
 }
 
@@ -87,9 +99,7 @@ fn find_banner_name(
             banner.map_or(DEFAULT_BANNER.to_string(), |b| b.name.clone())
         }
         BannerType::Ranked => {
-            let Some(rank_tier) = highest_rank else {
-                return DEFAULT_BANNER.to_string();
-            };
+            let rank_tier = highest_rank.expect("Highest rank must be provided for ranked banner");
 
             let banner = banners.iter().find(|banner| {
                 banner
@@ -110,7 +120,7 @@ impl Task for SummonerTask {
     const JOB: WorkerJob = WorkerJob::Summoner;
 
     async fn run(input: Self::Input, context: AppContext) -> TaskResult<TaskOutcome> {
-        let _locale = AppLocale::from_str(&input.default.locale);
+        let locale = AppLocale::from_str(&input.default.locale);
         let ddragon_cache: DdragonCache = context.clone().into();
 
         let banners = ddragon_cache
@@ -122,6 +132,10 @@ impl Task for SummonerTask {
             None => DEFAULT_BANNER.to_string(),
         };
 
+        let banner = banners.map_or(DEFAULT_BANNER.to_string(), |banners| {
+            find_banner_name(&banners, input.banner, input.highest_rank.clone())
+        });
+
         let background = Asset::new(
             AssetType::Online(OnlineAsset::CommunityDragon),
             format!("/game/assets/loadouts/regalia/banners/{}", banner),
@@ -130,10 +144,10 @@ impl Task for SummonerTask {
         let level_background = Asset::new(AssetType::Other, "level.png");
         let mut level_background = Sprite::from_asset(&level_background, 0, 0).await?;
         level_background.resize_to_width(160);
-        let _center_of_level_background = level_background.dimensions().0 / 2;
+        let center_of_level_background = level_background.dimensions().0 / 2;
 
         let profile_icon = get_profile_icon(input.default.profile_icon_id).await?;
-        let _profile_icon = Sprite::from_asset(&profile_icon, 0, 0)
+        let profile_icon = Sprite::from_asset(&profile_icon, 0, 0)
             .await?
             .roundify_circle();
 
@@ -145,16 +159,16 @@ impl Task for SummonerTask {
                     "{}_base.png",
                     input
                         .highest_rank
-                        .as_ref()
-                        .map(|rank| rank.tier().as_lowercase_str().to_string())
-                        .unwrap_or_else(|| "iron".to_string())
+                        .expect("Highest rank must be provided for ranked crest")
+                        .tier()
+                        .as_lowercase_str()
                 )
             } else {
                 //pad number to 3 digits, so 1 becomes 001, 2 becomes 002, etc...
                 format!("prestige_crest_lvl_{:03}.png", input.prestige_crest)
             },
         );
-        let _crest = Sprite::from_asset(&crest, 0, 0).await?;
+        let crest = Sprite::from_asset(&crest, 0, 0).await?;
 
         //if one challange is selected, other places is filledw ith -1
         assert!(
@@ -163,7 +177,7 @@ impl Task for SummonerTask {
             input.challenges.len()
         );
 
-        let _challenges = input.challenges.iter().map(|challenge_id| {
+        let challenges = input.challenges.iter().map(|challenge_id| {
             let challenge = input
                 .user_challenges
                 .iter()
@@ -175,7 +189,7 @@ impl Task for SummonerTask {
             }
         });
 
-        let canvas = MasterCanvas::from_asset(background, context.into()).await?;
+        let canvas = MasterCanvas::from_asset(background, context.into()).await;
 
         Ok(TaskOutcome::Render(canvas, SaveStrategy::Temporary))
     }
