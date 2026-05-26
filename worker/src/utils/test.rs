@@ -63,3 +63,15 @@ macro_rules! assert_task_visual {
         }
     }};
 }
+
+#[cfg(test)]
+#[macro_export]
+macro_rules! assert_task {
+    ($task_type:ty, $json_path:expr) => {{
+        if cfg!(feature = "save") {
+            $crate::assert_task_save!($task_type, $json_path);
+        } else {
+            $crate::assert_task_visual!($task_type, $json_path);
+        }
+    }};
+}

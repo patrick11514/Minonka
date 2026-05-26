@@ -179,34 +179,28 @@ impl Task for RankTask {
 }
 
 mod test {
-
-    #[tokio::test]
-    async fn test_save() {
-        crate::assert_task_save!(super::RankTask, "test_files/rank_single_solo.json");
-    }
-
     #[tokio::test]
     async fn test_rank_single_solo() {
-        crate::assert_task_visual!(super::RankTask, "test_files/rank_single_solo.json");
+        crate::assert_task!(super::RankTask, "test_files/rank_single_solo.json");
     }
 
     #[tokio::test]
     async fn test_rank_single_flex() {
-        crate::assert_task_visual!(super::RankTask, "test_files/rank_single_flex.json");
+        crate::assert_task!(super::RankTask, "test_files/rank_single_flex.json");
     }
 
     #[tokio::test]
     async fn test_rank_multiple() {
-        crate::assert_task_visual!(super::RankTask, "test_files/rank_multiple.json");
+        crate::assert_task!(super::RankTask, "test_files/rank_multiple.json");
     }
 
     #[tokio::test]
     async fn test_rank_multiple_2() {
-        crate::assert_task_visual!(super::RankTask, "test_files/rank_multiple_2.json");
+        crate::assert_task!(super::RankTask, "test_files/rank_multiple_2.json");
     }
 
     #[tokio::test]
     async fn test_rank_empty() {
-        crate::assert_task_visual!(super::RankTask, "test_files/rank_empty.json");
+        crate::assert_task!(super::RankTask, "test_files/rank_empty.json");
     }
 }
