@@ -1,15 +1,21 @@
 {
-    "puuid": "08w8IZINms_nYmLpPedzKNDvB9bg-6yri49fDpkVfTyfx8CaUXIf00EY70qQpSnhMaVkU6_Ug_gCAw",
+    "puuid": "aRXNQRRrwxur001OSwE_0OUSSwaselQw_wjPCyaQWlaw5MI_m4yGL-_2eEh6xY9Ts2BLAOL2920Llw",
     "region": "EUN1",
     "level": 120,
     "gameName": "godpixel15",
     "tagLine": "EUNE",
     "profileIconId": 6617,
     "titleId": "30120104",
-    "banner": { "default": 0 },
+    "banner": {
+        "default": 0
+    },
     "crest": 2,
     "prestigeCrest": 50,
-    "challenges": [2022018, 303402, 303401],
+    "challenges": [
+        2022018,
+        303402,
+        303401
+    ],
     "userChallenges": [
         {
             "challengeId": 0,
@@ -377,7 +383,12 @@
             "value": 335,
             "achievedTime": 1666171474644
         },
-        { "challengeId": 303204, "percentile": 1, "level": "NONE", "value": 1 },
+        {
+            "challengeId": 303204,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 1
+        },
         {
             "challengeId": 2022014,
             "percentile": 0.057,
@@ -598,7 +609,12 @@
             "position": -400699,
             "playersInLevel": 1585918
         },
-        { "challengeId": 101000, "percentile": 1, "level": "NONE", "value": 25 },
+        {
+            "challengeId": 101000,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 25
+        },
         {
             "challengeId": 203402,
             "percentile": 0.197,
@@ -916,7 +932,12 @@
             "value": 90,
             "achievedTime": 1734888817843
         },
-        { "challengeId": 120000, "percentile": 1, "level": "NONE", "value": 5 },
+        {
+            "challengeId": 120000,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 5
+        },
         {
             "challengeId": 303301,
             "percentile": 0.048,
@@ -924,7 +945,12 @@
             "value": 158,
             "achievedTime": 1734886606106
         },
-        { "challengeId": 120003, "percentile": 1, "level": "NONE", "value": 45 },
+        {
+            "challengeId": 120003,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 45
+        },
         {
             "challengeId": 303302,
             "percentile": 0.049,
@@ -932,7 +958,12 @@
             "value": 8,
             "achievedTime": 1655583856714
         },
-        { "challengeId": 120002, "percentile": 1, "level": "NONE", "value": 1 },
+        {
+            "challengeId": 120002,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 1
+        },
         {
             "challengeId": 303303,
             "percentile": 0.119,
@@ -1003,7 +1034,12 @@
             "value": 39,
             "achievedTime": 1662370936852
         },
-        { "challengeId": 401107, "percentile": 1, "level": "NONE", "value": 2 },
+        {
+            "challengeId": 401107,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 2
+        },
         {
             "challengeId": 401104,
             "percentile": 0.23,
@@ -1067,7 +1103,12 @@
             "value": 1679,
             "achievedTime": 1681833503550
         },
-        { "challengeId": 101105, "percentile": 1, "level": "NONE", "value": 7 },
+        {
+            "challengeId": 101105,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 7
+        },
         {
             "challengeId": 301300,
             "percentile": 0.178,
@@ -1075,7 +1116,12 @@
             "value": 140,
             "achievedTime": 1681133192172
         },
-        { "challengeId": 101107, "percentile": 1, "level": "NONE", "value": 185 },
+        {
+            "challengeId": 101107,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 185
+        },
         {
             "challengeId": 301302,
             "percentile": 0.031,
@@ -1521,7 +1567,12 @@
             "value": 1,
             "achievedTime": 1766863374532
         },
-        { "challengeId": 302404, "percentile": 1, "level": "NONE", "value": 1 },
+        {
+            "challengeId": 302404,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 1
+        },
         {
             "challengeId": 204103,
             "percentile": 0.132,
@@ -1564,7 +1615,12 @@
             "value": 40,
             "achievedTime": 1681755479051
         },
-        { "challengeId": 101201, "percentile": 1, "level": "NONE", "value": 124 },
+        {
+            "challengeId": 101201,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 124
+        },
         {
             "challengeId": 101200,
             "percentile": 0.295,
@@ -1572,7 +1628,12 @@
             "value": 15,
             "achievedTime": 1702239587686
         },
-        { "challengeId": 101203, "percentile": 1, "level": "NONE", "value": 11 },
+        {
+            "challengeId": 101203,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 11
+        },
         {
             "challengeId": 101202,
             "percentile": 0.288,
@@ -1587,7 +1648,12 @@
             "value": 1,
             "achievedTime": 1702238369109
         },
-        { "challengeId": 101204, "percentile": 1, "level": "NONE", "value": 209 },
+        {
+            "challengeId": 101204,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 209
+        },
         {
             "challengeId": 203102,
             "percentile": 0.175,
@@ -1625,8 +1691,18 @@
             "value": 13,
             "achievedTime": 1702761714545
         },
-        { "challengeId": 2024308, "percentile": 1, "level": "NONE", "value": 4 },
-        { "challengeId": 2024306, "percentile": 1, "level": "NONE", "value": 945 },
+        {
+            "challengeId": 2024308,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 4
+        },
+        {
+            "challengeId": 2024306,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 945
+        },
         {
             "challengeId": 2024305,
             "percentile": 0.147,
@@ -1739,7 +1815,12 @@
             "value": 53,
             "achievedTime": 1725888449112
         },
-        { "challengeId": 602001, "percentile": 1, "level": "NONE", "value": 2 },
+        {
+            "challengeId": 602001,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 2
+        },
         {
             "challengeId": 303000,
             "percentile": 0.037,
@@ -1768,8 +1849,18 @@
             "value": 47,
             "achievedTime": 1685814306518
         },
-        { "challengeId": 601003, "percentile": 1, "level": "NONE", "value": 1 },
-        { "challengeId": 601006, "percentile": 1, "level": "NONE", "value": 1 },
+        {
+            "challengeId": 601003,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 1
+        },
+        {
+            "challengeId": 601006,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 1
+        },
         {
             "challengeId": 204203,
             "percentile": 0.219,
@@ -1798,7 +1889,12 @@
             "value": 725,
             "achievedTime": 1698010783396
         },
-        { "challengeId": 101300, "percentile": 1, "level": "NONE", "value": 5 },
+        {
+            "challengeId": 101300,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 5
+        },
         {
             "challengeId": 101303,
             "percentile": 0.212,
@@ -1806,7 +1902,12 @@
             "value": 1,
             "achievedTime": 1763928026013
         },
-        { "challengeId": 101307, "percentile": 1, "level": "NONE", "value": 2 },
+        {
+            "challengeId": 101307,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 2
+        },
         {
             "challengeId": 203203,
             "percentile": 0.144,

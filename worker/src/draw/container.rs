@@ -89,6 +89,11 @@ impl Container {
         self.height = Some(h);
         self
     }
+    pub fn size(mut self, dimensions: (u32, u32)) -> Self {
+        self.width = Some(dimensions.0);
+        self.height = Some(dimensions.1);
+        self
+    }
     pub fn direction(mut self, dir: FlexDirection) -> Self {
         self.direction = dir;
         self
@@ -148,6 +153,30 @@ impl Container {
         self
     }
 
+    pub fn child_if(mut self, child: Option<impl Renderable + 'static>) -> Self {
+        if let Some(child) = child {
+            self.children.push(Box::new(child));
+        }
+        self
+    }
+
+    pub fn childs(mut self, children: Vec<impl Renderable + 'static>) -> Self {
+        for child in children {
+            self.children.push(Box::new(child));
+        }
+        self
+    }
+
+    pub fn childs_if(mut self, children: Vec<Option<impl Renderable + 'static>>) -> Self {
+        for child in children {
+            if let Some(child) = child {
+                self.children.push(Box::new(child));
+            }
+        }
+
+        self
+    }
+
     fn calculate_content_size(&self, fonts: &FontRegistry) -> (u32, u32) {
         let mut content_w = 0;
         let mut content_h = 0;
@@ -180,7 +209,7 @@ impl Container {
 }
 
 impl Renderable for Container {
-    fn render(&self, canvas: &mut RgbaImage, fonts: &FontRegistry, offset_x: u32, offset_y: u32) {
+    fn render(&self, canvas: &mut RgbaImage, fonts: &FontRegistry, offset_x: i32, offset_y: i32) {
         let (total_w, total_h) = self.size(fonts);
         let (content_w, content_h) = self.calculate_content_size(fonts);
 
@@ -189,8 +218,8 @@ impl Renderable for Container {
         let inner_h = total_h.saturating_sub(self.padding.top + self.padding.bottom);
 
         // Advance start positions to accommodate internal padding gutters
-        let mut cursor_x = offset_x + self.x + self.padding.left;
-        let mut cursor_y = offset_y + self.y + self.padding.top;
+        let mut cursor_x = offset_x + self.x as i32 + self.padding.left as i32;
+        let mut cursor_y = offset_y + self.y as i32 + self.padding.top as i32;
 
         let num_children = self.children.len();
         let total_gaps = (num_children as u32).saturating_sub(1) * self.gap;
@@ -199,12 +228,12 @@ impl Renderable for Container {
             match self.direction {
                 FlexDirection::Row => {
                     if matches!(self.justify, JustifyContent::Center) && inner_w > content_w {
-                        cursor_x += (inner_w - content_w) / 2;
+                        cursor_x += ((inner_w - content_w) / 2) as i32;
                     }
                 }
                 FlexDirection::Column => {
                     if matches!(self.justify, JustifyContent::Center) && inner_h > content_h {
-                        cursor_y += (inner_h - content_h) / 2;
+                        cursor_y += ((inner_h - content_h) / 2) as i32;
                     }
                 }
             }
@@ -275,14 +304,14 @@ impl Renderable for Container {
             child.render(
                 canvas,
                 fonts,
-                cursor_x + cross_offset_x + cell_align_x,
-                cursor_y + cross_offset_y + cell_align_y,
+                cursor_x + (cross_offset_x + cell_align_x) as i32,
+                cursor_y + (cross_offset_y + cell_align_y) as i32,
             );
 
             if i < num_children - 1 {
                 match self.direction {
-                    FlexDirection::Row => cursor_x += cell_w + current_gap,
-                    FlexDirection::Column => cursor_y += cell_h + current_gap,
+                    FlexDirection::Row => cursor_x += (cell_w + current_gap) as i32,
+                    FlexDirection::Column => cursor_y += (cell_h + current_gap) as i32,
                 }
             }
         }

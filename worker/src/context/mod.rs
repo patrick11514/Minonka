@@ -3,15 +3,10 @@ use std::collections::HashMap;
 use ab_glyph::FontArc;
 
 use crate::{
+    cache::{ddragon::DdragonCache, json::JsonCache},
     context::font_registry::{FontRegistry, FontType},
     tasks::error::{TaskError, TaskResult},
-    utils::{
-        ddragon_cache,
-        {
-            assets::{Asset, AssetType, asset_path},
-            ddragon_cache,
-        },
-    },
+    utils::assets::{Asset, AssetType, asset_path},
 };
 
 pub mod font_registry;
@@ -25,7 +20,8 @@ pub mod font_registry;
 #[derive(Debug, Clone)]
 pub struct AppContext {
     fonts: FontRegistry,
-    ddragon_cache: ddragon_cache::DdragonCache,
+    ddragon_cache: DdragonCache,
+    json_cache: JsonCache,
 }
 
 impl AppContext {
@@ -40,8 +36,8 @@ impl AppContext {
 
         Ok(Self {
             fonts: FontRegistry::new(fonts),
-            ddragon_cache: ddragon_cache::DdragonCache::new(),
-            ddragon_cache: ddragon_cache::DdragonCache::new(),
+            ddragon_cache: DdragonCache::new(),
+            json_cache: JsonCache::new(),
         })
     }
 
@@ -66,8 +62,14 @@ impl Into<FontRegistry> for AppContext {
     }
 }
 
-impl Into<ddragon_cache::DdragonCache> for AppContext {
-    fn into(self) -> ddragon_cache::DdragonCache {
+impl Into<DdragonCache> for AppContext {
+    fn into(self) -> DdragonCache {
         self.ddragon_cache
+    }
+}
+
+impl Into<JsonCache> for AppContext {
+    fn into(self) -> JsonCache {
+        self.json_cache
     }
 }

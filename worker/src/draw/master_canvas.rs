@@ -1,6 +1,6 @@
 use crate::context::font_registry::FontRegistry;
 use crate::draw::{container::Container, renderable::Renderable};
-use crate::tasks::error::{TaskError, TaskResult};
+use crate::tasks::error::{TaskError, TaskResult, TaskResultExt};
 use crate::utils::assets::{Asset, asset_path};
 use image::DynamicImage;
 use image::RgbaImage;
@@ -24,16 +24,26 @@ impl MasterCanvas {
         }
     }
 
-    #[tracing::instrument(skip(fonts), fields(path = %path))]
+    #[tracing::instrument(skip(fonts), fields(path = %path), err)]
     pub fn from_path(path: &str, fonts: FontRegistry) -> TaskResult<Self> {
-        let background = image::open(path).map_err(TaskError::Image)?.to_rgba8();
+        let background = image::open(path)
+            .map_err(TaskError::Image)
+            .context("open image", path)?
+            .to_rgba8();
         Ok(Self::new(background, fonts))
     }
 
-    #[tracing::instrument(skip(fonts, asset), fields(asset = %asset.name))]
+    #[tracing::instrument(skip(fonts, asset), fields(asset = %asset.name, asset_type = ?asset.asset_type), err)]
     pub async fn from_asset(asset: Asset, fonts: FontRegistry) -> TaskResult<Self> {
-        let path = asset_path(&asset).await?;
-        let background = image::open(&path).map_err(TaskError::Image)?.to_rgba8();
+        let path = asset_path(&asset)
+            .await
+            .context("resolve asset path", asset.name.clone())?;
+        let path_display = path.to_string_lossy().to_string();
+
+        let background = image::open(&path)
+            .map_err(TaskError::Image)
+            .context("open image", path_display)?
+            .to_rgba8();
         Ok(Self::new(background, fonts))
     }
 

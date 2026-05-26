@@ -9,6 +9,7 @@ pub enum Color {
     Yellow,
     Green,
     Red,
+    Gray,
 }
 
 impl Color {
@@ -21,6 +22,7 @@ impl Color {
             Color::Yellow => Rgba([255, 255, 0, 255]),
             Color::Green => Rgba([0, 255, 0, 255]),
             Color::Red => Rgba([255, 0, 0, 255]),
+            Color::Gray => Rgba([138, 133, 120, 255]),
         }
     }
 

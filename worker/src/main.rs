@@ -7,10 +7,9 @@ use tokio_tungstenite::{
     connect_async,
     tungstenite::{client::IntoClientRequest, protocol::Message},
 };
-use tracing::{Instrument, error, info};
-use tracing_subscriber::{EnvFilter, fmt::format::FmtSpan};
+use tracing::{Instrument, error, info, warn};
 
-use worker::{context::AppContext, tasks};
+use worker::{context::AppContext, tasks, utils::init_tracing};
 
 #[tokio::main]
 async fn main() {
@@ -39,19 +38,7 @@ async fn main() {
     }
 }
 
-fn init_tracing() {
-    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-
-    let _ = tracing_subscriber::fmt()
-        .with_env_filter(filter)
-        .with_target(false)
-        .with_thread_ids(true)
-        .with_thread_names(true)
-        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
-        .try_init();
-}
-
-#[tracing::instrument(skip(url), fields(url = %url))]
+#[tracing::instrument(skip(url), fields(url = %url), err)]
 async fn setup_websocket(url: &str) -> Result<(), Box<dyn std::error::Error>> {
     //app state
     let context = AppContext::new().await?;
@@ -77,7 +64,7 @@ async fn setup_websocket(url: &str) -> Result<(), Box<dyn std::error::Error>> {
             // Parse the message: "job;jobId;startDate;strData"
             let parts: Vec<&str> = text.splitn(4, ';').collect();
             if parts.len() != 4 {
-                eprintln!("Received malformed message: {}", text);
+                warn!(target = "worker", payload = %text, "received malformed websocket message");
                 continue;
             }
 
@@ -102,23 +89,33 @@ async fn setup_websocket(url: &str) -> Result<(), Box<dyn std::error::Error>> {
 
             tokio::spawn(
                 async move {
-                    let response = match tasks::dispatch(&job_name, &str_data, context_clone).await {
+                    let (response, failed) = match tasks::dispatch(&job_name, &str_data, context_clone).await {
                         Ok(result) => {
                             let json = serde_json::to_string(&result)
                                 .unwrap_or_else(|_| json!({ "type": "temp", "data": "" }).to_string());
-                            format!("completed;{};{};{}", job_id, json, start_date)
+                            (format!("completed;{};{};{}", job_id, json, start_date), false)
                         }
                         Err(err) => {
+                            error!(
+                                target = "worker",
+                                job_name = %job_name,
+                                job_id = %job_id,
+                                error = %err,
+                                error_chain = %tasks::error::format_error_chain(&err),
+                                "job execution failed"
+                            );
                             let message = err.to_string().replace(';', ",");
-                            format!("error;{};{};;{}", job_id, message, start_date)
+                            (format!("error;{};{};;{}", job_id, message, start_date), true)
                         }
                     };
 
                     let mut writer = write_clone.lock().await;
                     if let Err(e) = writer.send(Message::Text(response.into())).await {
                         error!(target = "worker", error = %e, "failed to send job completion");
+                    } else if failed {
+                        info!(target = "worker", job_name = %job_name, job_id = %job_id, "job failure result sent");
                     } else {
-                        info!(target = "worker", job_name = %job_name, job_id = %job_id, "job finished");
+                        info!(target = "worker", job_name = %job_name, job_id = %job_id, "job completed");
                     }
                 }
                 .instrument(job_span),

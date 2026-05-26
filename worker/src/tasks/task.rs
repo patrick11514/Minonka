@@ -1,4 +1,5 @@
 use serde::de::DeserializeOwned;
+use tracing::error;
 use tracing::Instrument;
 use ts_rs::TS;
 
@@ -44,17 +45,31 @@ pub trait Task {
         let span = tracing::info_span!("task_run", task = Self::NAME);
 
         async move {
-            let input = Self::parse_input(payload)?;
+            let result = async {
+                let input = Self::parse_input(payload)?;
 
-            match Self::run(input, context).await? {
-                TaskOutcome::Existing(file_result) => Ok(file_result),
-                TaskOutcome::Render(canvas, strategy) => match strategy {
-                    SaveStrategy::Temporary => storage::save_temp_canvas(canvas).await,
-                    SaveStrategy::Persistent { filename } => {
-                        storage::save_persistent_canvas(canvas, &filename).await
-                    }
-                },
+                match Self::run(input, context).await? {
+                    TaskOutcome::Existing(file_result) => Ok(file_result),
+                    TaskOutcome::Render(canvas, strategy) => match strategy {
+                        SaveStrategy::Temporary => storage::save_temp_canvas(canvas).await,
+                        SaveStrategy::Persistent { filename } => {
+                            storage::save_persistent_canvas(canvas, &filename).await
+                        }
+                    },
+                }
             }
+            .await;
+
+            if let Err(err) = &result {
+                error!(
+                    task = Self::NAME,
+                    error = %err,
+                    error_chain = %crate::tasks::error::format_error_chain(err),
+                    "task runner failed"
+                );
+            }
+
+            result
         }
         .instrument(span)
     }

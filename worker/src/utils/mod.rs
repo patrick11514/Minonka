@@ -4,6 +4,7 @@ use std::{
 };
 
 use tokio::fs;
+use tracing_subscriber::{EnvFilter, fmt::format::FmtSpan};
 
 use crate::{
     draw::{color::Color, label::Label},
@@ -12,7 +13,6 @@ use crate::{
 };
 
 pub mod assets;
-pub mod ddragon_cache;
 pub mod locale;
 pub mod rank;
 pub mod storage;
@@ -82,4 +82,16 @@ pub fn rank_to_label(tier: &str, rank: &str, locale: &AppLocale) -> Label {
         format!("{} {}", locale.tier_label(tier), rank)
     })
     .color(rank_color(tier))
+}
+
+pub fn init_tracing() {
+    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
+
+    let _ = tracing_subscriber::fmt()
+        .with_env_filter(filter)
+        .with_target(false)
+        .with_thread_ids(true)
+        .with_thread_names(true)
+        .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
+        .try_init();
 }

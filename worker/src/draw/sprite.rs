@@ -3,7 +3,7 @@ use image::{RgbaImage, imageops};
 use crate::{
     context::font_registry::FontRegistry,
     draw::renderable::Renderable,
-    tasks::error::{TaskError, TaskResult},
+    tasks::error::{TaskError, TaskResult, TaskResultExt},
     utils::assets::Asset,
 };
 
@@ -18,9 +18,12 @@ impl Sprite {
         Self { image, x, y }
     }
 
-    #[tracing::instrument(fields(path = %path))]
+    #[tracing::instrument(fields(path = %path), err)]
     pub fn from_path(path: &str, x: u32, y: u32) -> TaskResult<Self> {
-        let image = image::open(path).map_err(TaskError::Image)?.to_rgba8();
+        let image = image::open(path)
+            .map_err(TaskError::Image)
+            .context("open sprite", path)?
+            .to_rgba8();
         Ok(Self::new(image, x, y))
     }
 
@@ -29,10 +32,16 @@ impl Sprite {
         Ok(Self::new(image, x, y))
     }
 
-    #[tracing::instrument(skip(asset), fields(asset = %asset.name))]
+    #[tracing::instrument(skip(asset), fields(asset = %asset.name, asset_type = ?asset.asset_type), err)]
     pub async fn from_asset(asset: &Asset, x: u32, y: u32) -> TaskResult<Self> {
-        let path = crate::utils::assets::asset_path(asset).await?;
-        Ok(Self::from_path_checked(&path.to_string_lossy(), x, y)?)
+        let path = crate::utils::assets::asset_path(asset)
+            .await
+            .context("resolve sprite asset path", asset.name.clone())?;
+        let path_display = path.to_string_lossy().to_string();
+
+        Ok(Self::from_path_checked(&path_display, x, y)
+            .map_err(TaskError::Image)
+            .context("open sprite", path_display)?)
     }
 
     pub fn resize_to_width(&mut self, width: u32) {
@@ -114,12 +123,22 @@ impl Sprite {
         let max_radius = (width.min(height) as f32) / 2.0;
         self.roundify(max_radius);
     }
+
+    pub fn x(mut self, x: u32) -> Self {
+        self.x = x;
+        self
+    }
+
+    pub fn y(mut self, y: u32) -> Self {
+        self.y = y;
+        self
+    }
 }
 
 impl Renderable for Sprite {
-    fn render(&self, canvas: &mut RgbaImage, _fonts: &FontRegistry, offset_x: u32, offset_y: u32) {
-        let new_offset_x = offset_x + self.x;
-        let new_offset_y = offset_y + self.y;
+    fn render(&self, canvas: &mut RgbaImage, _fonts: &FontRegistry, offset_x: i32, offset_y: i32) {
+        let new_offset_x = offset_x + self.x as i32;
+        let new_offset_y = offset_y + self.y as i32;
 
         imageops::overlay(
             canvas,

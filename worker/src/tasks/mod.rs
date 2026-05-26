@@ -9,6 +9,7 @@ pub mod team;
 pub mod types;
 
 use crate::context::AppContext;
+use tracing::error;
 use tracing::instrument;
 
 use self::cherry_match::CherryMatchTask;
@@ -20,13 +21,13 @@ use self::task::Task;
 use self::team::TeamTask;
 use self::types::FileResult;
 
-#[instrument(skip(payload, context), fields(job_name = %job_name))]
+#[instrument(skip(payload, context), fields(job_name = %job_name), err)]
 pub async fn dispatch(
     job_name: &str,
     payload: &str,
     context: AppContext,
 ) -> error::TaskResult<FileResult> {
-    match job_name {
+    let result = match job_name {
         CherryMatchTask::NAME => CherryMatchTask::run_from_json(payload, context).await,
         MatchTask::NAME => MatchTask::run_from_json(payload, context).await,
         RankTask::NAME => RankTask::run_from_json(payload, context).await,
@@ -34,5 +35,16 @@ pub async fn dispatch(
         SummonerTask::NAME => SummonerTask::run_from_json(payload, context).await,
         TeamTask::NAME => TeamTask::run_from_json(payload, context).await,
         _ => Err(error::TaskError::UnknownJob(job_name.to_string())),
+    };
+
+    if let Err(err) = &result {
+        error!(
+            job_name = %job_name,
+            error = %err,
+            error_chain = %error::format_error_chain(err),
+            "task dispatch failed"
+        );
     }
+
+    result
 }

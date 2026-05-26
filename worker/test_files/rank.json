@@ -1,1 +1,24 @@
-{"puuid":"qVMjop4aosgqXgK2B9hwCa5wRBeB1nnmWxvSN4qaHVrYWSZMWyEyxghWmieNny83HJrOUroXQowTug","region":"EUN1","gameName":"LightUpMyHole","tagLine":"Czech","profileIconId":3584,"level":566,"ranks":[{"leagueId":"01c6fe76-c9c1-44cb-a0a3-48c362490251","queueType":"RANKED_SOLO_5x5","tier":"GOLD","rank":"II","leaguePoints":16,"wins":30,"losses":26,"hotStreak":false,"veteran":false,"freshBlood":false,"inactive":false}],"locale":"cs"}
+{
+    "puuid": "yifOFqliop8SU01OSwFD2-QW0_ySwF2VHpVDSKQatxltaAbbtRjG7OdWWE7x0zZFGOr9JQEJYDErUA",
+    "region": "EUN1",
+    "gameName": "LightUpMyHole",
+    "tagLine": "Czech",
+    "profileIconId": 3584,
+    "level": 566,
+    "ranks": [
+        {
+            "leagueId": "01c6fe76-c9c1-44cb-a0a3-48c362490251",
+            "queueType": "RANKED_SOLO_5x5",
+            "tier": "GOLD",
+            "rank": "II",
+            "leaguePoints": 16,
+            "wins": 30,
+            "losses": 26,
+            "hotStreak": false,
+            "veteran": false,
+            "freshBlood": false,
+            "inactive": false
+        }
+    ],
+    "locale": "cs"
+}
