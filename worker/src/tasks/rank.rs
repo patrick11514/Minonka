@@ -82,7 +82,8 @@ impl Task for RankTask {
 
         let level_background = Asset::new(AssetType::Other, "level.png");
         let mut level_background = Sprite::from_asset(&level_background, 0, 0).await?;
-        level_background.resize_to_width(120);
+        level_background.resize_to_width(160);
+        let center_of_level_background = level_background.dimensions().0 / 2;
 
         let left_column = Container::new()
             .direction(FlexDirection::Column)
@@ -95,15 +96,15 @@ impl Task for RankTask {
                     .align_items(AlignItems::Center)
                     .child(
                         Label::new(locale.region(&input.default.region).to_ascii_uppercase())
-                            .size(36)
+                            .size(56)
                             .bold(),
                     )
                     .child(
                         Stack::new().child(level_background).child(
                             Label::new(input.default.level.to_string())
-                                .size(42)
+                                .size(56)
                                 .bold()
-                                .x(60)
+                                .x(center_of_level_background)
                                 .align(Alignment::Middle),
                         ),
                     ),
@@ -114,7 +115,7 @@ impl Task for RankTask {
                     "{}#{}",
                     input.default.game_name, input.default.tag_line
                 ))
-                .size(48)
+                .size(56)
                 .bold(),
             );
 
@@ -141,7 +142,7 @@ impl Task for RankTask {
                     .gap(4)
                     .child(
                         Label::new(locale.queue_label(&rank_entry.queue_type))
-                            .size(50)
+                            .size(64)
                             .bold(),
                     )
                     .child(
@@ -150,31 +151,31 @@ impl Task for RankTask {
                             locale.tier_label(&rank_entry.tier),
                             rank_entry.rank
                         ))
-                        .size(45)
+                        .size(60)
                         .bold()
                         .color(rank_color(&rank_entry.tier)),
                     )
                     .child(rank_sprite)
                     .child(
                         Label::new(format!("{} LP", rank_entry.league_points))
-                            .size(45)
+                            .size(60)
                             .bold(),
                     )
                     .child(
                         Label::new(format!("WR: {:.2}%", win_rate))
-                            .size(45)
+                            .size(60)
                             .bold()
                             .color(Color::Green),
                     )
                     .child(
                         Label::new(format!("Wins - {}", rank_entry.wins))
-                            .size(45)
+                            .size(60)
                             .bold()
                             .color(Color::Green),
                     )
                     .child(
                         Label::new(format!("Losses - {}", rank_entry.losses))
-                            .size(45)
+                            .size(60)
                             .bold()
                             .color(Color::Red),
                     ),
@@ -198,7 +199,6 @@ impl Task for RankTask {
 }
 
 mod test {
-    use super::*;
 
     #[tokio::test]
     async fn test_save() {
