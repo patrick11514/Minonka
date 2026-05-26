@@ -1,11 +1,7 @@
 import { env } from '$/types/env';
 import { FileResult } from '$/types/types';
-import { CherryMatchData } from '$/Worker/tasks/cherryMatch';
-import { MatchData } from '$/Worker/tasks/match';
-import { RankData } from '$/Worker/tasks/rank';
-import { SpectatorData } from '$/Worker/tasks/spectator';
-import { SummonerData } from '$/Worker/tasks/summoner';
-import { TeamData } from '$/Worker/tasks/team';
+import { RankTaskInput } from '$/types/worker/RankTaskInput';
+import { SummonerTaskInput } from '$/types/worker/SummonerTaskInput';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import { WebSocket, WebSocketServer } from 'ws';
@@ -20,13 +16,14 @@ const Workers: Record<
     }
 > = {};
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type Jobs = {
-    summoner: SummonerData;
-    rank: RankData;
-    match: MatchData;
-    cherryMatch: CherryMatchData;
-    team: TeamData;
-    spectator: SpectatorData;
+    summoner: SummonerTaskInput;
+    rank: RankTaskInput;
+    match: any; //MatchData;
+    cherryMatch: any; //CherryMatchData;
+    team: any; //TeamData;
+    spectator: any; //SpectatorData;
 };
 
 const l = new Logger('WorkerServer', 'magenta');
