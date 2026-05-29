@@ -84,7 +84,6 @@ const RiotAPIStructure = {
             endOfUrl: `/entries/by-puuid/${puuid}`,
             schema: z.array(
                 z.object({
-                    leagueId: z.string(),
                     queueType: z.string(),
                     tier: tierType,
                     rank: rankType,
