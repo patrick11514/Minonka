@@ -1,4 +1,4 @@
 allowBuilds:
-  es5-ext: true
-  esbuild: true
-  sharp: true
+    es5-ext: true
+    esbuild: true
+    sharp: true
