@@ -48,11 +48,17 @@ pub enum FileResult {
 pub struct DefaultParametersInput {
     pub puuid: String,
     pub region: String,
+    pub locale: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "export-ts", ts(export))]
+pub struct ProfileParametersInput {
     pub level: u32,
     pub game_name: String,
     pub tag_line: String,
     pub profile_icon_id: u32,
-    pub locale: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]

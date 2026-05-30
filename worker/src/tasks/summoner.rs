@@ -12,6 +12,7 @@ use crate::draw::master_canvas::MasterCanvas;
 use crate::draw::sprite::Sprite;
 use crate::draw::stack::Stack;
 use crate::tasks::task::SaveStrategy;
+use crate::tasks::types::ProfileParametersInput;
 use crate::tasks::{
     error::{TaskError, TaskResult, TaskResultExt},
     task::{Task, TaskOutcome},
@@ -44,6 +45,8 @@ pub enum BannerType {
 pub struct SummonerTaskInput {
     #[serde(flatten)]
     pub default: DefaultParametersInput,
+    #[serde(flatten)]
+    pub profile: ProfileParametersInput,
     pub title_id: Option<String>,
     pub crest: u32,
     pub prestige_crest: u32,
@@ -142,7 +145,7 @@ impl Task for SummonerTask {
 
         let banner = match banners {
             Some(banners) => find_banner_name(&banners, input.banner, input.highest_rank.clone())
-                .context("resolve summoner banner", input.default.game_name.clone())?,
+                .context("resolve summoner banner", input.profile.game_name.clone())?,
             None => DEFAULT_BANNER.to_string(),
         };
 
@@ -162,7 +165,7 @@ impl Task for SummonerTask {
             "prepared summoner level background"
         );
 
-        let profile_icon = get_profile_icon(input.default.profile_icon_id).await?;
+        let profile_icon = get_profile_icon(input.profile.profile_icon_id).await?;
         let mut profile_icon = Sprite::from_asset(&profile_icon, 0, 0).await?;
         profile_icon.roundify_circle();
         profile_icon.resize_to_width(100);
@@ -289,7 +292,7 @@ impl Task for SummonerTask {
                     )
                     .child(
                         Stack::new().child(level_background).child(
-                            Label::new(input.default.level.to_string())
+                            Label::new(input.profile.level.to_string())
                                 .bold()
                                 .size(24)
                                 .x(center_of_level_background)
@@ -311,7 +314,7 @@ impl Task for SummonerTask {
                             .child(
                                 Label::new(format!(
                                     "{}#{}",
-                                    input.default.game_name, input.default.tag_line
+                                    input.profile.game_name, input.profile.tag_line
                                 ))
                                 .bold()
                                 .size(24),

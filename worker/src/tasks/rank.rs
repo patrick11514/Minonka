@@ -9,6 +9,7 @@ use crate::draw::master_canvas::MasterCanvas;
 use crate::draw::sprite::Sprite;
 use crate::draw::stack::Stack;
 use crate::tasks::task::SaveStrategy;
+use crate::tasks::types::ProfileParametersInput;
 use crate::tasks::{
     error::TaskResult,
     task::{Task, TaskOutcome},
@@ -39,6 +40,8 @@ pub struct RankQueueEntryInput {
 pub struct RankTaskInput {
     #[serde(flatten)]
     pub default: DefaultParametersInput,
+    #[serde(flatten)]
+    pub profile: ProfileParametersInput,
     pub ranks: Vec<RankQueueEntryInput>,
 }
 
@@ -53,7 +56,7 @@ impl Task for RankTask {
     async fn run(input: Self::Input, context: AppContext) -> TaskResult<TaskOutcome> {
         let locale = AppLocale::from_str(&input.default.locale);
 
-        let avatar_asset = get_profile_icon(input.default.profile_icon_id).await?;
+        let avatar_asset = get_profile_icon(input.profile.profile_icon_id).await?;
         let avatar_path = asset_path(&avatar_asset).await?;
 
         let mut resolved_ranks = Vec::new();
@@ -87,7 +90,7 @@ impl Task for RankTask {
                     )
                     .child(
                         Stack::new().child(level_background).child(
-                            Label::new(input.default.level.to_string())
+                            Label::new(input.profile.level.to_string())
                                 .size(56)
                                 .bold()
                                 .x(center_of_level_background)
@@ -99,7 +102,7 @@ impl Task for RankTask {
             .child(
                 Label::new(format!(
                     "{}#{}",
-                    input.default.game_name, input.default.tag_line
+                    input.profile.game_name, input.profile.tag_line
                 ))
                 .size(56)
                 .bold(),
