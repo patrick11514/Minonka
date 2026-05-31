@@ -203,7 +203,9 @@ export default template.parse({
         1900: 'Pick URF',
         2000: 'Tutorial 1',
         2010: 'Tutorial 2',
-        2020: 'Tutorial 3'
+        2020: 'Tutorial 3',
+        2300: 'Brawl',
+        2400: 'ARAM: Mayhem'
     },
     mapRegions: {
         bilgewater: 'Bilgewater',

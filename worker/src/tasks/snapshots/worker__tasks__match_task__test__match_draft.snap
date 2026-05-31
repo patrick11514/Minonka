@@ -1,0 +1,6 @@
+---
+source: src/tasks/match_task.rs
+expression: png_bytes
+extension: png
+snapshot_kind: binary
+---

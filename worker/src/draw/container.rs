@@ -1,4 +1,7 @@
-use crate::{context::font_registry::FontRegistry, draw::renderable::Renderable};
+use crate::{
+    context::font_registry::FontRegistry,
+    draw::renderable::{AsRenderable, Renderable},
+};
 use image::RgbaImage;
 
 #[derive(Default, Clone, Copy, Debug)]
@@ -24,7 +27,9 @@ impl Padding {
 pub enum ContainerDirection {
     #[default]
     Row,
+    RowReverse,
     Column,
+    ColumnReverse,
 }
 
 #[derive(Default, Clone, Copy)]
@@ -40,6 +45,7 @@ pub enum AlignItems {
     #[default]
     Start,
     Center,
+    End,
 }
 
 pub struct Container {
@@ -81,8 +87,32 @@ impl Container {
         self.y = y;
         self
     }
+    pub fn width_offset(mut self, offset: i32) -> Self {
+        if offset < 0 {
+            self.width = Some(
+                self.width
+                    .unwrap_or(0)
+                    .saturating_sub(offset.unsigned_abs()),
+            );
+        } else {
+            self.width = Some(self.width.unwrap_or(0).saturating_add(offset as u32));
+        }
+        self
+    }
     pub fn width(mut self, w: u32) -> Self {
         self.width = Some(w);
+        self
+    }
+    pub fn height_offset(mut self, offset: i32) -> Self {
+        if offset < 0 {
+            self.height = Some(
+                self.height
+                    .unwrap_or(0)
+                    .saturating_sub(offset.unsigned_abs()),
+            );
+        } else {
+            self.height = Some(self.height.unwrap_or(0).saturating_add(offset as u32));
+        }
         self
     }
     pub fn height(mut self, h: u32) -> Self {
@@ -113,6 +143,19 @@ impl Container {
     pub fn splits(mut self, splits: Vec<u32>) -> Self {
         self.splits = splits;
         self
+    }
+    pub fn reverse(mut self) -> Self {
+        self.direction = match self.direction {
+            ContainerDirection::Row => ContainerDirection::RowReverse,
+            ContainerDirection::RowReverse => ContainerDirection::Row,
+            ContainerDirection::Column => ContainerDirection::ColumnReverse,
+            ContainerDirection::ColumnReverse => ContainerDirection::Column,
+        };
+        self
+    }
+
+    pub fn reverse_if(mut self, condition: bool) -> Self {
+        if condition { self.reverse() } else { self }
     }
 
     /// Shorthand for 1 value: padding from all sides
@@ -147,30 +190,32 @@ impl Container {
         };
         self
     }
-
-    pub fn child(mut self, child: impl Renderable + 'static) -> Self {
-        self.children.push(Box::new(child));
+    pub fn child(mut self, child: impl AsRenderable) -> Self {
+        self.children.push(child.as_renderable());
         self
     }
 
-    pub fn child_if(mut self, child: Option<impl Renderable + 'static>) -> Self {
+    pub fn child_if(mut self, child: Option<impl AsRenderable>) -> Self {
         if let Some(child) = child {
-            self.children.push(Box::new(child));
+            self.children.push(child.as_renderable());
         }
         self
     }
 
-    pub fn childs(mut self, children: Vec<impl Renderable + 'static>) -> Self {
+    pub fn childs(mut self, children: impl IntoIterator<Item = impl AsRenderable>) -> Self {
         for child in children {
-            self.children.push(Box::new(child));
+            self.children.push(child.as_renderable());
         }
         self
     }
 
-    pub fn childs_if(mut self, children: Vec<Option<impl Renderable + 'static>>) -> Self {
+    pub fn childs_if(
+        mut self,
+        children: impl IntoIterator<Item = Option<impl AsRenderable>>,
+    ) -> Self {
         for child in children {
             if let Some(child) = child {
-                self.children.push(Box::new(child));
+                self.children.push(child.as_renderable());
             }
         }
 
@@ -185,11 +230,11 @@ impl Container {
             let (cw, ch) = child.size(fonts);
 
             match self.direction {
-                ContainerDirection::Row => {
+                ContainerDirection::Row | ContainerDirection::RowReverse => {
                     content_w += cw;
                     content_h = content_h.max(ch);
                 }
-                ContainerDirection::Column => {
+                ContainerDirection::Column | ContainerDirection::ColumnReverse => {
                     content_w = content_w.max(cw);
                     content_h += ch;
                 }
@@ -199,8 +244,10 @@ impl Container {
         if !self.children.is_empty() {
             let total_gaps = (self.children.len() as u32 - 1) * self.gap;
             match self.direction {
-                ContainerDirection::Row => content_w += total_gaps,
-                ContainerDirection::Column => content_h += total_gaps,
+                ContainerDirection::Row | ContainerDirection::RowReverse => content_w += total_gaps,
+                ContainerDirection::Column | ContainerDirection::ColumnReverse => {
+                    content_h += total_gaps
+                }
             }
         }
 
@@ -221,9 +268,18 @@ impl Renderable for Container {
         let mut cursor_x = offset_x + self.x as i32 + self.padding.left as i32;
         let mut cursor_y = offset_y + self.y as i32 + self.padding.top as i32;
 
+        // If reversing, anchor the cursor to the opposing inner gutter wall
+        if matches!(self.direction, ContainerDirection::RowReverse) {
+            cursor_x += inner_w as i32;
+        }
+        if matches!(self.direction, ContainerDirection::ColumnReverse) {
+            cursor_y += inner_h as i32;
+        }
+
         let num_children = self.children.len();
         let total_gaps = (num_children as u32).saturating_sub(1) * self.gap;
 
+        // 1. FIX: Invert the layout shifting logic for Centered Justification
         if self.splits.is_empty() {
             match self.direction {
                 ContainerDirection::Row => {
@@ -231,9 +287,19 @@ impl Renderable for Container {
                         cursor_x += ((inner_w - content_w) / 2) as i32;
                     }
                 }
+                ContainerDirection::RowReverse => {
+                    if matches!(self.justify, JustifyContent::Center) && inner_w > content_w {
+                        cursor_x -= ((inner_w - content_w) / 2) as i32;
+                    }
+                }
                 ContainerDirection::Column => {
                     if matches!(self.justify, JustifyContent::Center) && inner_h > content_h {
                         cursor_y += ((inner_h - content_h) / 2) as i32;
+                    }
+                }
+                ContainerDirection::ColumnReverse => {
+                    if matches!(self.justify, JustifyContent::Center) && inner_h > content_h {
+                        cursor_y -= ((inner_h - content_h) / 2) as i32;
                     }
                 }
             }
@@ -247,16 +313,17 @@ impl Renderable for Container {
             let mut cell_align_x = 0;
             let mut cell_align_y = 0;
 
+            // 2. FIX: Group Row/RowReverse and Column/ColumnReverse for custom cell splits
             if !self.splits.is_empty() && i < self.splits.len() {
                 match self.direction {
-                    ContainerDirection::Row => {
+                    ContainerDirection::Row | ContainerDirection::RowReverse => {
                         let available_w = inner_w.saturating_sub(total_gaps);
                         cell_w = (available_w * self.splits[i]) / 100;
                         if cell_w > cw {
                             cell_align_x = (cell_w - cw) / 2;
                         }
                     }
-                    ContainerDirection::Column => {
+                    ContainerDirection::Column | ContainerDirection::ColumnReverse => {
                         let available_h = inner_h.saturating_sub(total_gaps);
                         cell_h = (available_h * self.splits[i]) / 100;
                         if cell_h > ch {
@@ -269,19 +336,29 @@ impl Renderable for Container {
             let mut cross_offset_x = 0;
             let mut cross_offset_y = 0;
 
+            // 3. Match cross-axis alignment for standard and reversed layout strategies
             match self.direction {
-                ContainerDirection::Row => {
-                    if matches!(self.align_items, AlignItems::Center) && inner_h > ch {
-                        cross_offset_y = (inner_h - ch) / 2;
+                ContainerDirection::Row | ContainerDirection::RowReverse => {
+                    if inner_h > ch {
+                        match self.align_items {
+                            AlignItems::Center => cross_offset_y = (inner_h - ch) / 2,
+                            AlignItems::End => cross_offset_y = inner_h - ch,
+                            AlignItems::Start => {}
+                        }
                     }
                 }
-                ContainerDirection::Column => {
-                    if matches!(self.align_items, AlignItems::Center) && inner_w > cw {
-                        cross_offset_x = (inner_w - cw) / 2;
+                ContainerDirection::Column | ContainerDirection::ColumnReverse => {
+                    if inner_w > cw {
+                        match self.align_items {
+                            AlignItems::Center => cross_offset_x = (inner_w - cw) / 2,
+                            AlignItems::End => cross_offset_x = inner_w - cw,
+                            AlignItems::Start => {}
+                        }
                     }
                 }
             }
 
+            // 4. FIX: Handle Space-Between padding updates for reversed distributions
             let current_gap = if self.splits.is_empty()
                 && matches!(self.justify, JustifyContent::SpaceBetween)
                 && num_children > 1
@@ -290,10 +367,10 @@ impl Renderable for Container {
                 let raw_content_h = content_h.saturating_sub(total_gaps);
 
                 match self.direction {
-                    ContainerDirection::Row => {
+                    ContainerDirection::Row | ContainerDirection::RowReverse => {
                         (inner_w.saturating_sub(raw_content_w)) / (num_children as u32 - 1)
                     }
-                    ContainerDirection::Column => {
+                    ContainerDirection::Column | ContainerDirection::ColumnReverse => {
                         (inner_h.saturating_sub(raw_content_h)) / (num_children as u32 - 1)
                     }
                 }
@@ -301,17 +378,25 @@ impl Renderable for Container {
                 self.gap
             };
 
-            child.render(
-                canvas,
-                fonts,
-                cursor_x + (cross_offset_x + cell_align_x) as i32,
-                cursor_y + (cross_offset_y + cell_align_y) as i32,
-            );
+            let mut render_x = cursor_x + (cross_offset_x + cell_align_x) as i32;
+            let mut render_y = cursor_y + (cross_offset_y + cell_align_y) as i32;
+
+            // Offset the child backward into the viewport space
+            if matches!(self.direction, ContainerDirection::RowReverse) {
+                render_x -= cell_w as i32;
+            }
+            if matches!(self.direction, ContainerDirection::ColumnReverse) {
+                render_y -= cell_h as i32;
+            }
+
+            child.render(canvas, fonts, render_x, render_y);
 
             if i < num_children - 1 {
                 match self.direction {
                     ContainerDirection::Row => cursor_x += (cell_w + current_gap) as i32,
+                    ContainerDirection::RowReverse => cursor_x -= (cell_w + current_gap) as i32,
                     ContainerDirection::Column => cursor_y += (cell_h + current_gap) as i32,
+                    ContainerDirection::ColumnReverse => cursor_y -= (cell_h + current_gap) as i32,
                 }
             }
         }

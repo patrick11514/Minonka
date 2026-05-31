@@ -93,7 +93,7 @@ impl Task for RankTask {
                             Label::new(input.profile.level.to_string())
                                 .size(56)
                                 .bold()
-                                .x(center_of_level_background)
+                                .x(center_of_level_background as i32)
                                 .align(Alignment::Middle),
                         ),
                     ),

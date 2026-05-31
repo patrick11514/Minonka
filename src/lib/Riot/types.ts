@@ -434,6 +434,18 @@ export const queues = [
         map: "Summoner's Rift",
         description: 'Tutorial 3',
         notes: null
+    },
+    {
+        queueId: 2300,
+        map: 'The Bandlewood',
+        description: 'Brawl',
+        notes: null
+    },
+    {
+        queueId: 2400,
+        map: 'Howling Abyss',
+        description: 'ARAM: Mayhem',
+        notes: null
     }
 ] as const;
 

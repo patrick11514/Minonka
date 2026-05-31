@@ -137,7 +137,10 @@ export const ParticipantSchema = z.object({
         .or(z.literal('SOLO'))
         .or(z.literal('CARRY'))
         .or(z.literal('SUPPORT')),
-    roleBoundItem: z.number().optional(), //Basically quest -> its item
+    roleBoundItem: z
+        .number()
+        .optional()
+        .transform((v) => v || null), //Basically quest -> its item
     summoner1Id: z.number(),
     summoner2Id: z.number(),
     teamEarlySurrendered: z.boolean(),
@@ -150,6 +153,7 @@ export const ParticipantSchema = z.object({
         .or(z.literal('UTILITY'))
         .or(z.literal('')),
     totalDamageDealt: z.number(),
+    totalDamageDealtToChampions: z.number(),
     totalMinionsKilled: z.number(),
     visionScore: z.number(),
     win: z.boolean(),
@@ -181,8 +185,8 @@ export const RegularMatchSchema = z.object({
     info: z.object({
         gameCreation: z.number(),
         gameDuration: z.number(),
-        gameStartTimestamp: z.number(),
-        gameEndTimestamp: z.number(),
+        gameStartTimestamp: z.coerce.bigint(),
+        gameEndTimestamp: z.coerce.bigint(),
         gameId: z.number(),
         gameMode: z.string(),
         gameName: z.string(),

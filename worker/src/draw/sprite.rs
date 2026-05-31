@@ -7,6 +7,7 @@ use crate::{
     utils::assets::Asset,
 };
 
+#[derive(Clone)]
 pub struct Sprite {
     image: RgbaImage,
     x: u32,

@@ -36,8 +36,6 @@ impl WorkerJob {
 #[serde(rename_all = "camelCase", tag = "type")]
 #[cfg_attr(feature = "export-ts", ts(export))]
 pub enum FileResult {
-    #[serde(rename = "temp")]
-    Temp { data: String },
     #[serde(rename = "local")]
     Local { path: String },
 }

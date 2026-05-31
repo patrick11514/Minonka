@@ -1,9 +1,10 @@
 import { env } from '$/types/env';
-import { FileResult } from '$/types/types';
+import { FileResult } from '$/types/worker/FileResult';
+import { MatchTaskInput } from '$/types/worker/MatchTaskInput';
 import { RankTaskInput } from '$/types/worker/RankTaskInput';
 import { SummonerTaskInput } from '$/types/worker/SummonerTaskInput';
+import assert from 'node:assert';
 import crypto from 'node:crypto';
-import fs from 'node:fs/promises';
 import { WebSocket, WebSocketServer } from 'ws';
 import { EventEmitter } from './EventEmitter';
 import { asyncExists } from './fsAsync';
@@ -20,7 +21,7 @@ const Workers: Record<
 type Jobs = {
     summoner: SummonerTaskInput;
     rank: RankTaskInput;
-    match: any; //MatchData;
+    match: MatchTaskInput; //MatchData;
     cherryMatch: any; //CherryMatchData;
     team: any; //TeamData;
     spectator: any; //SpectatorData;
@@ -136,42 +137,9 @@ export class WorkerServer extends EventEmitter<Events> {
     }
 
     private async handleFileResult(result: FileResult): Promise<string> {
-        if (result.type === 'local') {
-            // Already a local file path, return as-is
-            return result.path;
-        }
+        assert(result.type === 'local', 'Unknown FileResult type');
 
-        if (result.type === 'temp') {
-            const buffer = Buffer.from(result.data, 'base64');
-
-            // Save to temporary cache directory
-            if (!(await asyncExists(env.CACHE_PATH))) {
-                await fs.mkdir(env.CACHE_PATH, { recursive: true });
-            }
-
-            const name = crypto.randomBytes(16).toString('hex');
-            const filePath = `${env.CACHE_PATH}/${name}.png`;
-
-            await fs.writeFile(filePath, buffer);
-            return filePath;
-        }
-
-        // Decode base64 data to buffer
-        if (result.data === undefined) {
-            //the file is already present, so just return the path
-            return `${env.PERSISTANT_CACHE_PATH}/${result.name}`;
-        }
-
-        const buffer = Buffer.from(result.data, 'base64');
-
-        // Save to persistent cache directory
-        if (!(await asyncExists(env.PERSISTANT_CACHE_PATH))) {
-            await fs.mkdir(env.PERSISTANT_CACHE_PATH, { recursive: true });
-        }
-
-        const filePath = `${env.PERSISTANT_CACHE_PATH}/${result.name}`;
-        await fs.writeFile(filePath, buffer);
-        return filePath;
+        return result.path;
     }
 
     async wait(jobId: string) {

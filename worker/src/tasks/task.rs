@@ -1,6 +1,6 @@
 use serde::de::DeserializeOwned;
-use tracing::error;
 use tracing::Instrument;
+use tracing::error;
 use ts_rs::TS;
 
 use crate::{
@@ -35,7 +35,9 @@ pub trait Task {
     ) -> impl std::future::Future<Output = TaskResult<TaskOutcome>> + Send;
 
     fn parse_input(payload: &str) -> TaskResult<Self::Input> {
-        Ok(serde_json::from_str(payload)?)
+        let deserializer = &mut serde_json::Deserializer::from_str(payload);
+
+        serde_path_to_error::deserialize(deserializer).map_err(crate::tasks::error::TaskError::Json)
     }
 
     fn run_from_json(

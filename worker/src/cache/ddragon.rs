@@ -25,7 +25,7 @@ impl DdragonCache {
     pub async fn get<T: DeserializeOwned + 'static>(&self, url: &str) -> TaskResult<Option<T>> {
         if let Some(cached) = self.cache.get(url).await {
             Ok(Some(
-                serde_json::from_value(cached)
+                serde_path_to_error::deserialize(cached)
                     .map_err(crate::tasks::error::TaskError::Json)
                     .context("deserialize cached json", url.to_string())?,
             ))
@@ -46,7 +46,7 @@ impl DdragonCache {
             }
 
             Ok(Some(
-                serde_json::from_value(data)
+                serde_path_to_error::deserialize(data)
                     .map_err(crate::tasks::error::TaskError::Json)
                     .context("deserialize source json", source_url)?,
             ))

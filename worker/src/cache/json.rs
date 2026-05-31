@@ -3,7 +3,7 @@ use std::{sync::Arc, time::Duration};
 use serde::de::DeserializeOwned;
 
 use crate::{
-    cache::challenges::Challenge,
+    cache::{challenges::Challenge, champion::Champion, runes::Rune, summoner::Summoner},
     tasks::error::{TaskResult, TaskResultExt},
     utils::{
         assets::{Asset, AssetType, asset_path},
@@ -44,13 +44,15 @@ impl JsonCache {
 
         let content = tokio::fs::read_to_string(path).await?;
 
-        serde_json::from_str(&content).map_err(crate::tasks::error::TaskError::Json)
+        let mut deserializer = serde_json::Deserializer::from_str(&content);
+        serde_path_to_error::deserialize(&mut deserializer)
+            .map_err(crate::tasks::error::TaskError::Json)
     }
 
     async fn get<T: DeserializeOwned + 'static>(&self, path: &str) -> TaskResult<Option<T>> {
         if let Some(cached) = self.cache.get(path).await {
             Ok(Some(
-                serde_json::from_value(cached)
+                serde_path_to_error::deserialize(cached)
                     .map_err(crate::tasks::error::TaskError::Json)
                     .context("deserialize cached json", path.to_string())?,
             ))
@@ -62,7 +64,7 @@ impl JsonCache {
             }
 
             Ok(Some(
-                serde_json::from_value(data)
+                serde_path_to_error::deserialize(data)
                     .map_err(crate::tasks::error::TaskError::Json)
                     .context("deserialize source json", path.to_string())?,
             ))
@@ -71,6 +73,21 @@ impl JsonCache {
 
     pub async fn get_challenges(&self, lang: &AppLocale) -> TaskResult<Option<Vec<Challenge>>> {
         let path = format!("{}/challenges.json", Self::locale_to_path(lang));
+        self.get(&path).await
+    }
+
+    pub async fn get_champions(&self, lang: &AppLocale) -> TaskResult<Option<Champion>> {
+        let path = format!("{}/champion.json", Self::locale_to_path(lang));
+        self.get(&path).await
+    }
+
+    pub async fn get_runes(&self, lang: &AppLocale) -> TaskResult<Option<Vec<Rune>>> {
+        let path = format!("{}/runesReforged.json", Self::locale_to_path(lang));
+        self.get(&path).await
+    }
+
+    pub async fn get_summoner_spells(&self, lang: &AppLocale) -> TaskResult<Option<Summoner>> {
+        let path = format!("{}/summoner.json", Self::locale_to_path(lang));
         self.get(&path).await
     }
 }

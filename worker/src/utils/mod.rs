@@ -3,6 +3,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
+use chrono::{Local, TimeZone};
 use tokio::fs;
 use tracing_subscriber::{EnvFilter, fmt::format::FmtSpan};
 
@@ -13,6 +14,7 @@ use crate::{
 };
 
 pub mod assets;
+pub mod deser;
 pub mod locale;
 pub mod rank;
 pub mod storage;
@@ -94,4 +96,44 @@ pub fn init_tracing() {
         .with_thread_names(true)
         .with_span_events(FmtSpan::NEW | FmtSpan::CLOSE)
         .try_init();
+}
+
+pub fn format_date(timestamp: i64, locale: &AppLocale) -> String {
+    let dt = Local.timestamp_millis_opt(timestamp).unwrap();
+
+    let format_pattern = match locale {
+        AppLocale::Cz => "%d.%m.%Y %H:%M:%S", // e.g., 19.05.2026 20:04:36
+        _ => "%m/%d/%Y, %I:%M:%S %p",         // e.g., 05/19/2026, 08:04:36 PM
+    };
+
+    dt.format(format_pattern).to_string()
+}
+
+pub fn format_duration(duration: u32) -> String {
+    let minutes = duration / 60;
+    let seconds = duration % 60;
+    format!("{minutes}:{seconds:02}")
+}
+
+pub fn fix_champion_name(name: &str) -> String {
+    match name {
+        "FiddleSticks" => "Fiddlesticks".to_string(),
+        _ => name.to_string(),
+    }
+}
+
+pub fn format_with_spaces(n: u32) -> String {
+    let s = n.to_string();
+    let bytes = s.as_bytes();
+    let len = bytes.len();
+    let mut result = String::with_capacity(len + len / 3);
+
+    for (i, &byte) in bytes.iter().enumerate() {
+        if i > 0 && (len - i) % 3 == 0 {
+            result.push(' ');
+        }
+        result.push(byte as char);
+    }
+
+    result
 }

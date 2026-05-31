@@ -1,8 +1,9 @@
 use std::path::PathBuf;
 
 use crate::{
+    cache::json::JsonCache,
     tasks::error::{TaskError, TaskResult, TaskResultExt},
-    utils::{get_cache_folder, get_current_dir, rank::Tier},
+    utils::{get_cache_folder, get_current_dir, locale::AppLocale, rank::Tier},
 };
 
 #[derive(Debug, Clone)]
@@ -137,6 +138,101 @@ pub fn get_rank_asset(rank: &Tier) -> Asset {
         AssetType::Ranks,
         format!("Ranked Emblems Latest/Rank={}", name),
     )
+}
+
+pub async fn get_champion_asset(
+    champion_id: Option<u32>,
+    cache: &JsonCache,
+    lang: &AppLocale,
+) -> TaskResult<Asset> {
+    if let Some(id) = champion_id {
+        let champion = cache
+            .get_champions(lang)
+            .await?
+            .expect("Failed to load champions");
+        let champion_data = champion
+            .data
+            .iter()
+            .find(|(_, data)| data.key == id.to_string())
+            .map(|(_, data)| data.image.full.clone());
+
+        if let Some(image) = champion_data {
+            return Ok(Asset::new(
+                AssetType::DDragon,
+                format!("_ROOT_/img/champion/{}", image),
+            ));
+        }
+    }
+
+    // Fallback asset -> profile icon 29
+    Ok(Asset::new(
+        AssetType::DDragon,
+        "_ROOT_/img/profileicon/29.png",
+    ))
+}
+
+pub async fn get_rune_asset(
+    style: u32,
+    selection: Option<u32>,
+    cache: &JsonCache,
+    lang: &AppLocale,
+) -> TaskResult<Asset> {
+    let runes = cache.get_runes(lang).await?.expect("Failed to load runes");
+
+    let style = runes.iter().find(|rune| rune.id == style);
+
+    let key = if let Some(selection) = selection {
+        style
+            .and_then(|rune| rune.slots.first())
+            .and_then(|slot| slot.runes.iter().find(|r| r.id == selection))
+            .and_then(|rune| Some(rune.icon.clone()))
+            .expect("Rune not found")
+    } else {
+        style
+            .and_then(|rune| Some(rune.icon.clone()))
+            .expect("Rune not found")
+    };
+
+    Ok(Asset::new(AssetType::DDragon, format!("/img/{}", key)))
+}
+
+pub fn get_item_asset(id: u32) -> Asset {
+    Asset::new(AssetType::DDragon, format!("_ROOT_/img/item/{}.png", id))
+}
+
+pub async fn get_summoner_asset(id: u32, cache: &JsonCache, lang: &AppLocale) -> TaskResult<Asset> {
+    let summoners = cache
+        .get_summoner_spells(lang)
+        .await?
+        .expect("Failed to load summoner spells");
+
+    let summoner = summoners
+        .data
+        .iter()
+        .find(|(_, data)| data.key == id.to_string())
+        .map(|(_, data)| data.image.full.clone())
+        .expect("Summoner spell not found");
+
+    Ok(Asset::new(
+        AssetType::DDragon,
+        format!("_ROOT_/img/spell/{}", summoner),
+    ))
+}
+
+pub enum Stat {
+    Minions,
+    Damage,
+    Golds,
+}
+
+pub fn get_stat_asset(stat: &Stat) -> Asset {
+    let name = match stat {
+        Stat::Minions => "minion.png",
+        Stat::Damage => "sword.png",
+        Stat::Golds => "coins.png",
+    };
+
+    Asset::new(AssetType::Other, name)
 }
 
 #[derive(Debug, Clone)]

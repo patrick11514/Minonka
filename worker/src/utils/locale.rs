@@ -1,5 +1,6 @@
 use crate::utils::first_upper;
 
+#[derive(Debug, Clone)]
 pub enum AppLocale {
     En,
     Cz,
@@ -76,6 +77,25 @@ impl AppLocale {
             "VN2" => "VN",
             "ME1" => "ME",
             _ => region,
+        }
+    }
+
+    pub fn outcome(&self, win: bool) -> &'static str {
+        match self {
+            AppLocale::Cz => {
+                if win {
+                    "Výhra"
+                } else {
+                    "Prohra"
+                }
+            }
+            AppLocale::En => {
+                if win {
+                    "Win"
+                } else {
+                    "Loss"
+                }
+            }
         }
     }
 }

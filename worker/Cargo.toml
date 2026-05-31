@@ -29,3 +29,6 @@ tracing = { version = "0.1.41", features = ["attributes"] }
 tracing-subscriber = { version = "0.3.19", features = ["env-filter", "fmt"] }
 indexmap = { version = "2.14.0", features = ["serde"] }
 futures = "0.3.32"
+serde_path_to_error = "0.1.20"
+chrono = "0.4.44"
+itertools = "0.14.0"

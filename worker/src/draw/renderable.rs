@@ -7,3 +7,34 @@ pub trait Renderable: Send {
 
     fn size(&self, fonts: &FontRegistry) -> (u32, u32);
 }
+
+pub trait AsRenderable {
+    fn as_renderable(self) -> Box<dyn Renderable>;
+}
+
+impl AsRenderable for crate::draw::sprite::Sprite {
+    fn as_renderable(self) -> Box<dyn Renderable> {
+        Box::new(self)
+    }
+}
+impl AsRenderable for crate::draw::label::Label {
+    fn as_renderable(self) -> Box<dyn Renderable> {
+        Box::new(self)
+    }
+}
+impl AsRenderable for crate::draw::container::Container {
+    fn as_renderable(self) -> Box<dyn Renderable> {
+        Box::new(self)
+    }
+}
+impl AsRenderable for crate::draw::stack::Stack {
+    fn as_renderable(self) -> Box<dyn Renderable> {
+        Box::new(self)
+    }
+}
+
+impl AsRenderable for Box<dyn Renderable> {
+    fn as_renderable(self) -> Box<dyn Renderable> {
+        self
+    }
+}

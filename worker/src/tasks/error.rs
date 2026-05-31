@@ -1,6 +1,6 @@
 #[derive(Debug)]
 pub enum TaskError {
-    Json(serde_json::Error),
+    Json(serde_path_to_error::Error<serde_json::Error>),
     Io(std::io::Error),
     Image(image::ImageError),
     Context {
@@ -56,8 +56,8 @@ impl TaskError {
     }
 }
 
-impl From<serde_json::Error> for TaskError {
-    fn from(value: serde_json::Error) -> Self {
+impl From<serde_path_to_error::Error<serde_json::Error>> for TaskError {
+    fn from(value: serde_path_to_error::Error<serde_json::Error>) -> Self {
         Self::Json(value)
     }
 }

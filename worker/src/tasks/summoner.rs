@@ -295,7 +295,7 @@ impl Task for SummonerTask {
                             Label::new(input.profile.level.to_string())
                                 .bold()
                                 .size(24)
-                                .x(center_of_level_background)
+                                .x(center_of_level_background as i32)
                                 .align(Alignment::Middle),
                         ),
                     )
@@ -326,16 +326,11 @@ impl Task for SummonerTask {
                             .direction(ContainerDirection::Row)
                             .gap(10)
                             .align_items(AlignItems::Center)
-                            .childs(
-                                challenges
-                                    .into_iter()
-                                    .map(|challenge| {
-                                        Stack::new()
-                                            .size((challenge_size, challenge_size))
-                                            .child_if(challenge)
-                                    })
-                                    .collect(),
-                            ),
+                            .childs(challenges.into_iter().map(|challenge| {
+                                Stack::new()
+                                    .size((challenge_size, challenge_size))
+                                    .child_if(challenge)
+                            })),
                     )
             });
 
