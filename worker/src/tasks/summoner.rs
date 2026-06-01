@@ -6,7 +6,7 @@ use crate::cache::ddragon::DdragonCache;
 use crate::cache::json::JsonCache;
 use crate::context::AppContext;
 use crate::draw::color::Color;
-use crate::draw::container::{AlignItems, Container, ContainerDirection};
+use crate::draw::container::{AlignItems, Container, ContainerDirection, JustifyContent};
 use crate::draw::label::{Alignment, Label};
 use crate::draw::master_canvas::MasterCanvas;
 use crate::draw::sprite::Sprite;
@@ -20,7 +20,7 @@ use crate::tasks::{
 };
 use crate::utils::assets::{Asset, AssetType, OnlineAsset, get_profile_icon};
 use crate::utils::locale::AppLocale;
-use crate::utils::rank::RankTier;
+use crate::utils::rank::{RankTier, Tier};
 use tracing::debug;
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -170,6 +170,7 @@ impl Task for SummonerTask {
         profile_icon.roundify_circle();
         profile_icon.resize_to_width(100);
 
+        let profile_icon_size = profile_icon.dimensions();
         let mut ranked_crest = false;
 
         let crest = Asset::new(
@@ -183,7 +184,7 @@ impl Task for SummonerTask {
                         .highest_rank
                         .as_ref()
                         .map(|rank| rank.tier().as_lowercase_str().to_string())
-                        .unwrap_or_else(|| "iron".to_string())
+                        .expect("User doesn't have a rank, but has ranked crest")
                 )
             } else {
                 //pad number to 3 digits, so 1 becomes 001, 2 becomes 002, etc...
@@ -304,7 +305,28 @@ impl Task for SummonerTask {
                             .size(profile_icon.dimensions())
                             .align_center()
                             .child(profile_icon.y(if ranked_crest { 0 } else { 6 }))
-                            .child(crest),
+                            .child(crest)
+                            .child_if(
+                                if ranked_crest
+                                    && input.highest_rank.clone().unwrap().tier() < &Tier::Master
+                                {
+                                    Some(
+                                        Container::new()
+                                            .size(profile_icon_size)
+                                            .justify(JustifyContent::Center)
+                                            .child(
+                                                Label::new(
+                                                    input.highest_rank.unwrap().rank().as_str(),
+                                                )
+                                                .bold()
+                                                .size(20)
+                                                .y(-7),
+                                            ),
+                                    )
+                                } else {
+                                    None
+                                },
+                            ),
                     )
                     .child(
                         Container::new()

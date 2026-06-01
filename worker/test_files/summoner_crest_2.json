@@ -11,7 +11,7 @@
     },
     "crest": 1,
     "prestigeCrest": 0,
-    "highest_rank": {
+    "highestRank": {
         "tierIndex": 7,
         "tier": "DIAMOND",
         "rankIndex": 1,

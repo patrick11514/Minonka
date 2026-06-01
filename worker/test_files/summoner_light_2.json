@@ -7,7 +7,7 @@
     "profileIconId": 4793,
     "titleId": "2000887",
     "banner": "ranked",
-    "highest_rank": {
+    "highestRank": {
         "tierIndex": 1,
         "tier": "BRONZE",
         "rankIndex": 1,

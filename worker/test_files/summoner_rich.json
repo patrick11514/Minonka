@@ -9,7 +9,7 @@
     "banner": {
         "default": 8
     },
-    "highest_rank": {
+    "highestRank": {
         "tierIndex": 5,
         "tier": "DIAMOND",
         "rankIndex": 1,

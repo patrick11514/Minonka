@@ -11,7 +11,7 @@
     },
     "crest": 2,
     "prestigeCrest": 50,
-    "highest_rank": {
+    "highestRank": {
         "tierIndex": 8,
         "tier": "MASTER",
         "rankIndex": 1,

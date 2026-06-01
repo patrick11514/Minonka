@@ -9,7 +9,7 @@
     "banner": "ranked",
     "crest": 1,
     "prestigeCrest": 50,
-    "highest_rank": {
+    "highestRank": {
         "tierIndex": 0,
         "tier": "IRON",
         "rankIndex": 3,

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
-#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS, PartialEq, PartialOrd)]
 #[serde(rename_all = "UPPERCASE")]
 #[cfg_attr(feature = "export-ts", ts(export))]
 pub enum Tier {
@@ -53,6 +53,12 @@ pub enum Rank {
     II,
     III,
     IV,
+}
+
+impl Rank {
+    pub fn as_str(&self) -> String {
+        format!("{:?}", self)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]

@@ -154,7 +154,7 @@ impl Container {
         self
     }
 
-    pub fn reverse_if(mut self, condition: bool) -> Self {
+    pub fn reverse_if(self, condition: bool) -> Self {
         if condition { self.reverse() } else { self }
     }
 
