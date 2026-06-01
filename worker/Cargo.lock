@@ -1251,16 +1251,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "insta-image"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7996488b176249911af0e5d17b2bdfe43e33267f650291cb874c0d4654e1dcb8"
-dependencies = [
- "insta",
- "png",
-]
-
-[[package]]
 name = "interpolate_name"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3521,7 +3511,6 @@ dependencies = [
  "imageproc",
  "indexmap",
  "insta",
- "insta-image",
  "itertools",
  "moka",
  "rayon",

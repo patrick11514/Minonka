@@ -34,7 +34,7 @@ if [ "$CURRENT_VERSION" != "$DDRAGON_VERSION" ]; then
     tar -xzf ddragon.tgz
     mv $DDRAGON_VERSION _ROOT_
     echo $DDRAGON_VERSION > .version
-
+    
     cd ..
 fi
 
@@ -48,7 +48,7 @@ if [ ! -d "ranks" ]; then
     wget -q -O ranks/ranks.zip https://static.developer.riotgames.com/docs/lol/ranked-emblems-latest.zip
     cd ranks
     unzip -q ranks.zip
-
+    
     cd ..
 fi
 
@@ -70,9 +70,9 @@ fi
 
 BANNER_FILES=$(curl -s https://raw.communitydragon.org/json/latest/game/assets/loadouts/regalia/banners/ | jq -r '.[].name')
 if [ ! -d "banners" ]; then
-  mkdir banners
+    mkdir banners
 else
-  rm -r banners/*
+    rm -r banners/*
 fi
 
 for file in $BANNER_FILES; do

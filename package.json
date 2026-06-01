@@ -16,7 +16,9 @@
         "migration:create": "./script/createMigration.sh",
         "migrate": "tsx ./script/runMigration.ts",
         "prepare": "husky",
-        "worker:export-bindings": "cd worker && cargo test export_bindings --features export-ts"
+        "worker:export-bindings": "cd worker && cargo test export_bindings --features export-ts",
+        "worker:test": "cd worker && cargo test",
+        "worker:inspect": "cd worker && cargo run --bin inspect_images"
     },
     "dependencies": {
         "@types/strip-color": "^0.1.2",
@@ -51,13 +53,6 @@
         "tsx": "^4.19.2",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.23.0"
-    },
-    "pnpm": {
-        "onlyBuiltDependencies": [
-            "es5-ext",
-            "esbuild",
-            "sharp"
-        ]
     },
     "lint-staged": {
         "*.{js,ts}": [
