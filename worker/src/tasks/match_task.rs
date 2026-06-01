@@ -167,6 +167,7 @@ impl RenderContext {
     pub async fn player_component(
         &self,
         player: &MatchParticipantInput,
+        me: bool,
         reversed: bool,
     ) -> TaskResult<Container> {
         let champion = Asset::new(
@@ -263,6 +264,8 @@ impl RenderContext {
         let mut item_background = Sprite::from_asset(&item_background, 0, 0).await?;
         item_background.resize_to_width(item_size);
 
+        let text_color = if me { Color::Yellow } else { Color::White };
+
         let items = join_all(items.into_iter().enumerate().map(|(i, item_id)| {
             let item_background = item_background.clone();
             async move {
@@ -345,12 +348,18 @@ impl RenderContext {
                             } else {
                                 AlignItems::Start
                             })
-                            .child(Label::new(player.riot_id_game_name.clone()).bold().size(36))
+                            .child(
+                                Label::new(player.riot_id_game_name.clone())
+                                    .bold()
+                                    .size(36)
+                                    .color(text_color),
+                            )
                             .child(
                                 Label::new(format!("#{}", player.riot_id_tagline))
                                     .y(-10)
                                     .bold()
-                                    .size(26),
+                                    .size(26)
+                                    .color(text_color),
                             ),
                     )
                     .child(
@@ -405,11 +414,12 @@ impl RenderContext {
 
     pub async fn make_teams(
         &self,
+        me_puuid: &str,
         participants: &[MatchParticipantInput],
     ) -> TaskResult<(Container, Container)> {
         let mut players = try_join_all(participants.into_iter().enumerate().map(|(i, p)| {
             let ctx = self.clone();
-            async move { ctx.player_component(p, i >= 5).await }
+            async move { ctx.player_component(p, p.puuid == me_puuid, i >= 5).await }
         }))
         .await?;
 
@@ -482,7 +492,9 @@ impl Task for MatchTask {
             ctx.bans(right_team, cross.clone()),
         );
 
-        let (left_players, right_players) = ctx.make_teams(&input.info.participants).await?;
+        let (left_players, right_players) = ctx
+            .make_teams(&input.default.puuid, &input.info.participants)
+            .await?;
 
         let center_spacing = 440;
 
