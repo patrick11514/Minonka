@@ -98,4 +98,18 @@ impl AppLocale {
             }
         }
     }
+
+    pub fn team(&self) -> String {
+        match self {
+            AppLocale::Cz => "Tým".to_string(),
+            AppLocale::En => "Team".to_string(),
+        }
+    }
+
+    pub fn place(&self) -> String {
+        match self {
+            AppLocale::Cz => "místo".to_string(),
+            AppLocale::En => "place".to_string(),
+        }
+    }
 }

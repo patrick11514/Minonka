@@ -24,7 +24,7 @@ fn main() -> io::Result<()> {
         "Found {} layout mutations requiring validation:\n",
         pending_reviews.len()
     );
-    let mut stdin = io::stdin();
+    let stdin = io::stdin();
 
     for (idx, item) in pending_reviews.iter().enumerate() {
         println!("------------------------------------------------------------");

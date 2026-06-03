@@ -1,9 +1,9 @@
-use std::path::PathBuf;
+use std::{fmt::Display, path::PathBuf};
 
 use crate::{
     cache::json::JsonCache,
     tasks::error::{TaskError, TaskResult, TaskResultExt},
-    utils::{get_cache_folder, get_current_dir, locale::AppLocale, rank::Tier},
+    utils::{get_current_dir, get_persistent_cache_folder, locale::AppLocale, rank::Tier},
 };
 
 #[derive(Debug, Clone)]
@@ -23,6 +23,23 @@ pub enum AssetType {
     Online(OnlineAsset),
 }
 
+impl Display for AssetType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            AssetType::Crest => write!(f, "Crest"),
+            AssetType::DDragon => write!(f, "DDragon"),
+            AssetType::Lanes => write!(f, "Lanes"),
+            AssetType::Mastery => write!(f, "Mastery"),
+            AssetType::Other => write!(f, "Other"),
+            AssetType::Ranks => write!(f, "Ranks"),
+            AssetType::Online(online_asset) => match online_asset {
+                OnlineAsset::CommunityDragon => write!(f, "Online(CommunityDragon)"),
+            },
+            AssetType::Fonts => write!(f, "Fonts"),
+        }
+    }
+}
+
 #[tracing::instrument(skip(asset), fields(asset = %name, asset_type = ?asset))]
 fn get_online_asset_url(name: &str, asset: &OnlineAsset) -> String {
     match asset {
@@ -36,7 +53,9 @@ fn get_online_asset_path(name: &str, asset: &OnlineAsset) -> PathBuf {
         OnlineAsset::CommunityDragon => "cddragon",
     };
 
-    get_cache_folder().join(format!("{}/{}", prefix, name))
+    get_current_dir()
+        .join(get_persistent_cache_folder())
+        .join(format!("{}/{}", prefix, name))
 }
 
 #[tracing::instrument(skip(asset), fields(asset = %name, asset_type = ?asset), err)]
@@ -239,6 +258,12 @@ pub fn get_stat_asset(stat: &Stat) -> Asset {
 pub struct Asset {
     pub asset_type: AssetType,
     pub name: String,
+}
+
+impl Display for Asset {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}:{}", self.asset_type, self.name)
+    }
 }
 
 impl Asset {

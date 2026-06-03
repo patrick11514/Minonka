@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+pub mod augments;
 pub mod challenges;
 pub mod champion;
 pub mod runes;

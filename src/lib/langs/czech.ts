@@ -82,17 +82,7 @@ export default template.parse({
         buttonInfoText: 'Zobrazuji %1-%2 posledních zápasů',
         place: 'Místo',
         team: 'Tým',
-        sentToChannel: 'Odesláno do kanálu',
-        subTeam: {
-            wolves: 'Vlk',
-            gromp: 'Ropušák',
-            krugs: 'Kameňák',
-            minions: 'Poskok',
-            poros: 'Poro',
-            raptors: 'Raptor',
-            scuttles: 'Krab',
-            sentinel: 'Strážce'
-        }
+        sentToChannel: 'Odesláno do kanálu'
     },
     clash: {
         title: 'Nadcházející Clash Turnaje',

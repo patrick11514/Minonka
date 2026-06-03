@@ -134,17 +134,7 @@ export default o({
         team: _,
         loading: _,
         uploading: _,
-        sentToChannel: _,
-        subTeam: o({
-            poros: _,
-            minions: _,
-            scuttles: _,
-            krugs: _,
-            raptors: _,
-            sentinel: _,
-            wolves: _,
-            gromp: _
-        } satisfies Record<(typeof subTeamMap)[keyof typeof subTeamMap], typeof _>)
+        sentToChannel: _
     }),
     clash: o({
         title: _,

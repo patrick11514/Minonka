@@ -1,4 +1,5 @@
 import { env } from '$/types/env';
+import { CherryMatchTaskInput } from '$/types/worker/CherryMatchTaskInput';
 import { FileResult } from '$/types/worker/FileResult';
 import { MatchTaskInput } from '$/types/worker/MatchTaskInput';
 import { RankTaskInput } from '$/types/worker/RankTaskInput';
@@ -22,7 +23,7 @@ type Jobs = {
     summoner: SummonerTaskInput;
     rank: RankTaskInput;
     match: MatchTaskInput; //MatchData;
-    cherryMatch: any; //CherryMatchData;
+    cherryMatch: CherryMatchTaskInput;
     team: any; //TeamData;
     spectator: any; //SpectatorData;
 };

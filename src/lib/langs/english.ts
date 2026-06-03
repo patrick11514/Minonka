@@ -89,17 +89,7 @@ export default template.parse({
         buttonInfoText: 'Showing %1-%2 last matches',
         place: 'Place',
         team: 'Team',
-        sentToChannel: 'Sent to channel',
-        subTeam: {
-            sentinel: 'Sentinel',
-            minions: 'Minion',
-            scuttles: 'Scuttle',
-            krugs: 'Krug',
-            raptors: 'Raptor',
-            poros: 'Poro',
-            wolves: 'Wolf',
-            gromp: 'Gromp'
-        }
+        sentToChannel: 'Sent to channel'
     },
     clash: {
         title: 'Upcoming Clash Tournaments',

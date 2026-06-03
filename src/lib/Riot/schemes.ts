@@ -163,94 +163,112 @@ export const ParticipantSchema = z.object({
 const cherryParticipantSchema = ParticipantSchema.extend({
     playerSubteamId: z.number(),
     subteamPlacement: z.number(),
-    ...Object.fromEntries(
-        Array.from({ length: 6 }).map((_, id) => [
-            `playerAugment${id + 1}` as NumberSuffix<
-                'playerAugment',
-                1 | 2 | 3 | 4 | 5 | 6
-            >,
-            id > 3 ? z.number().optional() : z.number()
-        ])
-    )
+    playerAugment1: z.number(),
+    playerAugment2: z.number(),
+    playerAugment3: z.number(),
+    playerAugment4: z.number(),
+    playerAugment5: z
+        .number()
+        .nullish()
+        .transform((v) => v ?? null),
+    playerAugment6: z
+        .number()
+        .nullish()
+        .transform((v) => v ?? null)
 });
 
 const queueIds = queues.map((queue) => queue.queueId);
 
-export const RegularMatchSchema = z.object({
-    metadata: z.object({
-        dataVersion: z.string(),
-        matchId: z.string(),
-        participants: z.array(z.string())
-    }),
-    info: z.object({
-        gameCreation: z.number(),
-        gameDuration: z.number(),
-        gameStartTimestamp: z.coerce.bigint(),
-        gameEndTimestamp: z.coerce.bigint(),
-        gameId: z.number(),
-        gameMode: z.string(),
-        gameName: z.string(),
-        mapId: z.number(),
-        participants: z.array(ParticipantSchema),
-        queueId: z.number().refine((v): v is QueueId => queueIds.includes(v as QueueId)),
-        teams: z.array(
+const MatchMetadataSchema = z.object({
+    dataVersion: z.string(),
+    matchId: z.string(),
+    participants: z.array(z.string())
+});
+
+const MatchTeamSchema = z.object({
+    bans: z.array(
+        z.object({
+            championId: z.number(),
+            pickTurn: z.number()
+        })
+    ),
+    feats: z
+        .record(
+            z.union([
+                z.literal('EPIC_MONSTER_KILL'),
+                z.literal('FIRST_BLOOD'),
+                z.literal('FIRST_TURRET')
+            ]),
             z.object({
-                bans: z.array(
-                    z.object({
-                        championId: z.number(),
-                        pickTurn: z.number()
-                    })
-                ),
-                feats: z
-                    .record(
-                        z.union([
-                            z.literal('EPIC_MONSTER_KILL'),
-                            z.literal('FIRST_BLOOD'),
-                            z.literal('FIRST_TURRET')
-                        ]),
-                        z.object({
-                            featState: z.number()
-                        })
-                    )
-                    .optional(),
-                objectives: z.record(
-                    z.union([
-                        z.literal('atakhan'),
-                        z.literal('baron'),
-                        z.literal('champion'),
-                        z.literal('dragon'),
-                        z.literal('horde'),
-                        z.literal('inhibitor'),
-                        z.literal('riftHerald'),
-                        z.literal('tower')
-                    ]),
-                    z.object({
-                        first: z.boolean(),
-                        kills: z.number()
-                    })
-                ),
-                teamId: z.literal(100).or(z.literal(200)),
-                win: z.boolean()
+                featState: z.number()
             })
         )
-    })
+        .optional(),
+    objectives: z.record(
+        z.union([
+            z.literal('atakhan'),
+            z.literal('baron'),
+            z.literal('champion'),
+            z.literal('dragon'),
+            z.literal('horde'),
+            z.literal('inhibitor'),
+            z.literal('riftHerald'),
+            z.literal('tower')
+        ]),
+        z.object({
+            first: z.boolean(),
+            kills: z.number()
+        })
+    ),
+    teamId: z.literal(100).or(z.literal(200)),
+    win: z.boolean()
 });
 
-export const CherryMatchSchema = RegularMatchSchema.extend({
-    info: RegularMatchSchema.shape.info.extend({
-        participants: z.array(cherryParticipantSchema),
-        teams: z.array(
-            RegularMatchSchema.shape.info.shape.teams.element.extend({
-                /* in cherry games, all players are in same team, so second team have just id 0*/
-                teamId: RegularMatchSchema.shape.info.shape.teams.element.shape.teamId.or(
-                    z.literal(0)
-                )
-            })
-        )
-    })
+const MatchInfoBaseSchema = z.object({
+    gameCreation: z.number(),
+    gameDuration: z.number(),
+    gameStartTimestamp: z.coerce.bigint(),
+    gameEndTimestamp: z.coerce.bigint(),
+    gameId: z.number(),
+    gameMode: z.string(),
+    gameName: z.string(),
+    mapId: z.number(),
+    queueId: z.number().refine((v): v is QueueId => queueIds.includes(v as QueueId))
 });
 
-export const MatchSchema = z.union([RegularMatchSchema, CherryMatchSchema]);
+export const RegularMatchInfoSchema = MatchInfoBaseSchema.extend({
+    isCherry: z.literal(false),
+    participants: z.array(ParticipantSchema),
+    teams: z.array(MatchTeamSchema)
+});
+
+export const CherryMatchInfoSchema = MatchInfoBaseSchema.extend({
+    isCherry: z.literal(true),
+    participants: z.array(cherryParticipantSchema),
+    teams: z.array(
+        MatchTeamSchema.extend({
+            /* in cherry games, all players are in same team, so second team have just id 0*/
+            teamId: MatchTeamSchema.shape.teamId.or(z.literal(0))
+        })
+    )
+});
+
+export const RegularMatchSchema = z.object({
+    metadata: MatchMetadataSchema,
+    isCherry: z.literal(false),
+    info: RegularMatchInfoSchema
+});
+
+export const CherryMatchSchema = z.object({
+    metadata: MatchMetadataSchema,
+    isCherry: z.literal(true),
+    info: CherryMatchInfoSchema
+});
+
+export const MatchSchema = z.discriminatedUnion('isCherry', [
+    RegularMatchSchema,
+    CherryMatchSchema
+]);
 
 export const ClashMemberSchema = z.object({
     puuid: z.string(),

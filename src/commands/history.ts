@@ -3,12 +3,13 @@ import { AccountCommand } from '$/lib/AccountCommand';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
-import { formatErrorResponse, toValidResponse } from '$/lib/Riot/baseRequest';
-import { CherryMatchSchema } from '$/lib/Riot/schemes';
+import { formatErrorResponse } from '$/lib/Riot/baseRequest';
+import { CherryMatchSchema, MatchSchema } from '$/lib/Riot/schemes';
 import { queues, Region } from '$/lib/Riot/types';
 import { conn } from '$/types/connection';
 import { Account } from '$/types/database';
 import { DePromise, OmitUnion } from '$/types/types';
+import type { MatchTaskInput } from '$/types/worker/MatchTaskInput';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -23,9 +24,12 @@ import {
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import crypto from 'node:crypto';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 const l = new Logger('History', 'white');
+
+type MatchData = z.infer<typeof MatchSchema>;
+type CherryMatchData = z.infer<typeof CherryMatchSchema>;
 
 type ButtonData = {
     discordId: string;
@@ -235,30 +239,42 @@ export default class History extends AccountCommand<CustomData> {
         }
 
         return await Promise.all(
-            matchesData.map(async (match) => {
-                const _match = match as toValidResponse<typeof match>;
+            matchesData.map(async (matchResponse) => {
+                if (!matchResponse.status) {
+                    throw new Error('Unexpected match response status');
+                }
+
+                const matchData: MatchData = matchResponse.data;
+
                 let jobId: string;
-                if (_match.data.info.gameMode === 'CHERRY') {
+                if (matchData.isCherry) {
+                    const cherryMatchData: CherryMatchData = matchData;
+
                     jobId = process.workerServer.addJob('cherryMatch', {
-                        ...(_match.data as z.infer<typeof CherryMatchSchema>),
+                        ...cherryMatchData,
                         locale,
                         region,
-                        myPuuid: puuid
+                        puuid,
+                        queueName: getLocale(locale).queues[cherryMatchData.info.queueId]
                     });
                 } else {
-                    jobId = process.workerServer.addJob('match', {
-                        ..._match.data,
+                    const regularMatchData = matchData;
+
+                    const payload: MatchTaskInput = {
+                        ...regularMatchData,
                         locale,
                         region,
                         puuid,
                         lpGain: await this.getLpGain(
-                            _match.data.metadata.matchId,
-                            _match.data.info.queueId,
+                            regularMatchData.metadata.matchId,
+                            regularMatchData.info.queueId,
                             puuid,
                             region
                         ),
-                        queueName: getLocale(locale).queues[_match.data.info.queueId]
-                    });
+                        queueName: getLocale(locale).queues[regularMatchData.info.queueId]
+                    };
+
+                    jobId = process.workerServer.addJob('match', payload);
                 }
 
                 return jobId;
