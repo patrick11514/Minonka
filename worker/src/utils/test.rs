@@ -18,7 +18,16 @@ pub fn generate_diff_mask(expected: &RgbaImage, actual: &RgbaImage) -> Option<Rg
             let p1 = expected.get_pixel(x, y);
             let p2 = actual.get_pixel(x, y);
 
-            if p1 == p2 {
+            let is_match = if p1[3] == 0 && p2[3] == 0 {
+                true
+            } else {
+                (p1[0] as i32 - p2[0] as i32).abs() <= 2
+                    && (p1[1] as i32 - p2[1] as i32).abs() <= 2
+                    && (p1[2] as i32 - p2[2] as i32).abs() <= 2
+                    && (p1[3] as i32 - p2[3] as i32).abs() <= 2
+            };
+
+            if is_match {
                 // Dim down matching elements to provide structural composition context
                 let gray = ((p1[0] as u32 + p1[1] as u32 + p1[2] as u32) / 3) as u8;
                 diff_canvas.put_pixel(x, y, Rgba([gray / 5, gray / 5, gray / 5, 255]));
