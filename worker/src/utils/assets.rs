@@ -121,6 +121,13 @@ pub fn get_background_asset() -> Asset {
     Asset::new(AssetType::Other, "background.png")
 }
 
+fn get_fallback_asset() -> Asset {
+    Asset::new(
+        AssetType::DDragon,
+        "_ROOT_/img/profileicon/29.png".to_string(),
+    )
+}
+
 pub async fn get_profile_icon(id: u32) -> TaskResult<Asset> {
     let asset = Asset::new(
         AssetType::DDragon,
@@ -129,10 +136,7 @@ pub async fn get_profile_icon(id: u32) -> TaskResult<Asset> {
 
     if !asset.exists().await? {
         //ID 29 => fallback icon
-        Ok(Asset::new(
-            AssetType::DDragon,
-            "_ROOT_/img/profileicon/29.png",
-        ))
+        Ok(get_fallback_asset())
     } else {
         Ok(asset)
     }
@@ -184,10 +188,7 @@ pub async fn get_champion_asset(
     }
 
     // Fallback asset -> profile icon 29
-    Ok(Asset::new(
-        AssetType::DDragon,
-        "_ROOT_/img/profileicon/29.png",
-    ))
+    Ok(get_fallback_asset())
 }
 
 pub async fn get_rune_asset(
@@ -201,15 +202,19 @@ pub async fn get_rune_asset(
     let style = runes.iter().find(|rune| rune.id == style);
 
     let key = if let Some(selection) = selection {
-        style
+        match style
             .and_then(|rune| rune.slots.first())
             .and_then(|slot| slot.runes.iter().find(|r| r.id == selection))
             .and_then(|rune| Some(rune.icon.clone()))
-            .expect("Rune not found")
+        {
+            Some(style) => style,
+            None => return Ok(get_fallback_asset()),
+        }
     } else {
-        style
-            .and_then(|rune| Some(rune.icon.clone()))
-            .expect("Rune not found")
+        match style.and_then(|rune| Some(rune.icon.clone())) {
+            Some(style) => style,
+            None => return Ok(get_fallback_asset()),
+        }
     };
 
     Ok(Asset::new(AssetType::DDragon, format!("/img/{}", key)))

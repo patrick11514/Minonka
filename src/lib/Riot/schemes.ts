@@ -236,14 +236,41 @@ const MatchInfoBaseSchema = z.object({
     queueId: z.number().refine((v): v is QueueId => queueIds.includes(v as QueueId))
 });
 
+const injectMatchDiscriminator = (match: unknown) => {
+    if (typeof match !== 'object' || match === null) {
+        return match;
+    }
+
+    const typedMatch = match as {
+        isCherry?: boolean;
+        info?: {
+            gameMode?: string;
+            participants?: Array<Record<string, unknown>>;
+        };
+    };
+
+    const isCherry = typedMatch.info?.gameMode === 'CHERRY';
+
+    return {
+        ...typedMatch,
+        isCherry,
+        info: typedMatch.info
+            ? {
+                  ...typedMatch.info,
+                  isCherry
+              }
+            : typedMatch.info
+    };
+};
+
 export const RegularMatchInfoSchema = MatchInfoBaseSchema.extend({
-    isCherry: z.literal(false),
+    isCherry: z.literal(false).default(false),
     participants: z.array(ParticipantSchema),
     teams: z.array(MatchTeamSchema)
 });
 
 export const CherryMatchInfoSchema = MatchInfoBaseSchema.extend({
-    isCherry: z.literal(true),
+    isCherry: z.literal(true).default(true),
     participants: z.array(cherryParticipantSchema),
     teams: z.array(
         MatchTeamSchema.extend({
@@ -255,20 +282,20 @@ export const CherryMatchInfoSchema = MatchInfoBaseSchema.extend({
 
 export const RegularMatchSchema = z.object({
     metadata: MatchMetadataSchema,
-    isCherry: z.literal(false),
+    isCherry: z.literal(false).default(false),
     info: RegularMatchInfoSchema
 });
 
 export const CherryMatchSchema = z.object({
     metadata: MatchMetadataSchema,
-    isCherry: z.literal(true),
+    isCherry: z.literal(true).default(true),
     info: CherryMatchInfoSchema
 });
 
-export const MatchSchema = z.discriminatedUnion('isCherry', [
-    RegularMatchSchema,
-    CherryMatchSchema
-]);
+export const MatchSchema = z.preprocess(
+    injectMatchDiscriminator,
+    z.discriminatedUnion('isCherry', [RegularMatchSchema, CherryMatchSchema])
+);
 
 export const ClashMemberSchema = z.object({
     puuid: z.string(),

@@ -546,12 +546,6 @@ impl Task for CherryMatchTask {
         let locale = AppLocale::from_str(&input.default.locale);
         let json: JsonCache = context.clone().into();
 
-        input
-            .info
-            .participants
-            .iter()
-            .for_each(|p| println!("{:?} {:?}", p.player_subteam_id, p.subteam_placement));
-
         let ctx = RenderContext {
             json: Arc::new(json),
             locale: locale.clone(),
@@ -573,12 +567,15 @@ impl Task for CherryMatchTask {
 
         teams.sort_by(|a, b| a.1.cmp(&b.1));
 
-        let pos = teams
+        let pos = input
+            .info
+            .participants
             .iter()
-            .position(|t| t.0 == input.info.participants[0].subteam_placement)
+            .find(|p| p.puuid == input.default.puuid)
+            .map(|p| p.subteam_placement)
             .unwrap();
 
-        let half = teams.len() / 2;
+        let half = (teams.len() / 2) as u32;
 
         let canvas = MasterCanvas::from_asset(background, context.into()).await?;
         let background_height = canvas.dimensions().1;
@@ -645,8 +642,8 @@ impl Task for CherryMatchTask {
 
 mod test {
     #[tokio::test]
-    async fn test_cherry_match_2nd() {
-        crate::assert_task!(super::CherryMatchTask, "test_files/cherryMatch_2nd.json");
+    async fn test_cherry_match_1st() {
+        crate::assert_task!(super::CherryMatchTask, "test_files/cherryMatch_1st.json");
     }
 
     #[tokio::test]
