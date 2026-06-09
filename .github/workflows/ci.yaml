@@ -66,6 +66,15 @@ jobs:
 
             - name: Run worker tests
               run: pnpm run worker:test
+            - name: Upload Visual Regression Diffs
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: visual-test-diffs
+                  path: |
+                      worker/src/tasks/snapshots/**/*.actual.png
+                      worker/src/tasks/snapshots/**/*.diff.png
+                  retention-days: 5
 
     deploy:
         name: Deploy
