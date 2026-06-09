@@ -1,8 +1,6 @@
 use std::sync::Arc;
 
 use futures::future::try_join_all;
-use futures::try_join;
-use image::codecs::ico;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
@@ -10,7 +8,7 @@ use crate::cache::json::JsonCache;
 use crate::context::AppContext;
 use crate::draw::color::Color;
 use crate::draw::container::{AlignItems, Container, ContainerDirection, JustifyContent};
-use crate::draw::label::{Alignment, Label};
+use crate::draw::label::Label;
 use crate::draw::master_canvas::MasterCanvas;
 use crate::draw::rich_label::RichLabel;
 use crate::draw::sprite::Sprite;
@@ -23,11 +21,10 @@ use crate::tasks::{
     types::WorkerJob,
 };
 use crate::utils::assets::{
-    Asset, AssetType, OnlineAsset, get_background_asset, get_champion_asset, get_profile_icon,
-    get_rooster_asset,
+    Asset, AssetType, get_background_asset, get_champion_asset, get_profile_icon, get_rooster_asset,
 };
 use crate::utils::locale::AppLocale;
-use crate::utils::rank::{Rank, RankTier};
+use crate::utils::rank::RankTier;
 use crate::utils::{FormatNumber, format_number};
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]

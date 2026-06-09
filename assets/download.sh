@@ -24,6 +24,8 @@ trap cleanup EXIT INT TERM
 
 DDRAGON_VERSION=$(curl https://ddragon.leagueoflegends.com/api/versions.json | jq -r ".[0]")
 
+echo "Latest DDragon version: $DDRAGON_VERSION"
+
 CURRENT_VERSION=$(cat ddragon/.version)
 if [ "$CURRENT_VERSION" != "$DDRAGON_VERSION" ]; then
     echo "Downloading version $DDRAGON_VERSION"
@@ -37,6 +39,8 @@ if [ "$CURRENT_VERSION" != "$DDRAGON_VERSION" ]; then
     
     cd ..
 fi
+
+echo "DDragon is up to date"
 
 # RANKS
 
@@ -52,6 +56,8 @@ if [ ! -d "ranks" ]; then
     cd ..
 fi
 
+echo "Ranks are up to date"
+
 # lane-rank-specific icons
 # URL: https://static.developer.riotgames.com/docs/lol/ranked-positions.zip
 if [ ! -d "lanes" ]; then
@@ -63,47 +69,4 @@ if [ ! -d "lanes" ]; then
     unzip -q lanes.zip
 fi
 
-# Banners
-# this should be always updated
-# URL: https://raw.communitydragon.org/latest/game/assets/loadouts/regalia/banners/
-# JSON URL: https://raw.communitydragon.org/json/latest/game/assets/loadouts/regalia/banners/
-
-BANNER_FILES=$(curl -s https://raw.communitydragon.org/json/latest/game/assets/loadouts/regalia/banners/ | jq -r '.[].name')
-if [ ! -d "banners" ]; then
-    mkdir banners
-else
-    rm -r banners/*
-fi
-
-for file in $BANNER_FILES; do
-    wget -q -O "banners/$file" "https://raw.communitydragon.org/latest/game/assets/loadouts/regalia/banners/$file"
-done
-
-# BANNER RENAMES
-declare -A BANNER_RENAMES=(
-    ["01_iron_banner"]="iron_banner"
-    ["02_bronze_banner"]="bronze_banner"
-    ["03_silver_banner"]="silver_banner"
-    ["04_gold_banner"]="gold_banner"
-    ["05_platinum_banner"]="platinum_banner"
-    ["06_diamond_banner"]="diamond_banner"
-    ["07_master_banner"]="master_banner"
-    ["08_grandmaster_banner"]="grandmaster_banner"
-    ["09_challenger_banner"]="challenger_banner"
-    ["00_unranked_banner"]="1_unranked_banner"
-    ["03_lny23_banner"]="3_lny23_banner"
-    ["04_sf23_banner"]="4_sf23_banner"
-    ["05_be_emporium_banner3"]="5_be_emporium_banner3"
-    ["06_winterblessed_noble_banner"]="6_winterblessed_noble_banner"
-    ["07_winterblessed_royal_banner"]="7_winterblessed_royal_banner"
-    ["08_winterblessed_aurora_banner"]="8_winterblessed_aurora_banner"
-    ["09_unkillable_demon_king_banner"]="9_unkillable_demon_king_banner"
-)
-
-for old_name in "${!BANNER_RENAMES[@]}"; do
-    new_name=${BANNER_RENAMES[$old_name]}
-    if [ -f "banners/$old_name.png" ]; then
-        mv "banners/$old_name.png" "banners/$new_name.png"
-    fi
-done
-
+echo "Lane-rank-specific icons are up to date"

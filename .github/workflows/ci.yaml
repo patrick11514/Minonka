@@ -8,7 +8,7 @@ on:
 
 jobs:
     lint:
-        name: 'Lint code'
+        name: 'Lint code & Test'
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -42,6 +42,32 @@ jobs:
             - name: TypeScript check
               run: pnpm run check
 
+            - name: Setup Rust
+              run: |
+                  rustup update stable
+                  rustup default stable
+
+            - name: Cache assets
+              uses: actions/cache@v3
+              with:
+                  path: |
+                      assets/ddragon
+                      assets/ranks
+                      assets/lanes
+                      assets/banners
+                  key: ${{ runner.os }}-assets-${{ hashFiles('assets/download.sh') }}
+                  restore-keys: |
+                      ${{ runner.os }}-assets-
+
+            - name: Download assets
+              run: |
+                  chmod +x ./assets/download.sh
+                  ./assets/download.sh
+
+
+            - name: Run worker tests
+              run: pnpm run worker:test
+
     deploy:
         name: Deploy
         needs: lint
@@ -54,11 +80,31 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: 24
-            - name: Install & Build
+            - name: Install & Build Frontend
               run: |
                   npm install -g pnpm
                   pnpm install --frozen-lockfile
                   pnpm run build
+            - name: Check Rustup & Install if missing
+              run: |
+                  if ! command -v rustup &> /dev/null; then
+                      if [ -f "$HOME/.cargo/env" ]; then
+                          source "$HOME/.cargo/env"
+                      fi
+                  fi
+                  if ! command -v rustup &> /dev/null; then
+                      echo "Installing rustup..."
+                      curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+                      source "$HOME/.cargo/env"
+                  else
+                      echo "rustup is already installed."
+                  fi
+                  echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+            - name: Build Rust worker
+              run: |
+                  source "$HOME/.cargo/env" || true
+                  cd worker
+                  cargo build --release --bin main
             - name: Sync Files
               run: |
                   rsync -av --delete ./ /opt/apps/Minonka/ \
@@ -70,7 +116,12 @@ jobs:
                     --exclude "assets/banners/" \
                     --exclude "assets/ddragon/" \
                     --exclude "assets/lanes/" \
-                    --exclude "assets/ranks/"
+                    --exclude "assets/ranks/" \
+                    --exclude "worker/target/"
+            - name: Copy Rust binary
+              run: |
+                  mkdir -p /opt/apps/Minonka/worker/target/release
+                  cp worker/target/release/main /opt/apps/Minonka/worker/target/release/main
             - name: Restart Application
               run: |
                   cd /opt/apps/Minonka
@@ -79,3 +130,4 @@ jobs:
                   pnpm run start:register
                   sudo systemctl restart minonka
                   sudo systemctl restart minonka_worker
+

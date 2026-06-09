@@ -17,7 +17,7 @@
         "migrate": "tsx ./script/runMigration.ts",
         "prepare": "husky",
         "worker:export-bindings": "cd worker && cargo test export_bindings --features export-ts",
-        "worker:test": "cd worker && cargo test",
+        "worker:test": "cd worker && RUST_LOG=error cargo test",
         "worker:inspect": "cd worker && cargo run --bin inspect_images"
     },
     "dependencies": {
