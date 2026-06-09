@@ -242,7 +242,7 @@ impl Task for TeamTask {
 
         let rooster = get_rooster_asset(input.icon_id);
         let mut rooster = Sprite::from_asset(&rooster, 0, 0).await?;
-        rooster.resize_to_width(120);
+        rooster.resize_to_width(100);
 
         let render_context = RenderContext {
             json: Arc::new(context.clone().into()),
