@@ -18,11 +18,7 @@
     },
     "crest": 1,
     "prestigeCrest": 350,
-    "challenges": [
-        203102,
-        204203,
-        302105
-    ],
+    "challenges": [203102, 204203, 302105],
     "userChallenges": [
         {
             "challengeId": 0,

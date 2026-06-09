@@ -20,9 +20,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    8230
-                ],
+                "perkIds": [8230],
                 "perkStyle": 8200,
                 "perkSubStyle": 8000
             }
@@ -38,9 +36,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    8214
-                ],
+                "perkIds": [8214],
                 "perkStyle": 8200,
                 "perkSubStyle": 8300
             }
@@ -56,9 +52,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    8010
-                ],
+                "perkIds": [8010],
                 "perkStyle": 8000,
                 "perkSubStyle": 8400
             }
@@ -74,9 +68,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    8005
-                ],
+                "perkIds": [8005],
                 "perkStyle": 8000,
                 "perkSubStyle": 8300
             }
@@ -92,9 +84,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    8112
-                ],
+                "perkIds": [8112],
                 "perkStyle": 8100,
                 "perkSubStyle": 8300
             }
@@ -110,9 +100,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    8229
-                ],
+                "perkIds": [8229],
                 "perkStyle": 8200,
                 "perkSubStyle": 8100
             }
@@ -128,9 +116,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    8992
-                ],
+                "perkIds": [8992],
                 "perkStyle": 8200,
                 "perkSubStyle": 8300
             }
@@ -146,9 +132,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    9923
-                ],
+                "perkIds": [9923],
                 "perkStyle": 8100,
                 "perkSubStyle": 8000
             }
@@ -164,9 +148,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    8112
-                ],
+                "perkIds": [8112],
                 "perkStyle": 8100,
                 "perkSubStyle": 8400
             }
@@ -182,9 +164,7 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [
-                    8010
-                ],
+                "perkIds": [8010],
                 "perkStyle": 8000,
                 "perkSubStyle": 8300
             }

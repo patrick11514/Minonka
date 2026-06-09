@@ -12,11 +12,7 @@
     "crest": 1,
     "highestRank": null,
     "prestigeCrest": 450,
-    "challenges": [
-        402100,
-        302301,
-        302103
-    ],
+    "challenges": [402100, 302301, 302103],
     "userChallenges": [
         {
             "challengeId": 0,

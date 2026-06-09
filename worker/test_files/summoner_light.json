@@ -16,11 +16,7 @@
         "rank": "I",
         "lp": 84
     },
-    "challenges": [
-        303401,
-        301103,
-        402209
-    ],
+    "challenges": [303401, 301103, 402209],
     "userChallenges": [
         {
             "challengeId": 0,
