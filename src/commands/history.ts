@@ -1,12 +1,11 @@
-import { updateLpForUser } from '$/crons/lp';
 import { AccountCommand } from '$/lib/AccountCommand';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
+import { getLpGain } from '$/lib/Riot/lp';
 import { CherryMatchSchema, MatchSchema } from '$/lib/Riot/schemes';
 import { queues, Region } from '$/lib/Riot/types';
-import { conn } from '$/types/connection';
 import { Account } from '$/types/database';
 import { DePromise, OmitUnion } from '$/types/types';
 import type { MatchTaskInput } from '$/types/worker/MatchTaskInput';
@@ -160,54 +159,6 @@ export default class History extends AccountCommand<CustomData> {
         );
     }
 
-    private async getLpGain(
-        matchId: string,
-        queue: number,
-        puuid: string,
-        region: Region
-    ) {
-        if (queue !== 420 && queue !== 440) return null; //Only ranked games
-
-        const account = await conn
-            .selectFrom('account')
-            .selectAll()
-            .where('puuid', '=', puuid)
-            .executeTakeFirst();
-
-        if (!account) return null;
-
-        for (let i = 0; i < 1; ++i) {
-            const lp = await conn
-                .selectFrom('match_lp')
-                .selectAll()
-                .where((eb) =>
-                    eb.and([
-                        eb('matchId', '=', matchId),
-                        eb('accountId', '=', account.id)
-                    ])
-                )
-                .executeTakeFirst();
-
-            if (lp) {
-                return lp.gain;
-            }
-
-            //Try fetch Lp
-            if (!lp && i === 0) {
-                await updateLpForUser({
-                    puuid,
-                    region,
-                    gameName: account.gameName,
-                    tagLine: account.tagLine,
-                    id: account.id
-                });
-                //Loop will re-run
-            }
-        }
-
-        return null;
-    }
-
     async getFiles(
         locale: Locale,
         region: Region,
@@ -265,7 +216,7 @@ export default class History extends AccountCommand<CustomData> {
                         locale,
                         region,
                         puuid,
-                        lpGain: await this.getLpGain(
+                        lpGain: await getLpGain(
                             regularMatchData.metadata.matchId,
                             regularMatchData.info.queueId,
                             puuid,

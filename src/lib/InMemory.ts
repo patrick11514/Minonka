@@ -57,4 +57,9 @@ export class InMemory<$Value = unknown> {
 
         return this.memory.get(key);
     }
+
+    async delete(key: string) {
+        this.memory.delete(key);
+        await conn.deleteFrom('in_memory').where('key', '=', key).execute();
+    }
 }

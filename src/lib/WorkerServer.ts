@@ -5,6 +5,7 @@ import { MatchTaskInput } from '$/types/worker/MatchTaskInput';
 import { RankTaskInput } from '$/types/worker/RankTaskInput';
 import { SummonerTaskInput } from '$/types/worker/SummonerTaskInput';
 import { TeamTaskInput } from '$/types/worker/TeamTaskInput';
+import { SpectatorTaskInput } from '$/types/worker/SpectatorTaskInput';
 import assert from 'node:assert';
 import crypto from 'node:crypto';
 import { WebSocket, WebSocketServer } from 'ws';
@@ -19,14 +20,13 @@ const Workers: Record<
     }
 > = {};
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 type Jobs = {
     summoner: SummonerTaskInput;
     rank: RankTaskInput;
     match: MatchTaskInput;
     cherryMatch: CherryMatchTaskInput;
     team: TeamTaskInput;
-    spectator: any; //SpectatorData;
+    spectator: SpectatorTaskInput;
 };
 
 const l = new Logger('WorkerServer', 'magenta');

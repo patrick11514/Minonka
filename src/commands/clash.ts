@@ -271,7 +271,11 @@ export default class Clash extends Command {
                         },
                         gameName: account.data.gameName,
                         tagLine: account.data.tagLine,
-                        masteries: masteries.data
+                        masteries: masteries.data.map((m) => ({
+                            ...m,
+                            championId: Number(m.championId),
+                            lastPlayTime: m.lastPlayTime
+                        }))
                     } satisfies TeamTaskInput['players'][number];
                 })
             );

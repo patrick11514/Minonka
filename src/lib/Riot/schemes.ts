@@ -305,7 +305,7 @@ export const ClashMemberSchema = z.object({
 
 export const MasterySchema = z.object({
     puuid: z.string(),
-    championId: z.coerce.bigint(),
+    championId: z.number(),
     championLevel: z.number(),
     championPoints: z.number(),
     lastPlayTime: z.coerce.bigint()
