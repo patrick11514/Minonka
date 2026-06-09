@@ -42,8 +42,9 @@ impl Display for AssetType {
 
 #[tracing::instrument(skip(asset), fields(asset = %name, asset_type = ?asset))]
 fn get_online_asset_url(name: &str, asset: &OnlineAsset) -> String {
+    let clean_name = name.strip_prefix('/').unwrap_or(name);
     match asset {
-        OnlineAsset::CommunityDragon => format!("https://raw.communitydragon.org/latest/{}", name),
+        OnlineAsset::CommunityDragon => format!("https://raw.communitydragon.org/latest/{}", clean_name),
     }
 }
 
@@ -52,10 +53,11 @@ fn get_online_asset_path(name: &str, asset: &OnlineAsset) -> PathBuf {
     let prefix = match asset {
         OnlineAsset::CommunityDragon => "cddragon",
     };
+    let clean_name = name.strip_prefix('/').unwrap_or(name);
 
     get_current_dir()
         .join(get_persistent_cache_folder())
-        .join(format!("{}/{}", prefix, name))
+        .join(format!("{}/{}", prefix, clean_name))
 }
 
 #[tracing::instrument(skip(asset), fields(asset = %name, asset_type = ?asset), err)]
@@ -65,6 +67,10 @@ async fn fetch_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<Vec<u
         .await
         .map_err(TaskError::Reqwest)
         .context("fetch online asset", url.clone())?;
+    let response = response
+        .error_for_status()
+        .map_err(TaskError::Reqwest)
+        .context("status check online asset", url.clone())?;
     let body = response
         .bytes()
         .await
@@ -77,7 +83,11 @@ async fn fetch_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<Vec<u
 async fn get_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<PathBuf> {
     let path = get_online_asset_path(name, asset);
     if path.exists() {
-        return Ok(path);
+        if let Ok(metadata) = tokio::fs::metadata(&path).await {
+            if metadata.len() > 0 {
+                return Ok(path);
+            }
+        }
     }
 
     let data = fetch_online_asset(name, asset).await?;
@@ -90,10 +100,18 @@ async fn get_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<PathBuf
                 parent.to_string_lossy().to_string(),
             )?;
     }
-    tokio::fs::write(&path, data)
-        .await
-        .map_err(TaskError::Io)
-        .context("write online asset", path.to_string_lossy().to_string())?;
+
+    let tmp_path = path.with_extension(format!("tmp-{}", crate::utils::unique_id()));
+    if let Err(err) = tokio::fs::write(&tmp_path, data).await {
+        let _ = tokio::fs::remove_file(&tmp_path).await;
+        return Err(TaskError::Io(err).context("write online asset tmp", tmp_path.to_string_lossy().to_string()));
+    }
+
+    if let Err(err) = tokio::fs::rename(&tmp_path, &path).await {
+        let _ = tokio::fs::remove_file(&tmp_path).await;
+        return Err(TaskError::Io(err).context("rename online asset", path.to_string_lossy().to_string()));
+    }
+
     Ok(path)
 }
 
