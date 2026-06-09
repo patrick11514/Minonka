@@ -1,5 +1,5 @@
 {
-    "puuid": "qy9sVrIDgjAmhQm-b5jpF2KIcmRMs_8iZ3PXDK-v9A2DRWGeKb5IzBCZoHvNFUETpZF_HlxP9szpmg",
+    "puuid": "_l57t-efMSSWRU1OSwEk_N7DfKuIO0MdUiIET5RxALMTNn5tzNuW5YaC-xfp9MfNQeYzyc5NKz5gaA",
     "region": "EUN1",
     "level": 75,
     "gameName": "NyxAly",
@@ -10,7 +10,7 @@
     "gameLength": 870,
     "participants": [
         {
-            "puuid": "JDwdWDd0kXMGplL72cty0joj40nQi5KtxvF93VHiab5HXOPXdy70rwAZKmcmeoClsL0PFyoegutrVA",
+            "puuid": "RJs1NK2k-g18l01OSwHX56FYSJQc4eKYSDV3VBXf8Koj8Tax11Wfa1Y1byF7-7pqEyo0G37E9D3piQ",
             "teamId": 100,
             "spell1Id": 6,
             "spell2Id": 11,
@@ -20,13 +20,15 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [8230],
+                "perkIds": [
+                    8230
+                ],
                 "perkStyle": 8200,
                 "perkSubStyle": 8000
             }
         },
         {
-            "puuid": "0dVQtsrrx_iVCqfEygbE9CS4XL0EJtioln5GPMcwontgG6K1Se9Y3wOyeAoKtUcFokJ67gUFtZ_mUQ",
+            "puuid": "FObJ1EpJEzPYOU1OSwGxf4SGZnf_5BkJ0vavZLanRjQ7varKB4fYaFOtoOikbxyI1IrrQhDmwQOLNQ",
             "teamId": 100,
             "spell1Id": 4,
             "spell2Id": 7,
@@ -36,13 +38,15 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [8214],
+                "perkIds": [
+                    8214
+                ],
                 "perkStyle": 8200,
                 "perkSubStyle": 8300
             }
         },
         {
-            "puuid": "Xls9OJO7nmbPAhPlww1LfO0jk76avdsUCp-tNttGsk6_maVFCwqI195Fgxdv1NdumK8cX-YFO7JS9A",
+            "puuid": "vWawd9Clo7v5dU1OSwFp1kIBiaB8mrybhBOj9KiIYu7Rb6eP8Kt66_1Ihn9dSUAMKiRQzlwLaNpGOw",
             "teamId": 100,
             "spell1Id": 4,
             "spell2Id": 14,
@@ -52,13 +56,15 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [8010],
+                "perkIds": [
+                    8010
+                ],
                 "perkStyle": 8000,
                 "perkSubStyle": 8400
             }
         },
         {
-            "puuid": "nu6Tvb1IKXTbgRolarN-VtN8A8WYFNZGdj5PmXHTT1BDIZRSabVKQmGLF2YNkVE6iaMMgA94IRklEQ",
+            "puuid": "Q7ERmo-atUcjg01OSwEcvHTLFdfm2eky-2jF5SR_45qmTJO-YHuESFdekvdTbYh2DNHhYgBbM8zGJQ",
             "teamId": 100,
             "spell1Id": 4,
             "spell2Id": 21,
@@ -68,13 +74,15 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [8005],
+                "perkIds": [
+                    8005
+                ],
                 "perkStyle": 8000,
                 "perkSubStyle": 8300
             }
         },
         {
-            "puuid": "msOnj0zMKVS1Wfy0RVSSBFlygn8vO5tdUzk7wvv18OsKr1kMNBo0ed7EqhtefKxENSix8SmZQD5JKw",
+            "puuid": "vs6WLDTL7IY3n01OSwEh3dbhxIu0oImmnBHNIps1BnaDP3lAOUmVXDVrDl-7O36lZUK5n3pAWs4T8g",
             "teamId": 100,
             "spell1Id": 4,
             "spell2Id": 14,
@@ -84,13 +92,15 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [8112],
+                "perkIds": [
+                    8112
+                ],
                 "perkStyle": 8100,
                 "perkSubStyle": 8300
             }
         },
         {
-            "puuid": "46UM9A2JQ_sGIl174p-JFu4VJDMhkcCxZHJZu62cazSSQJm0pk_RtdtZsmm29oEPNzNg8QSlvY1R0Q",
+            "puuid": "ENDYmeu4nKzQi01OSwEegBnM9aDF6C5Pl2s6PFHU9gG9nsUL0rZiQpxTB_S9bAxs7rEoXlV3TY8WWA",
             "teamId": 200,
             "spell1Id": 4,
             "spell2Id": 7,
@@ -100,13 +110,15 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [8229],
+                "perkIds": [
+                    8229
+                ],
                 "perkStyle": 8200,
                 "perkSubStyle": 8100
             }
         },
         {
-            "puuid": "3ZmsPgvQu8aJK86DahjklfBeCjZu9UgpUwON3mNv3_2ZjEKxWXlw_fGfKKiz3VKLppmSxgcMDBpQGg",
+            "puuid": "wfXJN4-W1ng2xU1OSwEiJqDa8R9qqGyTJDKzzltDSngKDyL4aEDVUZj7Ti8dCzR44BZjy5_HVTQnmQ",
             "teamId": 200,
             "spell1Id": 4,
             "spell2Id": 21,
@@ -116,13 +128,15 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [8992],
+                "perkIds": [
+                    8992
+                ],
                 "perkStyle": 8200,
                 "perkSubStyle": 8300
             }
         },
         {
-            "puuid": "JI9F7oJnqI6OlTjMg7xOQQEiGV-I6T2VcNrP8o-10gTl5anFYhvqt78p4QQsTh0fuZD6omP5vr_xpA",
+            "puuid": "glRKixI6BsFV2k1OSwH1a2v6nu4PTM7h-l8raLn6QDIHnLdEqnfnN_fo6aHXwzglWLCCqjlbhPpHuQ",
             "teamId": 200,
             "spell1Id": 4,
             "spell2Id": 11,
@@ -132,13 +146,15 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [9923],
+                "perkIds": [
+                    9923
+                ],
                 "perkStyle": 8100,
                 "perkSubStyle": 8000
             }
         },
         {
-            "puuid": "qy9sVrIDgjAmhQm-b5jpF2KIcmRMs_8iZ3PXDK-v9A2DRWGeKb5IzBCZoHvNFUETpZF_HlxP9szpmg",
+            "puuid": "_l57t-efMSSWRU1OSwEk_N7DfKuIO0MdUiIET5RxALMTNn5tzNuW5YaC-xfp9MfNQeYzyc5NKz5gaA",
             "teamId": 200,
             "spell1Id": 4,
             "spell2Id": 14,
@@ -148,13 +164,15 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [8112],
+                "perkIds": [
+                    8112
+                ],
                 "perkStyle": 8100,
                 "perkSubStyle": 8400
             }
         },
         {
-            "puuid": "gAKxRFy6sG-cdsGF1Rnz5sPwVfyLciGX69qolAm8pKY1NYGFb9z-X35zUNdl6hYpt7IiO89CigECKw",
+            "puuid": "8hWkR3861gM_Ck1OSwH9xpGUJvol2O4f0NhNAcgW-HejDCyAELzBWGXj2MtdlBSeMbTC6Zzq1UynCw",
             "teamId": 200,
             "spell1Id": 14,
             "spell2Id": 4,
@@ -164,23 +182,65 @@
             "bot": false,
             "gameCustomizationObjects": [],
             "perks": {
-                "perkIds": [8010],
+                "perkIds": [
+                    8010
+                ],
                 "perkStyle": 8000,
                 "perkSubStyle": 8300
             }
         }
     ],
     "bannedChampions": [
-        { "championId": 29, "teamId": 100, "pickTurn": 1 },
-        { "championId": 59, "teamId": 100, "pickTurn": 2 },
-        { "championId": 102, "teamId": 100, "pickTurn": 3 },
-        { "championId": 777, "teamId": 100, "pickTurn": 4 },
-        { "championId": 157, "teamId": 100, "pickTurn": 5 },
-        { "championId": 54, "teamId": 200, "pickTurn": 6 },
-        { "championId": 99, "teamId": 200, "pickTurn": 7 },
-        { "championId": 29, "teamId": 200, "pickTurn": 8 },
-        { "championId": 122, "teamId": 200, "pickTurn": 9 },
-        { "championId": 83, "teamId": 200, "pickTurn": 10 }
+        {
+            "championId": 29,
+            "teamId": 100,
+            "pickTurn": 1
+        },
+        {
+            "championId": 59,
+            "teamId": 100,
+            "pickTurn": 2
+        },
+        {
+            "championId": 102,
+            "teamId": 100,
+            "pickTurn": 3
+        },
+        {
+            "championId": 777,
+            "teamId": 100,
+            "pickTurn": 4
+        },
+        {
+            "championId": 157,
+            "teamId": 100,
+            "pickTurn": 5
+        },
+        {
+            "championId": 54,
+            "teamId": 200,
+            "pickTurn": 6
+        },
+        {
+            "championId": 99,
+            "teamId": 200,
+            "pickTurn": 7
+        },
+        {
+            "championId": 29,
+            "teamId": 200,
+            "pickTurn": 8
+        },
+        {
+            "championId": 122,
+            "teamId": 200,
+            "pickTurn": 9
+        },
+        {
+            "championId": 83,
+            "teamId": 200,
+            "pickTurn": 10
+        }
     ],
     "mapName": "Summoner's Rift"
 }

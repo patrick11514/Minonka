@@ -64,7 +64,6 @@ jobs:
                   chmod +x ./assets/download.sh
                   ./assets/download.sh
 
-
             - name: Run worker tests
               run: pnpm run worker:test
 
@@ -130,4 +129,3 @@ jobs:
                   pnpm run start:register
                   sudo systemctl restart minonka
                   sudo systemctl restart minonka_worker
-
