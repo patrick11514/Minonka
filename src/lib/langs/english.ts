@@ -118,7 +118,8 @@ export default template.parse({
             bandle_city: 'Bandle City %1',
             mount_targon: 'Mount Targon %1',
             aram2022: 'ARAM %1',
-            worlds2024: 'Worlds %1'
+            worlds2024: 'Worlds %1',
+            msi2024: 'MSI %1'
         },
         noCups: 'No upcoming Clash tournaments were found.'
     },
@@ -209,7 +210,8 @@ export default template.parse({
         targon: 'Targon',
         zaun: 'Zaun',
         bandle_city: 'Bandle City',
-        mount_targon: 'Mount Targon'
+        mount_targon: 'Mount Targon',
+        void: 'Void'
     },
     unranked: 'Unranked',
     help: {

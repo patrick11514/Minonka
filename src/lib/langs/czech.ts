@@ -118,7 +118,9 @@ export default template.parse({
             bandle_city: 'Pohár Bandle City',
             aram2022: 'ARAM %1',
             worlds2024: 'Pohár Worlds',
-            mount_targon: '%1 Hory Targonu'
+            mount_targon: '%1 Hory Targonu',
+            void: 'Pohár Prázdnoty',
+            msi2024: 'Pohár MSI'
         },
         noCups: 'Nebyly nalezeny žádné nadcházející Clash turnaje.'
     },
@@ -209,7 +211,8 @@ export default template.parse({
         bilgewater: 'Bilgewater',
         shadowIsles: 'Stínové ostrovy',
         bandle_city: 'Bandle City',
-        mount_targon: 'Hora Targonu'
+        mount_targon: 'Hora Targonu',
+        void: 'Prázdnota'
     },
     unranked: 'Nehodnocený',
     help: {

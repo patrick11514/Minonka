@@ -463,7 +463,8 @@ export const mapRegions = [
     'piltover',
     'shadowIsles',
     'bandle_city',
-    'mount_targon'
+    'mount_targon',
+    'void'
 ] as const;
 
 export const positions = [
