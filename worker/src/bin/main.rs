@@ -7,10 +7,15 @@ use tokio_tungstenite::{
 };
 use tracing::{Instrument, error, info, warn};
 
-use worker::{context::AppContext, tasks, utils::init_tracing};
+use worker::{
+    context::AppContext,
+    tasks,
+    utils::{get_current_dir, init_tracing},
+};
 
 #[tokio::main]
 async fn main() {
+    dotenv::from_path(get_current_dir().join(".env")).ok();
     init_tracing();
 
     // In a real app, you would load these from your .env file
