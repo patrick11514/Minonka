@@ -89,17 +89,7 @@ export default template.parse({
         buttonInfoText: 'Showing %1-%2 last matches',
         place: 'Place',
         team: 'Team',
-        sentToChannel: 'Sent to channel',
-        subTeam: {
-            sentinel: 'Sentinel',
-            minions: 'Minion',
-            scuttles: 'Scuttle',
-            krugs: 'Krug',
-            raptors: 'Raptor',
-            poros: 'Poro',
-            wolves: 'Wolf',
-            gromp: 'Gromp'
-        }
+        sentToChannel: 'Sent to channel'
     },
     clash: {
         title: 'Upcoming Clash Tournaments',
@@ -128,7 +118,8 @@ export default template.parse({
             bandle_city: 'Bandle City %1',
             mount_targon: 'Mount Targon %1',
             aram2022: 'ARAM %1',
-            worlds2024: 'Worlds %1'
+            worlds2024: 'Worlds %1',
+            msi2024: 'MSI %1'
         },
         noCups: 'No upcoming Clash tournaments were found.'
     },
@@ -203,7 +194,9 @@ export default template.parse({
         1900: 'Pick URF',
         2000: 'Tutorial 1',
         2010: 'Tutorial 2',
-        2020: 'Tutorial 3'
+        2020: 'Tutorial 3',
+        2300: 'Brawl',
+        2400: 'ARAM: Mayhem'
     },
     mapRegions: {
         bilgewater: 'Bilgewater',
@@ -217,7 +210,8 @@ export default template.parse({
         targon: 'Targon',
         zaun: 'Zaun',
         bandle_city: 'Bandle City',
-        mount_targon: 'Mount Targon'
+        mount_targon: 'Mount Targon',
+        void: 'Void'
     },
     unranked: 'Unranked',
     help: {

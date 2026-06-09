@@ -1,1 +1,16 @@
+UNREVIEWED_FILES=$(find . -type f \( -name "*.actual.png" -o -name "*.diff.png" \) \
+    -not -path "*/target/*" \
+    -not -path "*/.git/*" \
+    -not -path "*/.cargo/*" \
+-not -path "*/node_modules/*")
+
+if [ -n "$UNREVIEWED_FILES" ]; then
+    echo "❌ Commit Blocked: You have unreviewed snapshot mutations!"
+    echo "------------------------------------------------------------"
+    echo "$UNREVIEWED_FILES"
+    echo "------------------------------------------------------------"
+    echo "👉 Please run: pnpm worker:inspect to review changes."
+    exit 1
+fi
+
 npx lint-staged

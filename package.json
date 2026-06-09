@@ -5,21 +5,20 @@
     "type": "module",
     "scripts": {
         "dev": "NODE_ENV=development tsx watch ./src/index.ts",
-        "dev:worker": "NODE_ENV=development tsx watch ./src/Worker/Worker.ts",
-        "dev:worker:remote": "NODE_ENV=development WORKER_MODE=remote tsx watch ./src/Worker/Worker.ts",
         "dev:register": "NODE_ENV=development tsx ./src/index.ts --register",
         "build": "mkdir -p build && tsc && tsc-alias",
         "start": "node ./build/index.js",
         "start:register": "NODE_ENV=production node ./build/index.js --register",
-        "start:worker": "NODE_ENV=production node ./build/Worker/Worker.js",
-        "start:worker:remote": "NODE_ENV=production WORKER_MODE=remote node ./build/Worker/Worker.js",
         "genDatabaseSchema": "kysely-codegen --out-file ./src/types/database.ts",
         "format": "prettier --write .",
         "lint": "prettier --check . && eslint src",
         "check": "tsc --noEmit",
         "migration:create": "./script/createMigration.sh",
         "migrate": "tsx ./script/runMigration.ts",
-        "prepare": "husky"
+        "prepare": "husky",
+        "worker:export-bindings": "cd worker && cargo test export_bindings --features export-ts",
+        "worker:test": "cd worker && RUST_LOG=error cargo test",
+        "worker:inspect": "cd worker && cargo run --bin inspect_images"
     },
     "dependencies": {
         "@types/strip-color": "^0.1.2",
@@ -54,13 +53,6 @@
         "tsx": "^4.19.2",
         "typescript": "^5.7.3",
         "typescript-eslint": "^8.23.0"
-    },
-    "pnpm": {
-        "onlyBuiltDependencies": [
-            "es5-ext",
-            "esbuild",
-            "sharp"
-        ]
     },
     "lint-staged": {
         "*.{js,ts}": [

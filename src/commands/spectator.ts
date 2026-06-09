@@ -1,10 +1,12 @@
 import { AccountCommand } from '$/lib/AccountCommand';
+import { getMaps, getRiotLanguageFromDiscordLocale } from '$/lib/Assets';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
+import { getLpGain } from '$/lib/Riot/lp';
 import { Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
-import { SpectatorData } from '$/Worker/tasks/spectator';
+import { SpectatorTaskInput } from '$/types/worker/SpectatorTaskInput';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -23,11 +25,120 @@ import fs from 'node:fs/promises';
 
 const l = new Logger('Spectator', 'green');
 
-type ButtonData = {
+export type ButtonData = {
     discordId: string;
     puuid: string;
     region: Region;
+    channelId: string;
+    messageId: string;
+    lastUpdate: number;
+    locale: Locale;
 };
+
+export async function fetchSpectatorTaskInput(
+    puuid: string,
+    region: Region,
+    locale: Locale
+): Promise<
+    | { status: false; code: number; message: string }
+    | { status: true; data: SpectatorTaskInput; gameName: string; tagLine: string }
+> {
+    const spectator = await api[region].spectator.byPuuid(puuid);
+    if (!spectator.status) {
+        return { status: false, code: spectator.code, message: spectator.message };
+    }
+
+    const summoner = await api[region].summoner.byPuuid(puuid);
+    if (!summoner.status) {
+        return { status: false, code: summoner.code, message: summoner.message };
+    }
+
+    const account = await api[region].account.byPuuid(puuid);
+    if (!account.status) {
+        return { status: false, code: account.code, message: account.message };
+    }
+
+    const lang = getLocale(locale);
+    const queueName =
+        lang.queues[spectator.data.gameQueueConfigId as keyof typeof lang.queues] ??
+        'Unknown';
+    const riotLocale = getRiotLanguageFromDiscordLocale(locale);
+    const maps = await getMaps(riotLocale);
+    const mapName = maps?.data[spectator.data.mapId.toString()]?.MapName ?? 'Unknown';
+
+    const data: SpectatorTaskInput = {
+        puuid: puuid,
+        region: region,
+        locale: locale,
+        queueName,
+        gameLength: spectator.data.gameLength,
+        participants: spectator.data.participants,
+        bannedChampions: spectator.data.bannedChampions,
+        mapName
+    };
+
+    return {
+        status: true,
+        data,
+        gameName: account.data.gameName,
+        tagLine: account.data.tagLine
+    };
+}
+
+export async function handleMatchFinished(
+    message: Message<boolean>,
+    puuid: string,
+    region: Region,
+    locale: Locale,
+    discordId: string
+) {
+    const lang = getLocale(locale);
+    const matchIds = await api[region].match.ids(puuid, { count: 1, start: 0 });
+    if (!matchIds.status || matchIds.data.length === 0) {
+        throw new Error('No match found for this player.');
+    }
+
+    const matchId = matchIds.data[0];
+    const matchResponse = await api[region].match.match(matchId);
+    if (!matchResponse.status) {
+        throw new Error('Failed to load match details.');
+    }
+
+    const matchData = matchResponse.data;
+    const account = await api[region].account.byPuuid(puuid);
+    const gameName = account.status ? account.data.gameName : 'Unknown';
+    const tagLine = account.status ? account.data.tagLine : 'Unknown';
+    const header = `<@${discordId}> ${gameName}#${tagLine} (${lang.regions[region] ?? region}):\n`;
+
+    let result: string;
+    if (matchData.isCherry) {
+        result = await process.workerServer.addJobWait('cherryMatch', {
+            ...matchData,
+            locale,
+            region,
+            puuid,
+            queueName: getLocale(locale).queues[matchData.info.queueId]
+        });
+    } else {
+        const lpGain = await getLpGain(matchId, matchData.info.queueId, puuid, region);
+        result = await process.workerServer.addJobWait('match', {
+            ...matchData,
+            locale,
+            region,
+            puuid,
+            lpGain,
+            queueName: getLocale(locale).queues[matchData.info.queueId]
+        });
+    }
+
+    await message.edit({
+        content: header,
+        files: [result],
+        components: [] // Removes reload button
+    });
+
+    await fs.unlink(result);
+}
 
 export default class Spectator extends AccountCommand {
     constructor() {
@@ -76,10 +187,14 @@ export default class Spectator extends AccountCommand {
         region: Region
     ) {
         const lang = getLocale(interaction.locale);
-        const spectator = await api[region].spectator.byPuuid(user.puuid);
+        const spectatorResult = await fetchSpectatorTaskInput(
+            user.puuid,
+            region,
+            interaction.locale
+        );
 
-        if (!spectator.status) {
-            if (spectator.code === 404) {
+        if (!spectatorResult.status) {
+            if (spectatorResult.code === 404) {
                 await interaction.reply({
                     content: replacePlaceholders(
                         lang.spectator.not_in_game,
@@ -92,45 +207,13 @@ export default class Spectator extends AccountCommand {
             }
 
             await interaction.reply({
-                content: replacePlaceholders(lang.genericError, spectator.message),
+                content: replacePlaceholders(lang.genericError, spectatorResult.message),
                 flags: MessageFlags.Ephemeral
             });
             return;
         }
 
-        const summoner = await api[region].summoner.byPuuid(user.puuid);
-        if (!summoner.status) {
-            await interaction.reply({
-                content: replacePlaceholders(lang.genericError, summoner.message),
-                flags: MessageFlags.Ephemeral
-            });
-            return;
-        }
-
-        const account = await api[region].account.byPuuid(summoner.data.puuid);
-        if (!account.status) {
-            await interaction.reply({
-                content: replacePlaceholders(lang.genericError, account.message),
-                flags: MessageFlags.Ephemeral
-            });
-            return;
-        }
-
-        const data = {
-            puuid: summoner.data.puuid,
-            region: region,
-            level: summoner.data.summonerLevel,
-            gameName: account.data.gameName,
-            tagLine: account.data.tagLine,
-            profileIconId: summoner.data.profileIconId,
-            locale: interaction.locale,
-            queueId: spectator.data.gameQueueConfigId,
-            gameLength: spectator.data.gameLength,
-            participants: spectator.data.participants,
-            mapId: spectator.data.mapId
-        } satisfies SpectatorData;
-
-        const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
+        const header = `<@${interaction.user.id}> ${spectatorResult.gameName}#${spectatorResult.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
         if (
@@ -151,14 +234,23 @@ export default class Spectator extends AccountCommand {
         }
 
         try {
-            const result = await process.workerServer.addJobWait('spectator', data);
+            const result = await process.workerServer.addJobWait(
+                'spectator',
+                spectatorResult.data
+            );
 
             const key = crypto.randomBytes(16).toString('hex');
+            const msg = publicMessage ?? (await interaction.fetchReply());
+
             const inMemory = process.inMemory.getInstance<ButtonData>();
-            inMemory.set(key, {
+            await inMemory.set('spectator:' + key, {
                 discordId: interaction.user.id,
-                puuid: summoner.data.puuid,
-                region: region
+                puuid: user.puuid,
+                region: region,
+                channelId: msg.channelId,
+                messageId: msg.id,
+                lastUpdate: Date.now(),
+                locale: interaction.locale
             });
 
             const row = this.generateButtonRow(lang, key);
@@ -214,7 +306,7 @@ export default class Spectator extends AccountCommand {
         const key = id[1];
 
         const inMemory = process.inMemory.getInstance<ButtonData>();
-        const data = await inMemory.get(key);
+        const data = await inMemory.get('spectator:' + key);
 
         if (!data) {
             await interaction.reply({
@@ -232,29 +324,35 @@ export default class Spectator extends AccountCommand {
             return;
         }
 
-        // Check if user is still in game
-        const spectator = await api[data.region].spectator.byPuuid(data.puuid);
+        const spectatorResult = await fetchSpectatorTaskInput(
+            data.puuid,
+            data.region,
+            interaction.locale
+        );
 
-        if (!spectator.status) {
-            if (spectator.code === 404) {
-                // Get account data for error message
-                const account = await api[data.region].account.byPuuid(data.puuid);
-                const gameName = account.status ? account.data.gameName : 'Unknown';
-                const tagLine = account.status ? account.data.tagLine : 'Unknown';
-
-                await interaction.reply({
-                    content: replacePlaceholders(
-                        lang.spectator.not_in_game,
-                        gameName,
-                        tagLine
-                    ),
-                    flags: MessageFlags.Ephemeral
-                });
+        if (!spectatorResult.status) {
+            if (spectatorResult.code === 404) {
+                await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+                try {
+                    await handleMatchFinished(
+                        interaction.message,
+                        data.puuid,
+                        data.region,
+                        interaction.locale,
+                        data.discordId
+                    );
+                    await inMemory.delete('spectator:' + key);
+                    await interaction.deleteReply();
+                } catch (e) {
+                    l.error(e);
+                    await interaction.editReply({ content: lang.genericError });
+                    process.discordBot.handleError(e, interaction);
+                }
                 return;
             }
 
             await interaction.reply({
-                content: replacePlaceholders(lang.genericError, spectator.message),
+                content: replacePlaceholders(lang.genericError, spectatorResult.message),
                 flags: MessageFlags.Ephemeral
             });
             return;
@@ -265,35 +363,9 @@ export default class Spectator extends AccountCommand {
         });
 
         try {
-            // Get fresh user data from API
-            const summoner = await api[data.region].summoner.byPuuid(data.puuid);
-            const account = await api[data.region].account.byPuuid(data.puuid);
-
-            if (!summoner.status || !account.status) {
-                await interaction.editReply({
-                    content: lang.genericError
-                });
-                return;
-            }
-
-            // Create spectator data using stored essential data, fresh user data and game data
-            const spectatorData = {
-                puuid: data.puuid,
-                region: data.region,
-                level: summoner.data.summonerLevel,
-                gameName: account.data.gameName,
-                tagLine: account.data.tagLine,
-                profileIconId: summoner.data.profileIconId,
-                locale: interaction.locale,
-                queueId: spectator.data.gameQueueConfigId,
-                gameLength: spectator.data.gameLength,
-                participants: spectator.data.participants,
-                mapId: spectator.data.mapId
-            } satisfies SpectatorData;
-
             const result = await process.workerServer.addJobWait(
                 'spectator',
-                spectatorData
+                spectatorResult.data
             );
 
             const row = this.generateButtonRow(lang, key);
@@ -301,6 +373,11 @@ export default class Spectator extends AccountCommand {
             await interaction.message.edit({
                 files: [result],
                 components: [row]
+            });
+
+            await inMemory.set('spectator:' + key, {
+                ...data,
+                lastUpdate: Date.now()
             });
 
             await interaction.deleteReply();

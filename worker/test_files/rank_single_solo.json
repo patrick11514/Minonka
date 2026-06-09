@@ -1,0 +1,24 @@
+{
+    "puuid": "u7Itfvh43rwfQU1OSwHXNU4Z6jB38pmlY2QJ3qGyADNUbNRoAwFAb8Bk3JLVqzCX5Pb0gISMUyWP2w",
+    "region": "EUN1",
+    "gameName": "LightUpMyHole",
+    "tagLine": "Czech",
+    "profileIconId": 3584,
+    "level": 565,
+    "ranks": [
+        {
+            "leagueId": "01c6fe76-c9c1-44cb-a0a3-48c362490251",
+            "queueType": "RANKED_SOLO_5x5",
+            "tier": "GOLD",
+            "rank": "II",
+            "leaguePoints": 8,
+            "wins": 29,
+            "losses": 25,
+            "hotStreak": false,
+            "veteran": false,
+            "freshBlood": false,
+            "inactive": false
+        }
+    ],
+    "locale": "cs"
+}

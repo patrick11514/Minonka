@@ -82,17 +82,7 @@ export default template.parse({
         buttonInfoText: 'Zobrazuji %1-%2 posledních zápasů',
         place: 'Místo',
         team: 'Tým',
-        sentToChannel: 'Odesláno do kanálu',
-        subTeam: {
-            wolves: 'Vlk',
-            gromp: 'Ropušák',
-            krugs: 'Kameňák',
-            minions: 'Poskok',
-            poros: 'Poro',
-            raptors: 'Raptor',
-            scuttles: 'Krab',
-            sentinel: 'Strážce'
-        }
+        sentToChannel: 'Odesláno do kanálu'
     },
     clash: {
         title: 'Nadcházející Clash Turnaje',
@@ -128,7 +118,9 @@ export default template.parse({
             bandle_city: 'Pohár Bandle City',
             aram2022: 'ARAM %1',
             worlds2024: 'Pohár Worlds',
-            mount_targon: '%1 Hory Targonu'
+            mount_targon: '%1 Hory Targonu',
+            void: 'Pohár Prázdnoty',
+            msi2024: 'Pohár MSI'
         },
         noCups: 'Nebyly nalezeny žádné nadcházející Clash turnaje.'
     },
@@ -203,7 +195,9 @@ export default template.parse({
         1900: 'Pick URF',
         2000: 'Tutorial 1',
         2010: 'Tutorial 2',
-        2020: 'Tutorial 3'
+        2020: 'Tutorial 3',
+        2300: 'Brawl',
+        2400: 'ARAM: Mela'
     },
     mapRegions: {
         demacia: 'Demácie',
@@ -217,7 +211,8 @@ export default template.parse({
         bilgewater: 'Bilgewater',
         shadowIsles: 'Stínové ostrovy',
         bandle_city: 'Bandle City',
-        mount_targon: 'Hora Targonu'
+        mount_targon: 'Hora Targonu',
+        void: 'Prázdnota'
     },
     unranked: 'Nehodnocený',
     help: {

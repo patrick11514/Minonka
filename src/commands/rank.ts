@@ -5,7 +5,7 @@ import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
-import { RankData } from '$/Worker/tasks/rank';
+import { RankTaskInput } from '$/types/worker/RankTaskInput';
 import {
     CacheType,
     ChatInputCommandInteraction,
@@ -108,9 +108,9 @@ export default class Rank extends AccountCommand {
             tagLine: account.data.tagLine,
             profileIconId: summoner.data.profileIconId,
             level: summoner.data.summonerLevel,
-            ranks: league.data as RankData['ranks'],
+            ranks: league.data as RankTaskInput['ranks'],
             locale: interaction.locale
-        } satisfies RankData;
+        } satisfies RankTaskInput;
 
         const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
 

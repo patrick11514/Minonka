@@ -1,4 +1,48 @@
-import { subTeamMap } from '$/Worker/tasks/cherryMatch';
+export enum SubTeam {
+    Poro,
+    Minion,
+    Scuttle,
+    Krug,
+    Raptor,
+    Sentinel,
+    Wolf,
+    Gromp
+}
+
+/*const TeamIdToName = (id: number) => {
+    switch (id) {
+        case 1:
+            return SubTeam.Poro;
+        case 2:
+            return SubTeam.Minion;
+        case 3:
+            return SubTeam.Scuttle;
+        case 4:
+            return SubTeam.Krug;
+        case 5:
+            return SubTeam.Raptor;
+        case 6:
+            return SubTeam.Sentinel;
+        case 7:
+            return SubTeam.Wolf;
+        case 8:
+            return SubTeam.Gromp;
+    }
+
+    return SubTeam.Poro;
+};*/
+
+export const subTeamMap = {
+    [SubTeam.Poro]: 'poros',
+    [SubTeam.Minion]: 'minions',
+    [SubTeam.Scuttle]: 'scuttles',
+    [SubTeam.Krug]: 'krugs',
+    [SubTeam.Raptor]: 'raptors',
+    [SubTeam.Sentinel]: 'sentinel',
+    [SubTeam.Wolf]: 'wolves',
+    [SubTeam.Gromp]: 'gromp'
+} as const;
+
 import { z } from 'zod';
 import {
     mapRegions,
@@ -14,7 +58,7 @@ import { MatchStatus } from '../Riot/utilities';
 const _ = z.string();
 const o = z.object;
 
-const additionalClashNames = ['aram2022', 'worlds2024'] as const;
+const additionalClashNames = ['aram2022', 'worlds2024', 'msi2024'] as const;
 
 export default o({
     genericError: _,
@@ -90,17 +134,7 @@ export default o({
         team: _,
         loading: _,
         uploading: _,
-        sentToChannel: _,
-        subTeam: o({
-            poros: _,
-            minions: _,
-            scuttles: _,
-            krugs: _,
-            raptors: _,
-            sentinel: _,
-            wolves: _,
-            gromp: _
-        } satisfies Record<(typeof subTeamMap)[keyof typeof subTeamMap], typeof _>)
+        sentToChannel: _
     }),
     clash: o({
         title: _,

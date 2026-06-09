@@ -1,3 +1,23 @@
+#TODO REWRITE FOR RUST PART
+INFO ABOUT TESTING, HGOW TO RUN TESTS
+
+cargo watch -w src -x "test test_match_draft --features save -- --no-capture"
+
+watchign images:
+sxiv image.pmg
+
+anoynnizing files:
+node anonymize.js
+
+formatting:
+pnpm format
+
+and then crarting the test files
+
+etc...
+
+TODO TODO
+
 # Minonka
 
 Minonka is discordbot, which provides some **League of Legends** stats on discord primarly via images.

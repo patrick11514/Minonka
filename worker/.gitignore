@@ -1,0 +1,5 @@
+/target
+# Unchecked insta snapshots
+*.actual.png
+*.diff.png
+/test_files/*.png

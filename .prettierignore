@@ -1,2 +1,4 @@
 pnpm-lock.yaml
 assets
+src/types/worker
+worker/target

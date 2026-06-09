@@ -1,0 +1,2694 @@
+{
+    "puuid": "bF9DLd811NE-Fk1OSwE-4NtCq8ejHYqrmI-EesZF_-BZwpz-HYm1TAww1XCHQdJ4v4KsA2SA-Jq64A",
+    "region": "EUN1",
+    "level": 566,
+    "gameName": "LightUpMyHole",
+    "tagLine": "Czech",
+    "profileIconId": 3584,
+    "titleId": "20410204",
+    "banner": {
+        "default": 8
+    },
+    "highestRank": {
+        "tierIndex": 5,
+        "tier": "DIAMOND",
+        "rankIndex": 1,
+        "rank": "I",
+        "lp": 99
+    },
+    "crest": 1,
+    "prestigeCrest": 350,
+    "challenges": [203102, 204203, 302105],
+    "userChallenges": [
+        {
+            "challengeId": 0,
+            "percentile": 0.036,
+            "level": "DIAMOND",
+            "value": 16260,
+            "achievedTime": 1719603297956
+        },
+        {
+            "challengeId": 1,
+            "percentile": 0.103,
+            "level": "PLATINUM",
+            "value": 1600,
+            "achievedTime": 1710535367962
+        },
+        {
+            "challengeId": 2,
+            "percentile": 0.054,
+            "level": "DIAMOND",
+            "value": 4015,
+            "achievedTime": 1719856209768
+        },
+        {
+            "challengeId": 3,
+            "percentile": 0.054,
+            "level": "DIAMOND",
+            "value": 3695,
+            "achievedTime": 1697305125895
+        },
+        {
+            "challengeId": 4,
+            "percentile": 0.013,
+            "level": "DIAMOND",
+            "value": 4070,
+            "achievedTime": 1739405260852
+        },
+        {
+            "challengeId": 5,
+            "percentile": 0.042,
+            "level": "DIAMOND",
+            "value": 2880,
+            "achievedTime": 1694775758123
+        },
+        {
+            "challengeId": 302100,
+            "percentile": 0.091,
+            "level": "DIAMOND",
+            "value": 445,
+            "achievedTime": 1700160441428
+        },
+        {
+            "challengeId": 302101,
+            "percentile": 0.054,
+            "level": "DIAMOND",
+            "value": 124,
+            "achievedTime": 1710003358070
+        },
+        {
+            "challengeId": 302102,
+            "percentile": 0.142,
+            "level": "GOLD",
+            "value": 34,
+            "achievedTime": 1754400639772
+        },
+        {
+            "challengeId": 302103,
+            "percentile": 0.019,
+            "level": "GRANDMASTER",
+            "value": 4,
+            "achievedTime": 1727230086702,
+            "position": 205425,
+            "playersInLevel": 159161
+        },
+        {
+            "challengeId": 302104,
+            "percentile": 0.018,
+            "level": "DIAMOND",
+            "value": 8,
+            "achievedTime": 1772393963315
+        },
+        {
+            "challengeId": 302105,
+            "percentile": 0.007,
+            "level": "CHALLENGER",
+            "value": 554,
+            "achievedTime": 1674921144407,
+            "position": 69357,
+            "playersInLevel": 86355
+        },
+        {
+            "challengeId": 302106,
+            "percentile": 0.046,
+            "level": "MASTER",
+            "value": 554,
+            "achievedTime": 1700158810644,
+            "position": -123133,
+            "playersInLevel": 487111
+        },
+        {
+            "challengeId": 203303,
+            "percentile": 0.05,
+            "level": "MASTER",
+            "value": 2329,
+            "achievedTime": 1724195173941,
+            "position": -133650,
+            "playersInLevel": 529431
+        },
+        {
+            "challengeId": 203302,
+            "percentile": 0.075,
+            "level": "DIAMOND",
+            "value": 1747,
+            "achievedTime": 1697229573970
+        },
+        {
+            "challengeId": 203301,
+            "percentile": 0.105,
+            "level": "PLATINUM",
+            "value": 1976,
+            "achievedTime": 1681850885834
+        },
+        {
+            "challengeId": 203300,
+            "percentile": 0.068,
+            "level": "DIAMOND",
+            "value": 280,
+            "achievedTime": 1724196851023
+        },
+        {
+            "challengeId": 301100,
+            "percentile": 0.092,
+            "level": "DIAMOND",
+            "value": 405,
+            "achievedTime": 1689630354542
+        },
+        {
+            "challengeId": 301101,
+            "percentile": 0.081,
+            "level": "GOLD",
+            "value": 52,
+            "achievedTime": 1726849848378
+        },
+        {
+            "challengeId": 203305,
+            "percentile": 0.085,
+            "level": "PLATINUM",
+            "value": 71,
+            "achievedTime": 1678908315477
+        },
+        {
+            "challengeId": 301102,
+            "percentile": 0.126,
+            "level": "MASTER",
+            "value": 64,
+            "achievedTime": 1711388825837,
+            "position": -337407,
+            "playersInLevel": 1339669
+        },
+        {
+            "challengeId": 203304,
+            "percentile": 0.08,
+            "level": "PLATINUM",
+            "value": 204,
+            "achievedTime": 1739651537484
+        },
+        {
+            "challengeId": 301103,
+            "percentile": 0.048,
+            "level": "DIAMOND",
+            "value": 2,
+            "achievedTime": 1752920197324
+        },
+        {
+            "challengeId": 510007,
+            "percentile": 0.084,
+            "level": "BRONZE",
+            "value": 2,
+            "achievedTime": 1659339442476
+        },
+        {
+            "challengeId": 510006,
+            "percentile": 0.083,
+            "level": "MASTER",
+            "value": 8,
+            "achievedTime": 1746128539031
+        },
+        {
+            "challengeId": 510005,
+            "percentile": 0.026,
+            "level": "PLATINUM",
+            "value": 67,
+            "achievedTime": 1721744742963
+        },
+        {
+            "challengeId": 510004,
+            "percentile": 0.02,
+            "level": "GOLD",
+            "value": 16,
+            "achievedTime": 1718280218971
+        },
+        {
+            "challengeId": 301104,
+            "percentile": 0.039,
+            "level": "MASTER",
+            "value": 325,
+            "achievedTime": 1676323812871,
+            "position": -104535,
+            "playersInLevel": 414140
+        },
+        {
+            "challengeId": 510003,
+            "percentile": 0.055,
+            "level": "PLATINUM",
+            "value": 11,
+            "achievedTime": 1667780131527
+        },
+        {
+            "challengeId": 301105,
+            "percentile": 0.006,
+            "level": "GRANDMASTER",
+            "value": 222,
+            "achievedTime": 1689628505099,
+            "position": 66359,
+            "playersInLevel": 158034
+        },
+        {
+            "challengeId": 301106,
+            "percentile": 0.226,
+            "level": "DIAMOND",
+            "value": 11,
+            "achievedTime": 1662663909686
+        },
+        {
+            "challengeId": 510001,
+            "percentile": 0.04,
+            "level": "DIAMOND",
+            "value": 294,
+            "achievedTime": 1684533325290
+        },
+        {
+            "challengeId": 301107,
+            "percentile": 0.219,
+            "level": "DIAMOND",
+            "value": 6,
+            "achievedTime": 1674859891635
+        },
+        {
+            "challengeId": 510000,
+            "percentile": 0.022,
+            "level": "DIAMOND",
+            "value": 480,
+            "achievedTime": 1746128539039
+        },
+        {
+            "challengeId": 202303,
+            "percentile": 0.082,
+            "level": "SILVER",
+            "value": 10,
+            "achievedTime": 1736606656766
+        },
+        {
+            "challengeId": 510011,
+            "percentile": 0.028,
+            "level": "MASTER",
+            "value": 109,
+            "achievedTime": 1764612161729
+        },
+        {
+            "challengeId": 202302,
+            "percentile": 0.098,
+            "level": "MASTER",
+            "value": 16,
+            "achievedTime": 1676040320025
+        },
+        {
+            "challengeId": 510010,
+            "percentile": 0.032,
+            "level": "PLATINUM",
+            "value": 163,
+            "achievedTime": 1676586472497
+        },
+        {
+            "challengeId": 202301,
+            "percentile": 0.122,
+            "level": "PLATINUM",
+            "value": 4,
+            "achievedTime": 1733005127736
+        },
+        {
+            "challengeId": 510009,
+            "percentile": 0.034,
+            "level": "PLATINUM",
+            "value": 26,
+            "achievedTime": 1699136362559
+        },
+        {
+            "challengeId": 202300,
+            "percentile": 0.088,
+            "level": "DIAMOND",
+            "value": 215,
+            "achievedTime": 1725914649362
+        },
+        {
+            "challengeId": 510008,
+            "percentile": 0.012,
+            "level": "GOLD",
+            "value": 13,
+            "achievedTime": 1723761849951
+        },
+        {
+            "challengeId": 402502,
+            "percentile": 0.003,
+            "level": "GRANDMASTER",
+            "value": 73071,
+            "achievedTime": 1687346884771,
+            "position": 26959,
+            "playersInLevel": 141187
+        },
+        {
+            "challengeId": 2023006,
+            "percentile": 0.112,
+            "level": "SILVER",
+            "value": 57,
+            "achievedTime": 1702234611539
+        },
+        {
+            "challengeId": 402503,
+            "percentile": 0.057,
+            "level": "MASTER",
+            "value": 464901,
+            "achievedTime": 1698517573626,
+            "position": -152893,
+            "playersInLevel": 605597
+        },
+        {
+            "challengeId": 2023007,
+            "percentile": 0.04,
+            "level": "MASTER",
+            "value": 1,
+            "achievedTime": 1675019812523
+        },
+        {
+            "challengeId": 202305,
+            "percentile": 0.08,
+            "level": "DIAMOND",
+            "value": 237,
+            "achievedTime": 1725913101581
+        },
+        {
+            "challengeId": 402500,
+            "percentile": 0.028,
+            "level": "MASTER",
+            "value": 300,
+            "achievedTime": 1687348836468
+        },
+        {
+            "challengeId": 402501,
+            "percentile": 0.005,
+            "level": "GRANDMASTER",
+            "value": 4305738,
+            "achievedTime": 1739331466997,
+            "position": 56998,
+            "playersInLevel": 74293
+        },
+        {
+            "challengeId": 2023005,
+            "percentile": 0.154,
+            "level": "BRONZE",
+            "value": 19,
+            "achievedTime": 1702149848161
+        },
+        {
+            "challengeId": 2023003,
+            "percentile": 0.106,
+            "level": "MASTER",
+            "value": 669,
+            "achievedTime": 1676326425158,
+            "position": -286605,
+            "playersInLevel": 1133701
+        },
+        {
+            "challengeId": 2023000,
+            "percentile": 0.145,
+            "level": "DIAMOND",
+            "value": 1350,
+            "achievedTime": 1675095491504
+        },
+        {
+            "challengeId": 2023001,
+            "percentile": 0.181,
+            "level": "MASTER",
+            "value": 5,
+            "achievedTime": 1676061935799,
+            "position": -488491,
+            "playersInLevel": 1933503
+        },
+        {
+            "challengeId": 210003,
+            "percentile": 0.056,
+            "level": "MASTER",
+            "value": 333,
+            "achievedTime": 1739570165626,
+            "position": -150955,
+            "playersInLevel": 597888
+        },
+        {
+            "challengeId": 210002,
+            "percentile": 0.157,
+            "level": "IRON",
+            "value": 2,
+            "achievedTime": 1666903327565
+        },
+        {
+            "challengeId": 210001,
+            "percentile": 0.089,
+            "level": "SILVER",
+            "value": 17,
+            "achievedTime": 1717514479669
+        },
+        {
+            "challengeId": 210000,
+            "percentile": 0.027,
+            "level": "DIAMOND",
+            "value": 300,
+            "achievedTime": 1767878393488
+        },
+        {
+            "challengeId": 210006,
+            "percentile": 0.059,
+            "level": "PLATINUM",
+            "value": 7,
+            "achievedTime": 1767876624296
+        },
+        {
+            "challengeId": 210005,
+            "percentile": 0.026,
+            "level": "MASTER",
+            "value": 544,
+            "achievedTime": 1716917426482,
+            "position": -70481,
+            "playersInLevel": 278493
+        },
+        {
+            "challengeId": 402000,
+            "percentile": 0.021,
+            "level": "MASTER",
+            "value": 2820,
+            "achievedTime": 1723300053122
+        },
+        {
+            "challengeId": 210004,
+            "percentile": 0.102,
+            "level": "PLATINUM",
+            "value": 5,
+            "achievedTime": 1702820196759
+        },
+        {
+            "challengeId": 103000,
+            "percentile": 0.069,
+            "level": "DIAMOND",
+            "value": 1075,
+            "achievedTime": 1693406066986
+        },
+        {
+            "challengeId": 303204,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 1
+        },
+        {
+            "challengeId": 2022014,
+            "percentile": 0.035,
+            "level": "GOLD",
+            "value": 8,
+            "achievedTime": 1667156788918
+        },
+        {
+            "challengeId": 303205,
+            "percentile": 0.007,
+            "level": "SILVER",
+            "value": 15,
+            "achievedTime": 1745183899306
+        },
+        {
+            "challengeId": 2022015,
+            "percentile": 0.037,
+            "level": "MASTER",
+            "value": 211,
+            "achievedTime": 1666907662205,
+            "position": -99486,
+            "playersInLevel": 391907
+        },
+        {
+            "challengeId": 303200,
+            "percentile": 0.008,
+            "level": "PLATINUM",
+            "value": 165,
+            "achievedTime": 1760822222517
+        },
+        {
+            "challengeId": 2022010,
+            "percentile": 0.138,
+            "level": "IRON",
+            "value": 3,
+            "achievedTime": 1656457005251
+        },
+        {
+            "challengeId": 303201,
+            "percentile": 0.004,
+            "level": "PLATINUM",
+            "value": 43,
+            "achievedTime": 1750626023865
+        },
+        {
+            "challengeId": 2022011,
+            "percentile": 0.007,
+            "level": "PLATINUM",
+            "value": 38,
+            "achievedTime": 1666895652871
+        },
+        {
+            "challengeId": 303202,
+            "percentile": 0.02,
+            "level": "BRONZE",
+            "value": 3,
+            "achievedTime": 1694014549783
+        },
+        {
+            "challengeId": 2022008,
+            "percentile": 0.032,
+            "level": "DIAMOND",
+            "value": 15,
+            "achievedTime": 1666477171947
+        },
+        {
+            "challengeId": 303203,
+            "percentile": 0.01,
+            "level": "MASTER",
+            "value": 36,
+            "achievedTime": 1760822222505
+        },
+        {
+            "challengeId": 2022009,
+            "percentile": 0.049,
+            "level": "PLATINUM",
+            "value": 408,
+            "achievedTime": 1667744788302
+        },
+        {
+            "challengeId": 2022006,
+            "percentile": 0.064,
+            "level": "GOLD",
+            "value": 22,
+            "achievedTime": 1662660818700
+        },
+        {
+            "challengeId": 2022007,
+            "percentile": 0.099,
+            "level": "DIAMOND",
+            "value": 1,
+            "achievedTime": 1660857847158
+        },
+        {
+            "challengeId": 2022004,
+            "percentile": 0.099,
+            "level": "PLATINUM",
+            "value": 3,
+            "achievedTime": 1658693637687
+        },
+        {
+            "challengeId": 2022005,
+            "percentile": 0.064,
+            "level": "DIAMOND",
+            "value": 27,
+            "achievedTime": 1665776508450
+        },
+        {
+            "challengeId": 2022003,
+            "percentile": 0.056,
+            "level": "DIAMOND",
+            "value": 44,
+            "achievedTime": 1666715198815
+        },
+        {
+            "challengeId": 401000,
+            "percentile": 0.053,
+            "level": "PLATINUM",
+            "value": 735,
+            "achievedTime": 1719605480737
+        },
+        {
+            "challengeId": 2022000,
+            "percentile": 0.068,
+            "level": "PLATINUM",
+            "value": 760,
+            "achievedTime": 1661974045123
+        },
+        {
+            "challengeId": 2022001,
+            "percentile": 0.096,
+            "level": "IRON",
+            "value": 1,
+            "achievedTime": 1660434383834
+        },
+        {
+            "challengeId": 2023020,
+            "percentile": 0.1,
+            "level": "IRON",
+            "value": 1,
+            "achievedTime": 1686949940643
+        },
+        {
+            "challengeId": 2023018,
+            "percentile": 0.001,
+            "level": "GRANDMASTER",
+            "value": 1789,
+            "achievedTime": 1675095889889,
+            "position": 340,
+            "playersInLevel": 192516
+        },
+        {
+            "challengeId": 2023019,
+            "percentile": 0.037,
+            "level": "GRANDMASTER",
+            "value": 1413,
+            "achievedTime": 1675521120435,
+            "position": -79086,
+            "playersInLevel": 395439
+        },
+        {
+            "challengeId": 2023016,
+            "percentile": 0.004,
+            "level": "CHALLENGER",
+            "value": 27681,
+            "achievedTime": 1675271694233,
+            "position": 40100,
+            "playersInLevel": 71625
+        },
+        {
+            "challengeId": 2023017,
+            "percentile": 0.08,
+            "level": "MASTER",
+            "value": 1210,
+            "achievedTime": 1675795715836,
+            "position": -216662,
+            "playersInLevel": 856744
+        },
+        {
+            "challengeId": 2023014,
+            "percentile": 0.067,
+            "level": "SILVER",
+            "value": 3,
+            "achievedTime": 1678652967323
+        },
+        {
+            "challengeId": 2023015,
+            "percentile": 0,
+            "level": "CHALLENGER",
+            "value": 74,
+            "achievedTime": 1677524780805
+        },
+        {
+            "challengeId": 2023012,
+            "percentile": 0.002,
+            "level": "CHALLENGER",
+            "value": 907,
+            "achievedTime": 1675440641489,
+            "position": 24428,
+            "playersInLevel": 38511
+        },
+        {
+            "challengeId": 2023013,
+            "percentile": 0.063,
+            "level": "IRON",
+            "value": 1,
+            "achievedTime": 1678655459679
+        },
+        {
+            "challengeId": 302200,
+            "percentile": 0.069,
+            "level": "PLATINUM",
+            "value": 100,
+            "achievedTime": 1739405260852
+        },
+        {
+            "challengeId": 2023010,
+            "percentile": 0.002,
+            "level": "CHALLENGER",
+            "value": 197,
+            "achievedTime": 1678649971777,
+            "position": 18041,
+            "playersInLevel": 23350
+        },
+        {
+            "challengeId": 302201,
+            "percentile": 0.027,
+            "level": "GOLD",
+            "value": 43,
+            "achievedTime": 1691773665390
+        },
+        {
+            "challengeId": 2023011,
+            "percentile": 0.022,
+            "level": "GRANDMASTER",
+            "value": 2,
+            "achievedTime": 1731499359252,
+            "position": 230164,
+            "playersInLevel": 276840
+        },
+        {
+            "challengeId": 302202,
+            "percentile": 0.072,
+            "level": "DIAMOND",
+            "value": 113,
+            "achievedTime": 1747057005036
+        },
+        {
+            "challengeId": 2023008,
+            "percentile": 0.038,
+            "level": "GRANDMASTER",
+            "value": 104,
+            "achievedTime": 1674671196448,
+            "position": -80139,
+            "playersInLevel": 400700
+        },
+        {
+            "challengeId": 302203,
+            "percentile": 0.055,
+            "level": "SILVER",
+            "value": 8,
+            "achievedTime": 1739403626452
+        },
+        {
+            "challengeId": 2023009,
+            "percentile": 0.184,
+            "level": "MASTER",
+            "value": 16,
+            "achievedTime": 1673634372518
+        },
+        {
+            "challengeId": 101000,
+            "percentile": 0.154,
+            "level": "GOLD",
+            "value": 440,
+            "achievedTime": 1714160884516
+        },
+        {
+            "challengeId": 203402,
+            "percentile": 0.122,
+            "level": "GOLD",
+            "value": 189,
+            "achievedTime": 1681238075659
+        },
+        {
+            "challengeId": 203401,
+            "percentile": 0.028,
+            "level": "DIAMOND",
+            "value": 228,
+            "achievedTime": 1723033289935
+        },
+        {
+            "challengeId": 203400,
+            "percentile": 0.11,
+            "level": "GOLD",
+            "value": 200,
+            "achievedTime": 1684616129099
+        },
+        {
+            "challengeId": 203407,
+            "percentile": 0.083,
+            "level": "GOLD",
+            "value": 2,
+            "achievedTime": 1673729614903
+        },
+        {
+            "challengeId": 203406,
+            "percentile": 0.081,
+            "level": "PLATINUM",
+            "value": 109,
+            "achievedTime": 1755281218162
+        },
+        {
+            "challengeId": 203405,
+            "percentile": 0.085,
+            "level": "GOLD",
+            "value": 32,
+            "achievedTime": 1707152924304
+        },
+        {
+            "challengeId": 203404,
+            "percentile": 0.113,
+            "level": "SILVER",
+            "value": 5,
+            "achievedTime": 1677697112510
+        },
+        {
+            "challengeId": 301204,
+            "percentile": 0.353,
+            "level": "PLATINUM",
+            "value": 32,
+            "achievedTime": 1659960172831
+        },
+        {
+            "challengeId": 301205,
+            "percentile": 0.065,
+            "level": "MASTER",
+            "value": 34,
+            "achievedTime": 1693832721829
+        },
+        {
+            "challengeId": 203408,
+            "percentile": 0.205,
+            "level": "BRONZE",
+            "value": 4,
+            "achievedTime": 1694086231011
+        },
+        {
+            "challengeId": 301200,
+            "percentile": 0.076,
+            "level": "MASTER",
+            "value": 440,
+            "achievedTime": 1680806962521
+        },
+        {
+            "challengeId": 301201,
+            "percentile": 0.141,
+            "level": "MASTER",
+            "value": 33,
+            "achievedTime": 1680804902500
+        },
+        {
+            "challengeId": 301202,
+            "percentile": 0.058,
+            "level": "MASTER",
+            "value": 169,
+            "achievedTime": 1692011152537
+        },
+        {
+            "challengeId": 301203,
+            "percentile": 0.081,
+            "level": "MASTER",
+            "value": 47,
+            "achievedTime": 1665162460089
+        },
+        {
+            "challengeId": 2022020,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 1
+        },
+        {
+            "challengeId": 2022018,
+            "percentile": 0.026,
+            "level": "GRANDMASTER",
+            "value": 34,
+            "achievedTime": 1656371078687,
+            "position": -55964,
+            "playersInLevel": 279825
+        },
+        {
+            "challengeId": 2022019,
+            "percentile": 0.008,
+            "level": "DIAMOND",
+            "value": 96,
+            "achievedTime": 1665155495899
+        },
+        {
+            "challengeId": 2022016,
+            "percentile": 0.051,
+            "level": "PLATINUM",
+            "value": 1,
+            "achievedTime": 1666903327565
+        },
+        {
+            "challengeId": 2022017,
+            "percentile": 0.008,
+            "level": "PLATINUM",
+            "value": 50,
+            "achievedTime": 1666350014516
+        },
+        {
+            "challengeId": 505007,
+            "percentile": 0.133,
+            "level": "MASTER",
+            "value": 51,
+            "achievedTime": 1682350975317
+        },
+        {
+            "challengeId": 505006,
+            "percentile": 0.162,
+            "level": "MASTER",
+            "value": 49,
+            "achievedTime": 1658766491894
+        },
+        {
+            "challengeId": 505005,
+            "percentile": 0.114,
+            "level": "MASTER",
+            "value": 35,
+            "achievedTime": 1694085012428
+        },
+        {
+            "challengeId": 505004,
+            "percentile": 0.116,
+            "level": "MASTER",
+            "value": 79,
+            "achievedTime": 1716399881619
+        },
+        {
+            "challengeId": 505003,
+            "percentile": 0.093,
+            "level": "MASTER",
+            "value": 80,
+            "achievedTime": 1694775758120
+        },
+        {
+            "challengeId": 505002,
+            "percentile": 0.109,
+            "level": "MASTER",
+            "value": 54,
+            "achievedTime": 1716399881619
+        },
+        {
+            "challengeId": 505001,
+            "percentile": 0.113,
+            "level": "MASTER",
+            "value": 179,
+            "achievedTime": 1686946530158
+        },
+        {
+            "challengeId": 505000,
+            "percentile": 0.114,
+            "level": "MASTER",
+            "value": 700,
+            "achievedTime": 1694085012431
+        },
+        {
+            "challengeId": 402102,
+            "percentile": 0.067,
+            "level": "MASTER",
+            "value": 2289,
+            "achievedTime": 1691425028095,
+            "position": -114144,
+            "playersInLevel": 715750
+        },
+        {
+            "challengeId": 402103,
+            "percentile": 0.063,
+            "level": "DIAMOND",
+            "value": 85,
+            "achievedTime": 1725725469706
+        },
+        {
+            "challengeId": 402100,
+            "percentile": 0.037,
+            "level": "MASTER",
+            "value": 800,
+            "achievedTime": 1723300053122,
+            "position": -99158,
+            "playersInLevel": 393023
+        },
+        {
+            "challengeId": 2024108,
+            "percentile": 0.073,
+            "level": "SILVER",
+            "value": 4,
+            "achievedTime": 1713903245998
+        },
+        {
+            "challengeId": 402101,
+            "percentile": 0.044,
+            "level": "MASTER",
+            "value": 973,
+            "achievedTime": 1700410927328,
+            "position": -109617,
+            "playersInLevel": 472190
+        },
+        {
+            "challengeId": 2024106,
+            "percentile": 0,
+            "level": "GRANDMASTER",
+            "value": 67,
+            "achievedTime": 1714765322277
+        },
+        {
+            "challengeId": 2024107,
+            "percentile": 0.042,
+            "level": "DIAMOND",
+            "value": 2,
+            "achievedTime": 1711390672018
+        },
+        {
+            "challengeId": 2024104,
+            "percentile": 0,
+            "level": "GRANDMASTER",
+            "value": 89,
+            "achievedTime": 1713468369329
+        },
+        {
+            "challengeId": 2024105,
+            "percentile": 0.073,
+            "level": "BRONZE",
+            "value": 2,
+            "achievedTime": 1714161075600
+        },
+        {
+            "challengeId": 2024102,
+            "percentile": 0,
+            "level": "GRANDMASTER",
+            "value": 98,
+            "achievedTime": 1710005308486
+        },
+        {
+            "challengeId": 2024103,
+            "percentile": 0.102,
+            "level": "IRON",
+            "value": 2,
+            "achievedTime": 1707152924304
+        },
+        {
+            "challengeId": 402108,
+            "percentile": 0.003,
+            "level": "GRANDMASTER",
+            "value": 30003,
+            "achievedTime": 1731512351810,
+            "position": 26757,
+            "playersInLevel": 69782
+        },
+        {
+            "challengeId": 2024100,
+            "percentile": 0.029,
+            "level": "DIAMOND",
+            "value": 430,
+            "achievedTime": 1710532272500
+        },
+        {
+            "challengeId": 402109,
+            "percentile": 0.038,
+            "level": "MASTER",
+            "value": 206,
+            "achievedTime": 1723297826344
+        },
+        {
+            "challengeId": 2024101,
+            "percentile": 0.062,
+            "level": "PLATINUM",
+            "value": 49,
+            "achievedTime": 1710529668150
+        },
+        {
+            "challengeId": 103101,
+            "percentile": 0.025,
+            "level": "MASTER",
+            "value": 31,
+            "achievedTime": 1693404240479
+        },
+        {
+            "challengeId": 402106,
+            "percentile": 0.09,
+            "level": "PLATINUM",
+            "value": 2,
+            "achievedTime": 1673201682551
+        },
+        {
+            "challengeId": 103100,
+            "percentile": 0.025,
+            "level": "MASTER",
+            "value": 175,
+            "achievedTime": 1693406066986
+        },
+        {
+            "challengeId": 402107,
+            "percentile": 0.039,
+            "level": "MASTER",
+            "value": 12341,
+            "achievedTime": 1726860200501,
+            "position": -106071,
+            "playersInLevel": 420566
+        },
+        {
+            "challengeId": 103103,
+            "percentile": 0.284,
+            "level": "SILVER",
+            "value": 30,
+            "achievedTime": 1656888261889
+        },
+        {
+            "challengeId": 402104,
+            "percentile": 0.07,
+            "level": "MASTER",
+            "value": 1195,
+            "achievedTime": 1693682376597,
+            "position": -188987,
+            "playersInLevel": 748908
+        },
+        {
+            "challengeId": 103102,
+            "percentile": 0.046,
+            "level": "DIAMOND",
+            "value": 89,
+            "achievedTime": 1678804348239
+        },
+        {
+            "challengeId": 402105,
+            "percentile": 0.049,
+            "level": "MASTER",
+            "value": 1227,
+            "achievedTime": 1718655232995,
+            "position": -132185,
+            "playersInLevel": 523745
+        },
+        {
+            "challengeId": 303300,
+            "percentile": 0.016,
+            "level": "DIAMOND",
+            "value": 205,
+            "achievedTime": 1704914853895
+        },
+        {
+            "challengeId": 303301,
+            "percentile": 0.001,
+            "level": "GRANDMASTER",
+            "value": 757,
+            "achievedTime": 1775955917317,
+            "position": 12696,
+            "playersInLevel": 13227
+        },
+        {
+            "challengeId": 303302,
+            "percentile": 0.239,
+            "level": "IRON",
+            "value": 4,
+            "achievedTime": 1657690346835
+        },
+        {
+            "challengeId": 303303,
+            "percentile": 0.003,
+            "level": "GRANDMASTER",
+            "value": 2062,
+            "achievedTime": 1736913056240,
+            "position": 31298,
+            "playersInLevel": 50750
+        },
+        {
+            "challengeId": 504004,
+            "percentile": 0.027,
+            "level": "MASTER",
+            "value": 518,
+            "achievedTime": 1679673085332
+        },
+        {
+            "challengeId": 504003,
+            "percentile": 0.007,
+            "level": "MASTER",
+            "value": 75,
+            "achievedTime": 1718018653675
+        },
+        {
+            "challengeId": 504002,
+            "percentile": 0.013,
+            "level": "MASTER",
+            "value": 454,
+            "achievedTime": 1752600383648
+        },
+        {
+            "challengeId": 504001,
+            "percentile": 0.02,
+            "level": "MASTER",
+            "value": 55,
+            "achievedTime": 1678655463561
+        },
+        {
+            "challengeId": 504000,
+            "percentile": 0.009,
+            "level": "MASTER",
+            "value": 400,
+            "achievedTime": 1718018653676
+        },
+        {
+            "challengeId": 401102,
+            "percentile": 0.08,
+            "level": "DIAMOND",
+            "value": 3100677,
+            "achievedTime": 1739562660239
+        },
+        {
+            "challengeId": 401103,
+            "percentile": 0.079,
+            "level": "DIAMOND",
+            "value": 512612,
+            "achievedTime": 1739306142861
+        },
+        {
+            "challengeId": 401100,
+            "percentile": 0.071,
+            "level": "PLATINUM",
+            "value": 175,
+            "achievedTime": 1739564636740
+        },
+        {
+            "challengeId": 401106,
+            "percentile": 0.1,
+            "level": "SILVER",
+            "value": 68,
+            "achievedTime": 1679054070861
+        },
+        {
+            "challengeId": 401107,
+            "percentile": 0.057,
+            "level": "BRONZE",
+            "value": 10,
+            "achievedTime": 1736608900142
+        },
+        {
+            "challengeId": 401104,
+            "percentile": 0.077,
+            "level": "SILVER",
+            "value": 31,
+            "achievedTime": 1757264391466
+        },
+        {
+            "challengeId": 401105,
+            "percentile": 0.066,
+            "level": "SILVER",
+            "value": 19,
+            "achievedTime": 1719603676561
+        },
+        {
+            "challengeId": 302300,
+            "percentile": 0.03,
+            "level": "MASTER",
+            "value": 500,
+            "achievedTime": 1697305125895
+        },
+        {
+            "challengeId": 302301,
+            "percentile": 0.001,
+            "level": "GRANDMASTER",
+            "value": 6014,
+            "achievedTime": 1681850885834,
+            "position": 3636,
+            "playersInLevel": 129633
+        },
+        {
+            "challengeId": 302302,
+            "percentile": 0.004,
+            "level": "GRANDMASTER",
+            "value": 33770,
+            "achievedTime": 1685481530547,
+            "position": 42566,
+            "playersInLevel": 147973
+        },
+        {
+            "challengeId": 302303,
+            "percentile": 0.003,
+            "level": "MASTER",
+            "value": 1616,
+            "achievedTime": 1702593616486,
+            "position": 29164,
+            "playersInLevel": 111204
+        },
+        {
+            "challengeId": 204000,
+            "percentile": 0.006,
+            "level": "MASTER",
+            "value": 720,
+            "achievedTime": 1736601276098
+        },
+        {
+            "challengeId": 302304,
+            "percentile": 0.001,
+            "level": "GRANDMASTER",
+            "value": 17427,
+            "achievedTime": 1697303797311,
+            "position": 11779,
+            "playersInLevel": 82887
+        },
+        {
+            "challengeId": 302305,
+            "percentile": 0.046,
+            "level": "MASTER",
+            "value": 2841,
+            "achievedTime": 1701710151916,
+            "position": -124855,
+            "playersInLevel": 494981
+        },
+        {
+            "challengeId": 101101,
+            "percentile": 0.163,
+            "level": "MASTER",
+            "value": 31,
+            "achievedTime": 1714159755272,
+            "position": -438612,
+            "playersInLevel": 1737916
+        },
+        {
+            "challengeId": 101100,
+            "percentile": 0.179,
+            "level": "GOLD",
+            "value": 155,
+            "achievedTime": 1714160884516
+        },
+        {
+            "challengeId": 101105,
+            "percentile": 0.128,
+            "level": "GOLD",
+            "value": 295,
+            "achievedTime": 1761425396703
+        },
+        {
+            "challengeId": 301300,
+            "percentile": 0.016,
+            "level": "MASTER",
+            "value": 335,
+            "achievedTime": 1736606966843
+        },
+        {
+            "challengeId": 101104,
+            "percentile": 0.164,
+            "level": "SILVER",
+            "value": 13,
+            "achievedTime": 1672775619647
+        },
+        {
+            "challengeId": 301301,
+            "percentile": 0.099,
+            "level": "MASTER",
+            "value": 1,
+            "achievedTime": 1736606656766
+        },
+        {
+            "challengeId": 101107,
+            "percentile": 0.154,
+            "level": "SILVER",
+            "value": 4875,
+            "achievedTime": 1702234611539
+        },
+        {
+            "challengeId": 301302,
+            "percentile": 0.001,
+            "level": "MASTER",
+            "value": 523,
+            "achievedTime": 1711052227468,
+            "position": 7237,
+            "playersInLevel": 65386
+        },
+        {
+            "challengeId": 502005,
+            "percentile": 0.092,
+            "level": "MASTER",
+            "value": 61,
+            "achievedTime": 1697308976371
+        },
+        {
+            "challengeId": 301303,
+            "percentile": 0.265,
+            "level": "GOLD",
+            "value": 21,
+            "achievedTime": 1652913087213
+        },
+        {
+            "challengeId": 502004,
+            "percentile": 0.047,
+            "level": "PLATINUM",
+            "value": 123,
+            "achievedTime": 1710535367962
+        },
+        {
+            "challengeId": 502003,
+            "percentile": 0.021,
+            "level": "DIAMOND",
+            "value": 159,
+            "achievedTime": 1741277528539
+        },
+        {
+            "challengeId": 502002,
+            "percentile": 0.016,
+            "level": "GOLD",
+            "value": 19,
+            "achievedTime": 1746128539039
+        },
+        {
+            "challengeId": 502001,
+            "percentile": 0.015,
+            "level": "MASTER",
+            "value": 101,
+            "achievedTime": 1776108965758
+        },
+        {
+            "challengeId": 502000,
+            "percentile": 0.051,
+            "level": "DIAMOND",
+            "value": 325,
+            "achievedTime": 1715796554868
+        },
+        {
+            "challengeId": 203000,
+            "percentile": 0.124,
+            "level": "PLATINUM",
+            "value": 1185,
+            "achievedTime": 1678824974606
+        },
+        {
+            "challengeId": 301304,
+            "percentile": 0.08,
+            "level": "DIAMOND",
+            "value": 7,
+            "achievedTime": 1706111012571
+        },
+        {
+            "challengeId": 301305,
+            "percentile": 0.203,
+            "level": "GOLD",
+            "value": 9,
+            "achievedTime": 1660857847158
+        },
+        {
+            "challengeId": 301306,
+            "percentile": 0.287,
+            "level": "GOLD",
+            "value": 4,
+            "achievedTime": 1692117059112
+        },
+        {
+            "challengeId": 501007,
+            "percentile": 0.037,
+            "level": "GOLD",
+            "value": 2,
+            "achievedTime": 1716402162317
+        },
+        {
+            "challengeId": 501005,
+            "percentile": 0.032,
+            "level": "PLATINUM",
+            "value": 14,
+            "achievedTime": 1681475684118
+        },
+        {
+            "challengeId": 501004,
+            "percentile": 0.05,
+            "level": "MASTER",
+            "value": 221,
+            "achievedTime": 1739637454318,
+            "position": -135454,
+            "playersInLevel": 533475
+        },
+        {
+            "challengeId": 501003,
+            "percentile": 0.019,
+            "level": "PLATINUM",
+            "value": 10,
+            "achievedTime": 1734132989325
+        },
+        {
+            "challengeId": 501002,
+            "percentile": 0.024,
+            "level": "DIAMOND",
+            "value": 64,
+            "achievedTime": 1710532260118
+        },
+        {
+            "challengeId": 501001,
+            "percentile": 0.023,
+            "level": "MASTER",
+            "value": 1403,
+            "achievedTime": 1754855034555,
+            "position": -63634,
+            "playersInLevel": 250218
+        },
+        {
+            "challengeId": 2024208,
+            "percentile": 0.107,
+            "level": "MASTER",
+            "value": 676,
+            "achievedTime": 1717516357358
+        },
+        {
+            "challengeId": 501000,
+            "percentile": 0.017,
+            "level": "DIAMOND",
+            "value": 595,
+            "achievedTime": 1739637454354
+        },
+        {
+            "challengeId": 2024206,
+            "percentile": 0.067,
+            "level": "MASTER",
+            "value": 125,
+            "achievedTime": 1719169813030
+        },
+        {
+            "challengeId": 2024207,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 3
+        },
+        {
+            "challengeId": 2024204,
+            "percentile": 0.109,
+            "level": "MASTER",
+            "value": 200,
+            "achievedTime": 1718272969773
+        },
+        {
+            "challengeId": 202000,
+            "percentile": 0.074,
+            "level": "DIAMOND",
+            "value": 1235,
+            "achievedTime": 1697137996093
+        },
+        {
+            "challengeId": 501012,
+            "percentile": 0.023,
+            "level": "GOLD",
+            "value": 2,
+            "achievedTime": 1716402162317
+        },
+        {
+            "challengeId": 2024205,
+            "percentile": 0.128,
+            "level": "IRON",
+            "value": 45,
+            "achievedTime": 1718487288085
+        },
+        {
+            "challengeId": 501011,
+            "percentile": 0.01,
+            "level": "DIAMOND",
+            "value": 5,
+            "achievedTime": 1731622916920
+        },
+        {
+            "challengeId": 2024202,
+            "percentile": 0.036,
+            "level": "MASTER",
+            "value": 30,
+            "achievedTime": 1726849848378
+        },
+        {
+            "challengeId": 501010,
+            "percentile": 0.011,
+            "level": "DIAMOND",
+            "value": 5,
+            "achievedTime": 1726862032406
+        },
+        {
+            "challengeId": 2024203,
+            "percentile": 0.076,
+            "level": "MASTER",
+            "value": 1230,
+            "achievedTime": 1716402418962
+        },
+        {
+            "challengeId": 501009,
+            "percentile": 0.016,
+            "level": "DIAMOND",
+            "value": 6,
+            "achievedTime": 1733002000859
+        },
+        {
+            "challengeId": 2024200,
+            "percentile": 0.086,
+            "level": "DIAMOND",
+            "value": 605,
+            "achievedTime": 1717784556916
+        },
+        {
+            "challengeId": 501008,
+            "percentile": 0.037,
+            "level": "GOLD",
+            "value": 2,
+            "achievedTime": 1706220443162
+        },
+        {
+            "challengeId": 2024201,
+            "percentile": 0.049,
+            "level": "MASTER",
+            "value": 54,
+            "achievedTime": 1717005996479
+        },
+        {
+            "challengeId": 402206,
+            "percentile": 0.002,
+            "level": "MASTER",
+            "value": 2815,
+            "achievedTime": 1705337011867,
+            "position": 17590,
+            "playersInLevel": 256237
+        },
+        {
+            "challengeId": 402207,
+            "percentile": 0.053,
+            "level": "MASTER",
+            "value": 657,
+            "achievedTime": 1698500108457,
+            "position": -141814,
+            "playersInLevel": 561262
+        },
+        {
+            "challengeId": 402204,
+            "percentile": 0.143,
+            "level": "SILVER",
+            "value": 9394,
+            "achievedTime": 1676171687492
+        },
+        {
+            "challengeId": 402205,
+            "percentile": 0.093,
+            "level": "GOLD",
+            "value": 2791,
+            "achievedTime": 1675475611007
+        },
+        {
+            "challengeId": 402202,
+            "percentile": 0.025,
+            "level": "MASTER",
+            "value": 3325,
+            "achievedTime": 1704482025707,
+            "position": -68413,
+            "playersInLevel": 269905
+        },
+        {
+            "challengeId": 402203,
+            "percentile": 0.062,
+            "level": "PLATINUM",
+            "value": 868,
+            "achievedTime": 1718479792574
+        },
+        {
+            "challengeId": 402200,
+            "percentile": 0.062,
+            "level": "DIAMOND",
+            "value": 660,
+            "achievedTime": 1698502273096
+        },
+        {
+            "challengeId": 402201,
+            "percentile": 0.071,
+            "level": "PLATINUM",
+            "value": 37,
+            "achievedTime": 1712771155285
+        },
+        {
+            "challengeId": 103201,
+            "percentile": 0.032,
+            "level": "MASTER",
+            "value": 333,
+            "achievedTime": 1723506214807
+        },
+        {
+            "challengeId": 103200,
+            "percentile": 0.032,
+            "level": "MASTER",
+            "value": 465,
+            "achievedTime": 1726945962442
+        },
+        {
+            "challengeId": 103203,
+            "percentile": 0.032,
+            "level": "MASTER",
+            "value": 148,
+            "achievedTime": 1726944485120
+        },
+        {
+            "challengeId": 103202,
+            "percentile": 0.068,
+            "level": "DIAMOND",
+            "value": 18,
+            "achievedTime": 1758311402008
+        },
+        {
+            "challengeId": 103205,
+            "percentile": 0.414,
+            "level": "GOLD",
+            "value": 180,
+            "achievedTime": 1656199130484
+        },
+        {
+            "challengeId": 402210,
+            "percentile": 0.07,
+            "level": "MASTER",
+            "value": 3890,
+            "achievedTime": 1693342157421,
+            "position": -188147,
+            "playersInLevel": 745184
+        },
+        {
+            "challengeId": 103204,
+            "percentile": 0.346,
+            "level": "PLATINUM",
+            "value": 3014,
+            "achievedTime": 1666205212010
+        },
+        {
+            "challengeId": 103207,
+            "percentile": 0.129,
+            "level": "PLATINUM",
+            "value": 5,
+            "achievedTime": 1695662808159
+        },
+        {
+            "challengeId": 402208,
+            "percentile": 0.065,
+            "level": "PLATINUM",
+            "value": 288,
+            "achievedTime": 1692117924340
+        },
+        {
+            "challengeId": 103206,
+            "percentile": 0.025,
+            "level": "MASTER",
+            "value": 490,
+            "achievedTime": 1736882642874
+        },
+        {
+            "challengeId": 402209,
+            "percentile": 0.068,
+            "level": "MASTER",
+            "value": 2803,
+            "achievedTime": 1733000028681,
+            "position": -182738,
+            "playersInLevel": 726034
+        },
+        {
+            "challengeId": 201003,
+            "percentile": 0.137,
+            "level": "PLATINUM",
+            "value": 13,
+            "achievedTime": 1696963778345
+        },
+        {
+            "challengeId": 303404,
+            "percentile": 0.039,
+            "level": "PLATINUM",
+            "value": 3,
+            "achievedTime": 1699210820872
+        },
+        {
+            "challengeId": 201002,
+            "percentile": 0.165,
+            "level": "SILVER",
+            "value": 4,
+            "achievedTime": 1768847603160
+        },
+        {
+            "challengeId": 303405,
+            "percentile": 0.055,
+            "level": "GOLD",
+            "value": 1,
+            "achievedTime": 1699213469508
+        },
+        {
+            "challengeId": 201001,
+            "percentile": 0.057,
+            "level": "MASTER",
+            "value": 233,
+            "achievedTime": 1719854481918,
+            "position": -153817,
+            "playersInLevel": 609119
+        },
+        {
+            "challengeId": 303406,
+            "percentile": 0.061,
+            "level": "PLATINUM",
+            "value": 4,
+            "achievedTime": 1689628505099
+        },
+        {
+            "challengeId": 201000,
+            "percentile": 0.075,
+            "level": "DIAMOND",
+            "value": 255,
+            "achievedTime": 1719856209768
+        },
+        {
+            "challengeId": 303400,
+            "percentile": 0.054,
+            "level": "PLATINUM",
+            "value": 415,
+            "achievedTime": 1699214987848
+        },
+        {
+            "challengeId": 303401,
+            "percentile": 0.034,
+            "level": "DIAMOND",
+            "value": 6,
+            "achievedTime": 1767627554397
+        },
+        {
+            "challengeId": 303402,
+            "percentile": 0.091,
+            "level": "MASTER",
+            "value": 30,
+            "achievedTime": 1678646623732,
+            "position": -242870,
+            "playersInLevel": 965370
+        },
+        {
+            "challengeId": 201004,
+            "percentile": 0.028,
+            "level": "MASTER",
+            "value": 74,
+            "achievedTime": 1721063364555,
+            "position": -75297,
+            "playersInLevel": 298525
+        },
+        {
+            "challengeId": 303403,
+            "percentile": 0.073,
+            "level": "GOLD",
+            "value": 2,
+            "achievedTime": 1699210820872
+        },
+        {
+            "challengeId": 303412,
+            "percentile": 0.033,
+            "level": "MASTER",
+            "value": 8,
+            "achievedTime": 1760811598799,
+            "position": 354530,
+            "playersInLevel": 470088
+        },
+        {
+            "challengeId": 401206,
+            "percentile": 0.168,
+            "level": "IRON",
+            "value": 2,
+            "achievedTime": 1652280386727
+        },
+        {
+            "challengeId": 401207,
+            "percentile": 0.133,
+            "level": "IRON",
+            "value": 1,
+            "achievedTime": 1716400112858
+        },
+        {
+            "challengeId": 401204,
+            "percentile": 0.056,
+            "level": "SILVER",
+            "value": 5,
+            "achievedTime": 1723513113816
+        },
+        {
+            "challengeId": 401205,
+            "percentile": 0.017,
+            "level": "GOLD",
+            "value": 12,
+            "achievedTime": 1719603676561
+        },
+        {
+            "challengeId": 401202,
+            "percentile": 0.205,
+            "level": "IRON",
+            "value": 2,
+            "achievedTime": 1754400639772
+        },
+        {
+            "challengeId": 303409,
+            "percentile": 0.105,
+            "level": "GOLD",
+            "value": 1,
+            "achievedTime": 1699210820872
+        },
+        {
+            "challengeId": 401203,
+            "percentile": 0.025,
+            "level": "SILVER",
+            "value": 12,
+            "achievedTime": 1754400639772
+        },
+        {
+            "challengeId": 401200,
+            "percentile": 0.045,
+            "level": "GOLD",
+            "value": 115,
+            "achievedTime": 1754402099827
+        },
+        {
+            "challengeId": 401201,
+            "percentile": 0.202,
+            "level": "IRON",
+            "value": 3,
+            "achievedTime": 1719603676561
+        },
+        {
+            "challengeId": 401212,
+            "percentile": 0.097,
+            "level": "IRON",
+            "value": 2,
+            "achievedTime": 1715797004346
+        },
+        {
+            "challengeId": 401210,
+            "percentile": 0.019,
+            "level": "SILVER",
+            "value": 5,
+            "achievedTime": 1767997928003
+        },
+        {
+            "challengeId": 401211,
+            "percentile": 0.036,
+            "level": "BRONZE",
+            "value": 4,
+            "achievedTime": 1767632967795
+        },
+        {
+            "challengeId": 401209,
+            "percentile": 0.03,
+            "level": "BRONZE",
+            "value": 5,
+            "achievedTime": 1769438934011
+        },
+        {
+            "challengeId": 302404,
+            "percentile": 0.043,
+            "level": "SILVER",
+            "value": 50,
+            "achievedTime": 1776107254614
+        },
+        {
+            "challengeId": 204103,
+            "percentile": 0.004,
+            "level": "GRANDMASTER",
+            "value": 611,
+            "achievedTime": 1760842587329,
+            "position": 41780,
+            "playersInLevel": 53028
+        },
+        {
+            "challengeId": 302400,
+            "percentile": 0.066,
+            "level": "DIAMOND",
+            "value": 215,
+            "achievedTime": 1680550340233
+        },
+        {
+            "challengeId": 204102,
+            "percentile": 0.001,
+            "level": "MASTER",
+            "value": 562,
+            "achievedTime": 1710005308486,
+            "position": 12221,
+            "playersInLevel": 79092
+        },
+        {
+            "challengeId": 302401,
+            "percentile": 0.007,
+            "level": "GRANDMASTER",
+            "value": 584,
+            "achievedTime": 1749091956051,
+            "position": 73460,
+            "playersInLevel": 114018
+        },
+        {
+            "challengeId": 204101,
+            "percentile": 0.008,
+            "level": "DIAMOND",
+            "value": 386,
+            "achievedTime": 1736599462430
+        },
+        {
+            "challengeId": 302402,
+            "percentile": 0.004,
+            "level": "GRANDMASTER",
+            "value": 1978,
+            "achievedTime": 1680548441350,
+            "position": 42629,
+            "playersInLevel": 174587
+        },
+        {
+            "challengeId": 204100,
+            "percentile": 0.005,
+            "level": "MASTER",
+            "value": 260,
+            "achievedTime": 1736601276098
+        },
+        {
+            "challengeId": 101201,
+            "percentile": 0.114,
+            "level": "GOLD",
+            "value": 6023,
+            "achievedTime": 1762376626309
+        },
+        {
+            "challengeId": 101200,
+            "percentile": 0.127,
+            "level": "GOLD",
+            "value": 130,
+            "achievedTime": 1714083058012
+        },
+        {
+            "challengeId": 101203,
+            "percentile": 0.091,
+            "level": "PLATINUM",
+            "value": 768,
+            "achievedTime": 1762114617438
+        },
+        {
+            "challengeId": 101202,
+            "percentile": 0.12,
+            "level": "GOLD",
+            "value": 9080,
+            "achievedTime": 1761684603665
+        },
+        {
+            "challengeId": 101205,
+            "percentile": 0.088,
+            "level": "SILVER",
+            "value": 3,
+            "achievedTime": 1672516165851
+        },
+        {
+            "challengeId": 101204,
+            "percentile": 0.16,
+            "level": "SILVER",
+            "value": 4108,
+            "achievedTime": 1731355101152
+        },
+        {
+            "challengeId": 101206,
+            "percentile": 0.211,
+            "level": "BRONZE",
+            "value": 1,
+            "achievedTime": 1660163184008
+        },
+        {
+            "challengeId": 203103,
+            "percentile": 0.103,
+            "level": "SILVER",
+            "value": 3,
+            "achievedTime": 1736893567572
+        },
+        {
+            "challengeId": 203102,
+            "percentile": 0.007,
+            "level": "CHALLENGER",
+            "value": 11737,
+            "achievedTime": 1663347231980,
+            "position": 69423,
+            "playersInLevel": 94119
+        },
+        {
+            "challengeId": 203101,
+            "percentile": 0.062,
+            "level": "DIAMOND",
+            "value": 41,
+            "achievedTime": 1700506993041
+        },
+        {
+            "challengeId": 203100,
+            "percentile": 0.067,
+            "level": "DIAMOND",
+            "value": 315,
+            "achievedTime": 1700508751695
+        },
+        {
+            "challengeId": 203106,
+            "percentile": 0.034,
+            "level": "MASTER",
+            "value": 76,
+            "achievedTime": 1769032347757,
+            "position": -91371,
+            "playersInLevel": 362367
+        },
+        {
+            "challengeId": 203104,
+            "percentile": 0.074,
+            "level": "PLATINUM",
+            "value": 34,
+            "achievedTime": 1693404240479
+        },
+        {
+            "challengeId": 2024308,
+            "percentile": 0.08,
+            "level": "GOLD",
+            "value": 23,
+            "achievedTime": 1733777762149
+        },
+        {
+            "challengeId": 2024306,
+            "percentile": 0.099,
+            "level": "MASTER",
+            "value": 26003,
+            "achievedTime": 1733854126485
+        },
+        {
+            "challengeId": 2024307,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 6
+        },
+        {
+            "challengeId": 2024304,
+            "percentile": 0.081,
+            "level": "MASTER",
+            "value": 26,
+            "achievedTime": 1728755456360
+        },
+        {
+            "challengeId": 2024305,
+            "percentile": 0.041,
+            "level": "DIAMOND",
+            "value": 22,
+            "achievedTime": 1726849848378
+        },
+        {
+            "challengeId": 603001,
+            "percentile": 0.057,
+            "level": "GOLD",
+            "value": 6883,
+            "achievedTime": 1721253310083
+        },
+        {
+            "challengeId": 2024302,
+            "percentile": 0.087,
+            "level": "GOLD",
+            "value": 21,
+            "achievedTime": 1731620887178
+        },
+        {
+            "challengeId": 603000,
+            "percentile": 0.051,
+            "level": "PLATINUM",
+            "value": 135,
+            "achievedTime": 1721331715305
+        },
+        {
+            "challengeId": 2024303,
+            "percentile": 0.078,
+            "level": "PLATINUM",
+            "value": 2,
+            "achievedTime": 1732050939565
+        },
+        {
+            "challengeId": 603003,
+            "percentile": 0.064,
+            "level": "BRONZE",
+            "value": 9,
+            "achievedTime": 1721252047655
+        },
+        {
+            "challengeId": 2024300,
+            "percentile": 0.069,
+            "level": "DIAMOND",
+            "value": 450,
+            "achievedTime": 1733856051553
+        },
+        {
+            "challengeId": 603002,
+            "percentile": 0.048,
+            "level": "SILVER",
+            "value": 1,
+            "achievedTime": 1721332118373
+        },
+        {
+            "challengeId": 2024301,
+            "percentile": 0.071,
+            "level": "MASTER",
+            "value": 10,
+            "achievedTime": 1734129830641
+        },
+        {
+            "challengeId": 202103,
+            "percentile": 0.05,
+            "level": "MASTER",
+            "value": 160,
+            "achievedTime": 1738067548447,
+            "position": -134830,
+            "playersInLevel": 534410
+        },
+        {
+            "challengeId": 603005,
+            "percentile": 0.059,
+            "level": "SILVER",
+            "value": 4,
+            "achievedTime": 1721253310083
+        },
+        {
+            "challengeId": 202102,
+            "percentile": 0.047,
+            "level": "MASTER",
+            "value": 224,
+            "achievedTime": 1733000028681,
+            "position": -125599,
+            "playersInLevel": 497949
+        },
+        {
+            "challengeId": 603004,
+            "percentile": 0.057,
+            "level": "SILVER",
+            "value": 7,
+            "achievedTime": 1721252047655
+        },
+        {
+            "challengeId": 202101,
+            "percentile": 0.139,
+            "level": "GOLD",
+            "value": 13,
+            "achievedTime": 1673125102852
+        },
+        {
+            "challengeId": 603007,
+            "percentile": 0.052,
+            "level": "SILVER",
+            "value": 26838,
+            "achievedTime": 1721330315427
+        },
+        {
+            "challengeId": 202100,
+            "percentile": 0.041,
+            "level": "MASTER",
+            "value": 425,
+            "achievedTime": 1760992189828
+        },
+        {
+            "challengeId": 603006,
+            "percentile": 0.055,
+            "level": "PLATINUM",
+            "value": 3,
+            "achievedTime": 1721253310083
+        },
+        {
+            "challengeId": 202105,
+            "percentile": 0.046,
+            "level": "MASTER",
+            "value": 262,
+            "achievedTime": 1760990887833,
+            "position": -122991,
+            "playersInLevel": 487805
+        },
+        {
+            "challengeId": 202104,
+            "percentile": 0.004,
+            "level": "GRANDMASTER",
+            "value": 1206,
+            "achievedTime": 1681245466243,
+            "position": 40914,
+            "playersInLevel": 115349
+        },
+        {
+            "challengeId": 103301,
+            "percentile": 0.08,
+            "level": "DIAMOND",
+            "value": 5,
+            "achievedTime": 1706738712503
+        },
+        {
+            "challengeId": 103300,
+            "percentile": 0.07,
+            "level": "DIAMOND",
+            "value": 175,
+            "achievedTime": 1710535367962
+        },
+        {
+            "challengeId": 103303,
+            "percentile": 0.058,
+            "level": "MASTER",
+            "value": 240,
+            "achievedTime": 1710532611283,
+            "position": -155926,
+            "playersInLevel": 618023
+        },
+        {
+            "challengeId": 103302,
+            "percentile": 0.094,
+            "level": "SILVER",
+            "value": 1,
+            "achievedTime": 1675019812523
+        },
+        {
+            "challengeId": 401302,
+            "percentile": 0.003,
+            "level": "GRANDMASTER",
+            "value": 630,
+            "achievedTime": 1740208461102,
+            "position": 28157,
+            "playersInLevel": 53232
+        },
+        {
+            "challengeId": 401303,
+            "percentile": 0.005,
+            "level": "MASTER",
+            "value": 332,
+            "achievedTime": 1680333440669,
+            "position": 53257,
+            "playersInLevel": 389821
+        },
+        {
+            "challengeId": 401300,
+            "percentile": 0.031,
+            "level": "DIAMOND",
+            "value": 320,
+            "achievedTime": 1736686199536
+        },
+        {
+            "challengeId": 401301,
+            "percentile": 0.101,
+            "level": "SILVER",
+            "value": 52,
+            "achievedTime": 1757784859032
+        },
+        {
+            "challengeId": 602001,
+            "percentile": 0.042,
+            "level": "SILVER",
+            "value": 49,
+            "achievedTime": 1742242917649
+        },
+        {
+            "challengeId": 602000,
+            "percentile": 0.055,
+            "level": "SILVER",
+            "value": 25,
+            "achievedTime": 1741365136843
+        },
+        {
+            "challengeId": 602002,
+            "percentile": 0.039,
+            "level": "BRONZE",
+            "value": 11,
+            "achievedTime": 1742760907379
+        },
+        {
+            "challengeId": 303000,
+            "percentile": 0.037,
+            "level": "GOLD",
+            "value": 925,
+            "achievedTime": 1699214987848
+        },
+        {
+            "challengeId": 401306,
+            "percentile": 0.098,
+            "level": "IRON",
+            "value": 8,
+            "achievedTime": 1707147099184
+        },
+        {
+            "challengeId": 401304,
+            "percentile": 0.005,
+            "level": "MASTER",
+            "value": 182,
+            "achievedTime": 1736684139768,
+            "position": 57295,
+            "playersInLevel": 422372
+        },
+        {
+            "challengeId": 401305,
+            "percentile": 1,
+            "level": "NONE",
+            "value": 5,
+            "achievedTime": 1656371078687
+        },
+        {
+            "challengeId": 601001,
+            "percentile": 0.039,
+            "level": "SILVER",
+            "value": 6,
+            "achievedTime": 1776019378870
+        },
+        {
+            "challengeId": 601000,
+            "percentile": 0.043,
+            "level": "MASTER",
+            "value": 475,
+            "achievedTime": 1741722402529
+        },
+        {
+            "challengeId": 601003,
+            "percentile": 0,
+            "level": "GRANDMASTER",
+            "value": 83,
+            "achievedTime": 1744566868859
+        },
+        {
+            "challengeId": 601002,
+            "percentile": 0,
+            "level": "CHALLENGER",
+            "value": 1172,
+            "achievedTime": 1715117687979
+        },
+        {
+            "challengeId": 601005,
+            "percentile": 0.045,
+            "level": "DIAMOND",
+            "value": 33,
+            "achievedTime": 1742760907379
+        },
+        {
+            "challengeId": 601004,
+            "percentile": 0,
+            "level": "CHALLENGER",
+            "value": 114,
+            "achievedTime": 1744139811627
+        },
+        {
+            "challengeId": 601006,
+            "percentile": 0,
+            "level": "GRANDMASTER",
+            "value": 108,
+            "achievedTime": 1741725826210
+        },
+        {
+            "challengeId": 204203,
+            "percentile": 0.001,
+            "level": "CHALLENGER",
+            "value": 601,
+            "achievedTime": 1681580551200,
+            "position": 12629,
+            "playersInLevel": 34351
+        },
+        {
+            "challengeId": 204202,
+            "percentile": 0.014,
+            "level": "GRANDMASTER",
+            "value": 742,
+            "achievedTime": 1746156015919,
+            "position": -30130,
+            "playersInLevel": 150658
+        },
+        {
+            "challengeId": 204201,
+            "percentile": 0.024,
+            "level": "DIAMOND",
+            "value": 15,
+            "achievedTime": 1779187424097
+        },
+        {
+            "challengeId": 204200,
+            "percentile": 0.017,
+            "level": "MASTER",
+            "value": 260,
+            "achievedTime": 1779189334020
+        },
+        {
+            "challengeId": 101301,
+            "percentile": 0.168,
+            "level": "BRONZE",
+            "value": 10,
+            "achievedTime": 1731354119132
+        },
+        {
+            "challengeId": 302000,
+            "percentile": 0.067,
+            "level": "DIAMOND",
+            "value": 1520,
+            "achievedTime": 1685484087019
+        },
+        {
+            "challengeId": 101300,
+            "percentile": 0.21,
+            "level": "SILVER",
+            "value": 90,
+            "achievedTime": 1714077258779
+        },
+        {
+            "challengeId": 101303,
+            "percentile": 0.157,
+            "level": "BRONZE",
+            "value": 2,
+            "achievedTime": 1731354119132
+        },
+        {
+            "challengeId": 101302,
+            "percentile": 0.17,
+            "level": "SILVER",
+            "value": 7,
+            "achievedTime": 1731354119132
+        },
+        {
+            "challengeId": 101305,
+            "percentile": 0.185,
+            "level": "IRON",
+            "value": 2,
+            "achievedTime": 1699388491457
+        },
+        {
+            "challengeId": 101304,
+            "percentile": 0.204,
+            "level": "GOLD",
+            "value": 1,
+            "achievedTime": 1714076441122
+        },
+        {
+            "challengeId": 101307,
+            "percentile": 0.11,
+            "level": "GOLD",
+            "value": 71,
+            "achievedTime": 1772793229312
+        },
+        {
+            "challengeId": 203203,
+            "percentile": 0.041,
+            "level": "MASTER",
+            "value": 4930,
+            "achievedTime": 1706215999521,
+            "position": -109775,
+            "playersInLevel": 435222
+        },
+        {
+            "challengeId": 203202,
+            "percentile": 0.069,
+            "level": "GOLD",
+            "value": 4,
+            "achievedTime": 1673125102852
+        },
+        {
+            "challengeId": 203201,
+            "percentile": 0.092,
+            "level": "DIAMOND",
+            "value": 39,
+            "achievedTime": 1739478278056
+        },
+        {
+            "challengeId": 203200,
+            "percentile": 0.066,
+            "level": "DIAMOND",
+            "value": 185,
+            "achievedTime": 1706217917464
+        },
+        {
+            "challengeId": 600012,
+            "percentile": 0.239,
+            "level": "BRONZE",
+            "value": 1,
+            "achievedTime": 1663858053964
+        },
+        {
+            "challengeId": 301000,
+            "percentile": 0.025,
+            "level": "MASTER",
+            "value": 1440,
+            "achievedTime": 1736606966843
+        },
+        {
+            "challengeId": 600006,
+            "percentile": 0.059,
+            "level": "MASTER",
+            "value": 565,
+            "achievedTime": 1684429078470,
+            "position": -158245,
+            "playersInLevel": 624695
+        },
+        {
+            "challengeId": 202203,
+            "percentile": 0.062,
+            "level": "DIAMOND",
+            "value": 122,
+            "achievedTime": 1733002592561
+        },
+        {
+            "challengeId": 202202,
+            "percentile": 0.002,
+            "level": "GRANDMASTER",
+            "value": 750,
+            "achievedTime": 1753931160762,
+            "position": 23451,
+            "playersInLevel": 29754
+        },
+        {
+            "challengeId": 202201,
+            "percentile": 0.004,
+            "level": "MASTER",
+            "value": 324,
+            "achievedTime": 1760811598799,
+            "position": 39441,
+            "playersInLevel": 138196
+        },
+        {
+            "challengeId": 202200,
+            "percentile": 0.061,
+            "level": "DIAMOND",
+            "value": 375,
+            "achievedTime": 1702587216581
+        },
+        {
+            "challengeId": 202205,
+            "percentile": 0.168,
+            "level": "SILVER",
+            "value": 2,
+            "achievedTime": 1754400639772
+        },
+        {
+            "challengeId": 202204,
+            "percentile": 0.059,
+            "level": "MASTER",
+            "value": 724,
+            "achievedTime": 1717786706676,
+            "position": -157573,
+            "playersInLevel": 624720
+        },
+        {
+            "challengeId": 402406,
+            "percentile": 0.078,
+            "level": "MASTER",
+            "value": 33,
+            "achievedTime": 1675271694233
+        },
+        {
+            "challengeId": 402407,
+            "percentile": 0.06,
+            "level": "MASTER",
+            "value": 203678,
+            "achievedTime": 1698342737840,
+            "position": -161145,
+            "playersInLevel": 638232
+        },
+        {
+            "challengeId": 402404,
+            "percentile": 0.046,
+            "level": "MASTER",
+            "value": 1650,
+            "achievedTime": 1698947453204,
+            "position": -123675,
+            "playersInLevel": 490575
+        },
+        {
+            "challengeId": 402402,
+            "percentile": 0.005,
+            "level": "GRANDMASTER",
+            "value": 30224,
+            "achievedTime": 1739515012884,
+            "position": 48894,
+            "playersInLevel": 80748
+        },
+        {
+            "challengeId": 402403,
+            "percentile": 0.003,
+            "level": "GRANDMASTER",
+            "value": 5086,
+            "achievedTime": 1736666517994,
+            "position": 29756,
+            "playersInLevel": 64898
+        },
+        {
+            "challengeId": 402400,
+            "percentile": 0.001,
+            "level": "GRANDMASTER",
+            "value": 760,
+            "achievedTime": 1731532183981,
+            "position": 12841,
+            "playersInLevel": 12840
+        },
+        {
+            "challengeId": 402401,
+            "percentile": 0.001,
+            "level": "GRANDMASTER",
+            "value": 9641,
+            "achievedTime": 1681500302655,
+            "position": 15497,
+            "playersInLevel": 143184
+        },
+        {
+            "challengeId": 402408,
+            "percentile": 0.049,
+            "level": "MASTER",
+            "value": 476202,
+            "achievedTime": 1697919430994,
+            "position": -132253,
+            "playersInLevel": 523978
+        },
+        {
+            "challengeId": 402409,
+            "percentile": 0.048,
+            "level": "MASTER",
+            "value": 25106584,
+            "achievedTime": 1704907561997,
+            "position": -129852,
+            "playersInLevel": 514596
+        }
+    ],
+    "locale": "cs"
+}

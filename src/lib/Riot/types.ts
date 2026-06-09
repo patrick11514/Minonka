@@ -1,3 +1,4 @@
+import { RankTier } from '$/types/worker/RankTier';
 import { z } from 'zod';
 import { getLocale } from '../langs';
 
@@ -92,6 +93,16 @@ export class Rank {
 
     isTiered() {
         return this.tierIndex < 7;
+    }
+
+    toRust(): RankTier {
+        return {
+            tierIndex: this.tierIndex,
+            tier: this.getTier(),
+            rankIndex: this.rankIndex,
+            rank: this.getRank(),
+            lp: this.lp
+        };
     }
 }
 
@@ -423,6 +434,18 @@ export const queues = [
         map: "Summoner's Rift",
         description: 'Tutorial 3',
         notes: null
+    },
+    {
+        queueId: 2300,
+        map: 'The Bandlewood',
+        description: 'Brawl',
+        notes: null
+    },
+    {
+        queueId: 2400,
+        map: 'Howling Abyss',
+        description: 'ARAM: Mayhem',
+        notes: null
     }
 ] as const;
 
@@ -440,7 +463,8 @@ export const mapRegions = [
     'piltover',
     'shadowIsles',
     'bandle_city',
-    'mount_targon'
+    'mount_targon',
+    'void'
 ] as const;
 
 export const positions = [

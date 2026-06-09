@@ -1,0 +1,40 @@
+{
+    "puuid": "-l9rqza7E5c3701OSwEuWxoaIXRPR9zpMtaDwTUmPTVcvcHFUG-F0h6305nS7YZvdVOWztcFkfPu1A",
+    "region": "eun1",
+    "locale": "cs",
+    "abbreviation": "ONE",
+    "name": "One Man Army",
+    "iconId": 10,
+    "tier": 2,
+    "captain": "-l9rqza7E5c3701OSwEuWxoaIXRPR9zpMtaDwTUmPTVcvcHFUG-F0h6305nS7YZvdVOWztcFkfPu1A",
+    "players": [
+        {
+            "puuid": "-l9rqza7E5c3701OSwEuWxoaIXRPR9zpMtaDwTUmPTVcvcHFUG-F0h6305nS7YZvdVOWztcFkfPu1A",
+            "position": "MIDDLE",
+            "role": "CAPTAIN",
+            "profileIconId": 4220,
+            "level": 254,
+            "gameName": "SoloQueueWarrior",
+            "tagLine": "LONER",
+            "highestRank": {
+                "tierIndex": 4,
+                "tier": "PLATINUM",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 0,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 94,
+                "losses": 81
+            },
+            "masteries": [
+                {
+                    "puuid": "-l9rqza7E5c3701OSwEuWxoaIXRPR9zpMtaDwTUmPTVcvcHFUG-F0h6305nS7YZvdVOWztcFkfPu1A",
+                    "championId": 157,
+                    "championLevel": 7,
+                    "championPoints": 94200,
+                    "lastPlayTime": 1718020800000
+                }
+            ]
+        }
+    ]
+}

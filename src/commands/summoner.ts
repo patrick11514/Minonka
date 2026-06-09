@@ -3,9 +3,11 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
-import { Region } from '$/lib/Riot/types';
+import { Rank, Region } from '$/lib/Riot/types';
+import { getHighestRank } from '$/lib/utilities';
 import { Account } from '$/types/database';
-import { SummonerData } from '$/Worker/tasks/summoner';
+import { BannerType } from '$/types/worker/BannerType';
+import { SummonerTaskInput } from '$/types/worker/SummonerTaskInput';
 import {
     CacheType,
     ChatInputCommandInteraction,
@@ -82,6 +84,20 @@ export default class Summoner extends AccountCommand {
             return;
         }
 
+        const highestRank = await getHighestRank(summoner.data.puuid, region, lang);
+        const bannerType = challenges.data.preferences.bannerAccent ?? 1;
+
+        let banner: BannerType;
+        if (bannerType === 2) {
+            if (!highestRank) {
+                banner = { default: 1 };
+            } else {
+                banner = 'ranked';
+            }
+        } else {
+            banner = { default: bannerType };
+        }
+
         const data = {
             puuid: summoner.data.puuid,
             region: region,
@@ -89,14 +105,15 @@ export default class Summoner extends AccountCommand {
             gameName: account.data.gameName,
             tagLine: account.data.tagLine,
             profileIconId: summoner.data.profileIconId,
-            titleId: challenges.data.preferences.title,
-            banner: challenges.data.preferences.bannerAccent ?? 1,
+            titleId: challenges.data.preferences.title ?? null,
+            banner,
             crest: challenges.data.preferences.crestBorder ?? 1,
             prestigeCrest: challenges.data.preferences.prestigeCrestBorderLevel ?? 1,
             challenges: challenges.data.preferences.challengeIds ?? [],
             userChallenges: challenges.data.challenges,
-            locale: interaction.locale
-        } satisfies SummonerData;
+            locale: interaction.locale,
+            highestRank: new Rank(highestRank).toRust()
+        } satisfies SummonerTaskInput;
 
         const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
 

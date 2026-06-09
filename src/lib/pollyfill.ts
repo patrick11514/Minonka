@@ -39,3 +39,7 @@ Object.defineProperty(Array.prototype, 'asyncMap', {
     },
     enumerable: false
 });
+
+(BigInt.prototype as any).toJSON = function () {
+    return Number(this);
+};

@@ -1,0 +1,35 @@
+[package]
+name = "worker"
+version = "0.1.0"
+edition = "2024"
+default-run = "main"
+
+[features]
+default = []
+export-ts = []
+save = []
+
+
+[dependencies]
+ab_glyph = "0.2.32"
+futures-util = "0.3.32"
+image = "0.25.10"
+imageproc = "0.26.2"
+insta = "1.47.2"
+moka = { version = "0.12.15", features = ["future"] }
+rayon = "1.12.0"
+reqwest = { version = "0.13.3", features = ["json"] }
+rusttype = "0.9.3"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = { version = "1.0.149", features = ["preserve_order"] }
+tokio = { version = "1.52.3", features = ["full"] }
+tokio-tungstenite = "0.29.0"
+ts-rs = { version = "12.0.1", features = ["no-serde-warnings"] }
+url = "2.5.8"
+tracing = { version = "0.1.41", features = ["attributes"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter", "fmt"] }
+indexmap = { version = "2.14.0", features = ["serde"] }
+futures = "0.3.32"
+serde_path_to_error = "0.1.20"
+chrono = "0.4.44"
+itertools = "0.14.0"

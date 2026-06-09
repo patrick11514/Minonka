@@ -1,0 +1,88 @@
+{
+    "puuid": "_-R5uiRwXc3CjU1OSwEHt2UsvqzG5PdfQf8vWbDsqgsWnKHhSXE7lzD5pDT6S5Mml4DAcI0Peujm_g",
+    "region": "eun1",
+    "locale": "en-US",
+    "abbreviation": "TRIO",
+    "name": "The Missing Two",
+    "iconId": 1,
+    "tier": 3,
+    "captain": "WZgYgCYLAbgUkU1OSwExyENc_uXE6TaqZm3Va593xL1yJCeBS-7YkNBF5DSrbebNiO8dSQ_9lwDcEw",
+    "players": [
+        {
+            "puuid": "_-R5uiRwXc3CjU1OSwEHt2UsvqzG5PdfQf8vWbDsqgsWnKHhSXE7lzD5pDT6S5Mml4DAcI0Peujm_g",
+            "position": "TOP",
+            "role": "MEMBER",
+            "profileIconId": 1150,
+            "level": 142,
+            "gameName": "Frontliner",
+            "tagLine": "V4",
+            "highestRank": {
+                "tierIndex": 3,
+                "tier": "GOLD",
+                "rankIndex": 2,
+                "rank": "II",
+                "lp": 0,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 55,
+                "losses": 50
+            },
+            "masteries": [
+                {
+                    "puuid": "_-R5uiRwXc3CjU1OSwEHt2UsvqzG5PdfQf8vWbDsqgsWnKHhSXE7lzD5pDT6S5Mml4DAcI0Peujm_g",
+                    "championId": 24,
+                    "championLevel": 5,
+                    "championPoints": 42100,
+                    "lastPlayTime": 1717934400000
+                }
+            ]
+        },
+        {
+            "puuid": "KfxwvFPr8ZDCEU1OSwHqo0Icpr6Tgxz461fe9dfCFUP8L_P3WdqxsodyYsF6HOoFztQaWcsGyaNCEA",
+            "position": "JUNGLE",
+            "role": "MEMBER",
+            "profileIconId": 320,
+            "level": 98,
+            "gameName": "CampClearer",
+            "tagLine": "PVE",
+            "highestRank": {
+                "tierIndex": 2,
+                "tier": "SILVER",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 0,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 34,
+                "losses": 36
+            },
+            "masteries": []
+        },
+        {
+            "puuid": "WZgYgCYLAbgUkU1OSwExyENc_uXE6TaqZm3Va593xL1yJCeBS-7YkNBF5DSrbebNiO8dSQ_9lwDcEw",
+            "position": "MIDDLE",
+            "role": "CAPTAIN",
+            "profileIconId": 915,
+            "level": 310,
+            "gameName": "ShotCaller",
+            "tagLine": "LEAD",
+            "highestRank": {
+                "tierIndex": 4,
+                "tier": "PLATINUM",
+                "rankIndex": 1,
+                "rank": "III",
+                "lp": 0,
+                "queueType": "RANKED_FLEX_SR",
+                "wins": 110,
+                "losses": 95
+            },
+            "masteries": [
+                {
+                    "puuid": "WZgYgCYLAbgUkU1OSwExyENc_uXE6TaqZm3Va593xL1yJCeBS-7YkNBF5DSrbebNiO8dSQ_9lwDcEw",
+                    "championId": 134,
+                    "championLevel": 6,
+                    "championPoints": 62000,
+                    "lastPlayTime": 1718107200000
+                }
+            ]
+        }
+    ]
+}

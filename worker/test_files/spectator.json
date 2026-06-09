@@ -1,0 +1,226 @@
+{
+    "puuid": "V1eFHB7EDQVB9E1OSwHo-1-z-PKaXGV6PcXQN-22cJUEeD4ZB1UhD84ZQQ3pY_hg-q77TlimYWFESg",
+    "region": "EUN1",
+    "level": 75,
+    "gameName": "NyxAly",
+    "tagLine": "Lady",
+    "profileIconId": 4793,
+    "locale": "en_US",
+    "queueName": "Solo/Tandem",
+    "gameLength": 870,
+    "participants": [
+        {
+            "puuid": "UD8gIc11zOP70E1OSwFrYeeqOMlPXDPJQMvGYY3kV_d5ZCvQ0Vu-8OrOzqU9KAyYZWueTcX2fDTY5g",
+            "teamId": 100,
+            "spell1Id": 6,
+            "spell2Id": 11,
+            "championId": 120,
+            "profileIconId": 6036,
+            "riotId": "TheRainMaster1#23465",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [8230],
+                "perkStyle": 8200,
+                "perkSubStyle": 8000
+            }
+        },
+        {
+            "puuid": "8wRKp7gozcSZPk1OSwGx2oUz5F9ZDVXX00jCDUfOjzAK8HlnhhfKw72eH6vQoT_6h-VXwXQoyh2kFw",
+            "teamId": 100,
+            "spell1Id": 4,
+            "spell2Id": 7,
+            "championId": 147,
+            "profileIconId": 3150,
+            "riotId": "Sage#CeNo",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [8214],
+                "perkStyle": 8200,
+                "perkSubStyle": 8300
+            }
+        },
+        {
+            "puuid": "E-te2n4BTVqYj01OSwGvS4qJzlQ_ffWPfXjkd-nJRCwxit_z2t_-EUdy0qNGH7l_SDgPu9MYbE-vDA",
+            "teamId": 100,
+            "spell1Id": 4,
+            "spell2Id": 14,
+            "championId": 887,
+            "profileIconId": 5010,
+            "riotId": "skejtehr#2501",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [8010],
+                "perkStyle": 8000,
+                "perkSubStyle": 8400
+            }
+        },
+        {
+            "puuid": "08wcS0X9AT0Tk01OSwHpjWMSATUCgYEmyHGFeaRtSn3yMsp285SnVAx56wwvGAM8ItthbOnCFc3Tww",
+            "teamId": 100,
+            "spell1Id": 4,
+            "spell2Id": 21,
+            "championId": 21,
+            "profileIconId": 7,
+            "riotId": "Jaga#4174",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [8005],
+                "perkStyle": 8000,
+                "perkSubStyle": 8300
+            }
+        },
+        {
+            "puuid": "XsX6MCHsOundl01OSwFh_71YZAfod6whAnMN8kQp7p_cC4vpmxV9GXnAsi5PX5S9A2EQQ0JFYD4FOA",
+            "teamId": 100,
+            "spell1Id": 4,
+            "spell2Id": 14,
+            "championId": 20,
+            "profileIconId": 6296,
+            "riotId": "Fizzler#rizz",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [8112],
+                "perkStyle": 8100,
+                "perkSubStyle": 8300
+            }
+        },
+        {
+            "puuid": "MyukhkJu6Gee_k1OSwEQ8VSRpXz1c4rJN_ZVxKiyNDvdaU_ihvZhJpM0XfOHzPcUbjaULGqvQp6UnA",
+            "teamId": 200,
+            "spell1Id": 4,
+            "spell2Id": 7,
+            "championId": 800,
+            "profileIconId": 6923,
+            "riotId": "Big Yahu#BY000",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [8229],
+                "perkStyle": 8200,
+                "perkSubStyle": 8100
+            }
+        },
+        {
+            "puuid": "oRBZ0-xyaYstoE1OSwE2G-bhH4i0huZ8ob9E0RFKfzuzVxYUaPKi3_H9enij2mBEzZ9HjvnWGddi5w",
+            "teamId": 200,
+            "spell1Id": 4,
+            "spell2Id": 21,
+            "championId": 901,
+            "profileIconId": 2076,
+            "riotId": "TIJANIC007#EUNE",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [8992],
+                "perkStyle": 8200,
+                "perkSubStyle": 8300
+            }
+        },
+        {
+            "puuid": "4yLl7Pi_qjwLC01OSwE-8RiKx_spxPDNQ9-8GNVQ9nNXJKc_wEbPkqSeco5gJ7w02EMM6cU9ziCQCw",
+            "teamId": 200,
+            "spell1Id": 4,
+            "spell2Id": 11,
+            "championId": 11,
+            "profileIconId": 6002,
+            "riotId": "siwymiki#4748",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [9923],
+                "perkStyle": 8100,
+                "perkSubStyle": 8000
+            }
+        },
+        {
+            "puuid": "V1eFHB7EDQVB9E1OSwHo-1-z-PKaXGV6PcXQN-22cJUEeD4ZB1UhD84ZQQ3pY_hg-q77TlimYWFESg",
+            "teamId": 200,
+            "spell1Id": 4,
+            "spell2Id": 14,
+            "championId": 84,
+            "profileIconId": 4793,
+            "riotId": "NyxAly#Lady",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [8112],
+                "perkStyle": 8100,
+                "perkSubStyle": 8400
+            }
+        },
+        {
+            "puuid": "ztVFta1TQJKFPE1OSwHvxqosFMghR5c8ffX4Sot3RFJ2k28xbPduc3bacFNSOREjL22Vv-cwYiRk3g",
+            "teamId": 200,
+            "spell1Id": 14,
+            "spell2Id": 4,
+            "championId": 39,
+            "profileIconId": 3838,
+            "riotId": "Meow23o#cat",
+            "bot": false,
+            "gameCustomizationObjects": [],
+            "perks": {
+                "perkIds": [8010],
+                "perkStyle": 8000,
+                "perkSubStyle": 8300
+            }
+        }
+    ],
+    "bannedChampions": [
+        {
+            "championId": 29,
+            "teamId": 100,
+            "pickTurn": 1
+        },
+        {
+            "championId": 59,
+            "teamId": 100,
+            "pickTurn": 2
+        },
+        {
+            "championId": 102,
+            "teamId": 100,
+            "pickTurn": 3
+        },
+        {
+            "championId": 777,
+            "teamId": 100,
+            "pickTurn": 4
+        },
+        {
+            "championId": 157,
+            "teamId": 100,
+            "pickTurn": 5
+        },
+        {
+            "championId": 54,
+            "teamId": 200,
+            "pickTurn": 6
+        },
+        {
+            "championId": 99,
+            "teamId": 200,
+            "pickTurn": 7
+        },
+        {
+            "championId": 29,
+            "teamId": 200,
+            "pickTurn": 8
+        },
+        {
+            "championId": 122,
+            "teamId": 200,
+            "pickTurn": 9
+        },
+        {
+            "championId": 83,
+            "teamId": 200,
+            "pickTurn": 10
+        }
+    ],
+    "mapName": "Vyvolávačův žleb"
+}

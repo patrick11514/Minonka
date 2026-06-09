@@ -2,11 +2,13 @@ import { AccountCommand } from '$/lib/AccountCommand';
 import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
-import { formatErrorResponse, toValidResponse } from '$/lib/Riot/baseRequest';
-import { CherryMatchSchema, RegularMatchSchema } from '$/lib/Riot/schemes';
+import { formatErrorResponse } from '$/lib/Riot/baseRequest';
+import { getLpGain } from '$/lib/Riot/lp';
+import { CherryMatchSchema, MatchSchema } from '$/lib/Riot/schemes';
 import { queues, Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
 import { DePromise, OmitUnion } from '$/types/types';
+import type { MatchTaskInput } from '$/types/worker/MatchTaskInput';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -21,9 +23,12 @@ import {
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import crypto from 'node:crypto';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 const l = new Logger('History', 'white');
+
+type MatchData = z.infer<typeof MatchSchema>;
+type CherryMatchData = z.infer<typeof CherryMatchSchema>;
 
 type ButtonData = {
     discordId: string;
@@ -184,27 +189,48 @@ export default class History extends AccountCommand<CustomData> {
             return formatErrorResponse(lang, matchesData.find((match) => !match.status)!);
         }
 
-        return matchesData.map((match) => {
-            const _match = match as toValidResponse<typeof match>;
-            let jobId: string;
-            if (_match.data.info.gameMode === 'CHERRY') {
-                jobId = process.workerServer.addJob('cherryMatch', {
-                    ...(_match.data as z.infer<typeof CherryMatchSchema>),
-                    locale,
-                    region,
-                    myPuuid: puuid
-                });
-            } else {
-                jobId = process.workerServer.addJob('match', {
-                    ...(_match.data as z.infer<typeof RegularMatchSchema>),
-                    locale,
-                    region,
-                    myPuuid: puuid
-                });
-            }
+        return await Promise.all(
+            matchesData.map(async (matchResponse) => {
+                if (!matchResponse.status) {
+                    throw new Error('Unexpected match response status');
+                }
 
-            return jobId;
-        });
+                const matchData: MatchData = matchResponse.data;
+
+                let jobId: string;
+                if (matchData.isCherry) {
+                    const cherryMatchData: CherryMatchData = matchData;
+
+                    jobId = process.workerServer.addJob('cherryMatch', {
+                        ...cherryMatchData,
+                        locale,
+                        region,
+                        puuid,
+                        queueName: getLocale(locale).queues[cherryMatchData.info.queueId]
+                    });
+                } else {
+                    const regularMatchData = matchData;
+
+                    const payload: MatchTaskInput = {
+                        ...regularMatchData,
+                        locale,
+                        region,
+                        puuid,
+                        lpGain: await getLpGain(
+                            regularMatchData.metadata.matchId,
+                            regularMatchData.info.queueId,
+                            puuid,
+                            region
+                        ),
+                        queueName: getLocale(locale).queues[regularMatchData.info.queueId]
+                    };
+
+                    jobId = process.workerServer.addJob('match', payload);
+                }
+
+                return jobId;
+            })
+        );
     }
 
     generateButtonRow(
@@ -253,92 +279,39 @@ export default class History extends AccountCommand<CustomData> {
             });
         }
 
-        let dontUpdate = false;
-
         try {
-            let progress = 0;
-            const max = jobIds.length;
-
             const files = await Promise.all(
-                jobIds.map(async (jobId) => {
-                    const start = Date.now();
-                    const path = await process.workerServer.wait(jobId);
-                    if (!dontUpdate && Date.now() - start > 100) {
-                        const content =
-                            contentPrefix +
-                            replacePlaceholders(
-                                lang.match.loading,
-                                (++progress).toString(),
-                                max.toString()
-                            );
-                        if (editMessage instanceof Message) {
-                            await editMessage.edit({ content });
-                        } else {
-                            await interaction.editReply({ content });
-                        }
-                    }
-                    return path;
-                })
+                jobIds.map((jobId) => process.workerServer.wait(jobId))
             );
 
-            const uploadingContent = contentPrefix + lang.match.uploading;
-            if (editMessage instanceof Message) {
-                await editMessage.edit({ content: uploadingContent });
-            } else {
-                await interaction.editReply({ content: uploadingContent });
-            }
+            const payload = {
+                content: contentPrefix,
+                files,
+                components: [row]
+            };
 
             if (editMessage instanceof Message) {
-                await editMessage.edit({
-                    content: contentPrefix,
-                    files,
-                    components: [row]
-                });
+                await editMessage.edit(payload);
                 if (interaction.deferred) await interaction.deleteReply();
             } else {
-                await editMessage.editReply({
-                    content: contentPrefix,
-                    files,
-                    components: [row]
-                });
+                await editMessage.editReply(payload);
             }
         } catch (e) {
-            dontUpdate = true;
-            //cancel all jobs
             jobIds.forEach((jobId) => process.workerServer.removeJob(jobId));
 
-            if (e instanceof Error) {
-                l.error(e);
-                const content =
-                    contentPrefix + replacePlaceholders(lang.workerError, e.message);
+            const content =
+                contentPrefix +
+                (e instanceof Error
+                    ? replacePlaceholders(lang.workerError, e.message)
+                    : lang.genericError);
 
-                if (editMessage instanceof Message) {
-                    await editMessage.edit({
-                        content
-                    });
-                } else {
-                    await interaction.editReply({
-                        content
-                    });
-                }
-
-                process.discordBot.handleError(e, interaction);
-                return;
-            }
-
-            const content = contentPrefix + lang.genericError;
             if (editMessage instanceof Message) {
-                await editMessage.edit({
-                    content
-                });
+                await editMessage.edit({ content });
             } else {
-                await interaction.editReply({
-                    content
-                });
+                await interaction.editReply({ content });
             }
 
             process.discordBot.handleError(e, interaction);
-            return;
         }
     }
 
