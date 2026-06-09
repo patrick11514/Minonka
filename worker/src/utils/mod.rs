@@ -3,7 +3,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use chrono::{Local, TimeZone};
+use chrono::{TimeZone, Utc};
 use tokio::fs;
 use tracing_subscriber::{EnvFilter, fmt::format::FmtSpan};
 
@@ -99,7 +99,7 @@ pub fn init_tracing() {
 }
 
 pub fn format_date(timestamp: i64, locale: &AppLocale) -> String {
-    let dt = Local.timestamp_millis_opt(timestamp).unwrap();
+    let dt = Utc.timestamp_millis_opt(timestamp).unwrap();
 
     let format_pattern = match locale {
         AppLocale::Cz => "%d.%m.%Y %H:%M:%S", // e.g., 19.05.2026 20:04:36
