@@ -49,8 +49,8 @@ pub enum AlignItems {
 }
 
 pub struct Container {
-    x: u32,
-    y: u32,
+    x: i32,
+    y: i32,
     children: Vec<Box<dyn Renderable>>,
     width: Option<u32>,
     height: Option<u32>,
@@ -60,6 +60,14 @@ pub struct Container {
     gap: u32,
     splits: Vec<u32>,
     padding: Padding,
+    wrap: bool,
+    max_items_per_line: Option<usize>,
+}
+
+struct Line<'a> {
+    children: Vec<&'a Box<dyn Renderable>>,
+    width: u32,
+    height: u32,
 }
 
 impl Container {
@@ -76,14 +84,16 @@ impl Container {
             children: Vec::new(),
             splits: Vec::new(),
             padding: Padding::zero(),
+            wrap: false,
+            max_items_per_line: None,
         }
     }
 
-    pub fn x(mut self, x: u32) -> Self {
+    pub fn x(mut self, x: i32) -> Self {
         self.x = x;
         self
     }
-    pub fn y(mut self, y: u32) -> Self {
+    pub fn y(mut self, y: i32) -> Self {
         self.y = y;
         self
     }
@@ -223,182 +233,336 @@ impl Container {
     }
 
     fn calculate_content_size(&self, fonts: &FontRegistry) -> (u32, u32) {
-        let mut content_w = 0;
-        let mut content_h = 0;
+        // Determine the available bounding space for wrapping thresholds
+        let inner_max_w = self
+            .width
+            .unwrap_or(u32::MAX)
+            .saturating_sub(self.padding.left + self.padding.right);
+
+        // Only wrap on Row setups; Column layouts stack natively along the y-axis anyway
+        if matches!(
+            self.direction,
+            ContainerDirection::Row | ContainerDirection::RowReverse
+        ) {
+            let lines = self.pack_lines(fonts, inner_max_w);
+
+            let mut total_w = 0;
+            let mut total_h = 0;
+
+            for line in &lines {
+                total_w = total_w.max(line.width);
+                total_h += line.height;
+            }
+
+            if !lines.is_empty() {
+                total_h += (lines.len() as u32 - 1) * self.gap; // Account for gaps between wrapped rows
+            }
+
+            (total_w, total_h)
+        } else {
+            // Fall back to your legacy cross-axis tracking if it's a Column
+            let mut content_w = 0;
+            let mut content_h = 0;
+            for child in &self.children {
+                let (cw, ch) = child.size(fonts);
+                content_w = content_w.max(cw);
+                content_h += ch;
+            }
+            if !self.children.is_empty() {
+                content_h += (self.children.len() as u32 - 1) * self.gap;
+            }
+            (content_w, content_h)
+        }
+    }
+
+    pub fn wrap(mut self, wrap: bool) -> Self {
+        self.wrap = wrap;
+        self
+    }
+
+    pub fn max_items_per_line(mut self, count: usize) -> Self {
+        self.max_items_per_line = Some(count);
+        self
+    }
+
+    fn pack_lines(&self, fonts: &FontRegistry, max_width: u32) -> Vec<Line<'_>> {
+        let mut lines = Vec::new();
+        let mut current_line = Line {
+            children: Vec::new(),
+            width: 0,
+            height: 0,
+        };
 
         for child in &self.children {
             let (cw, ch) = child.size(fonts);
 
-            match self.direction {
-                ContainerDirection::Row | ContainerDirection::RowReverse => {
-                    content_w += cw;
-                    content_h = content_h.max(ch);
-                }
-                ContainerDirection::Column | ContainerDirection::ColumnReverse => {
-                    content_w = content_w.max(cw);
-                    content_h += ch;
-                }
+            // Check wrapping conditions
+            let count_exceeded = self
+                .max_items_per_line
+                .map_or(false, |max| current_line.children.len() >= max);
+
+            let width_exceeded = self.wrap
+                && !current_line.children.is_empty()
+                && (current_line.width + self.gap + cw > max_width);
+
+            if count_exceeded || width_exceeded {
+                // Push current line and start a new one
+                lines.push(current_line);
+                current_line = Line {
+                    children: Vec::new(),
+                    width: 0,
+                    height: 0,
+                };
             }
+
+            // Append item stats to the line track
+            if current_line.children.is_empty() {
+                current_line.width = cw;
+            } else {
+                current_line.width += self.gap + cw;
+            }
+            current_line.height = current_line.height.max(ch);
+            current_line.children.push(child);
         }
 
-        if !self.children.is_empty() {
-            let total_gaps = (self.children.len() as u32 - 1) * self.gap;
-            match self.direction {
-                ContainerDirection::Row | ContainerDirection::RowReverse => content_w += total_gaps,
-                ContainerDirection::Column | ContainerDirection::ColumnReverse => {
-                    content_h += total_gaps
-                }
-            }
+        if !current_line.children.is_empty() {
+            lines.push(current_line);
         }
 
-        (content_w, content_h)
+        lines
+    }
+
+    pub fn dimensions(&self, fonts: &FontRegistry) -> (u32, u32) {
+        self.size(fonts)
     }
 }
 
 impl Renderable for Container {
     fn render(&self, canvas: &mut RgbaImage, fonts: &FontRegistry, offset_x: i32, offset_y: i32) {
-        let (total_w, total_h) = self.size(fonts);
-        let (content_w, content_h) = self.calculate_content_size(fonts);
+        if matches!(
+            self.direction,
+            ContainerDirection::Column | ContainerDirection::ColumnReverse
+        ) || !self.wrap && self.max_items_per_line.is_none()
+        {
+            let (total_w, total_h) = self.size(fonts);
+            let (content_w, content_h) = self.calculate_content_size(fonts);
 
-        // Derive inner viewport tracking bounds by slicing off the padding values
+            // Derive inner viewport tracking bounds by slicing off the padding values
+            let inner_w = total_w.saturating_sub(self.padding.left + self.padding.right);
+            let inner_h = total_h.saturating_sub(self.padding.top + self.padding.bottom);
+
+            // Advance start positions to accommodate internal padding gutters
+            let mut cursor_x = offset_x + self.x + self.padding.left as i32;
+            let mut cursor_y = offset_y + self.y + self.padding.top as i32;
+
+            // If reversing, anchor the cursor to the opposing inner gutter wall
+            if matches!(self.direction, ContainerDirection::RowReverse) {
+                cursor_x += inner_w as i32;
+            }
+            if matches!(self.direction, ContainerDirection::ColumnReverse) {
+                cursor_y += inner_h as i32;
+            }
+
+            let num_children = self.children.len();
+            let total_gaps = (num_children as u32).saturating_sub(1) * self.gap;
+
+            // 1. FIX: Invert the layout shifting logic for Centered Justification
+            if self.splits.is_empty() {
+                match self.direction {
+                    ContainerDirection::Row => {
+                        if matches!(self.justify, JustifyContent::Center) && inner_w > content_w {
+                            cursor_x += ((inner_w - content_w) / 2) as i32;
+                        }
+                    }
+                    ContainerDirection::RowReverse => {
+                        if matches!(self.justify, JustifyContent::Center) && inner_w > content_w {
+                            cursor_x -= ((inner_w - content_w) / 2) as i32;
+                        }
+                    }
+                    ContainerDirection::Column => {
+                        if matches!(self.justify, JustifyContent::Center) && inner_h > content_h {
+                            cursor_y += ((inner_h - content_h) / 2) as i32;
+                        }
+                    }
+                    ContainerDirection::ColumnReverse => {
+                        if matches!(self.justify, JustifyContent::Center) && inner_h > content_h {
+                            cursor_y -= ((inner_h - content_h) / 2) as i32;
+                        }
+                    }
+                }
+            }
+
+            for (i, child) in self.children.iter().enumerate() {
+                let (cw, ch) = child.size(fonts);
+
+                let mut cell_w = cw;
+                let mut cell_h = ch;
+                let mut cell_align_x = 0;
+                let mut cell_align_y = 0;
+
+                // 2. FIX: Group Row/RowReverse and Column/ColumnReverse for custom cell splits
+                if !self.splits.is_empty() && i < self.splits.len() {
+                    match self.direction {
+                        ContainerDirection::Row | ContainerDirection::RowReverse => {
+                            let available_w = inner_w.saturating_sub(total_gaps);
+                            cell_w = (available_w * self.splits[i]) / 100;
+                            if cell_w > cw {
+                                cell_align_x = (cell_w - cw) / 2;
+                            }
+                        }
+                        ContainerDirection::Column | ContainerDirection::ColumnReverse => {
+                            let available_h = inner_h.saturating_sub(total_gaps);
+                            cell_h = (available_h * self.splits[i]) / 100;
+                            if cell_h > ch {
+                                cell_align_y = (cell_h - ch) / 2;
+                            }
+                        }
+                    }
+                }
+
+                let mut cross_offset_x = 0;
+                let mut cross_offset_y = 0;
+
+                // 3. Match cross-axis alignment for standard and reversed layout strategies
+                match self.direction {
+                    ContainerDirection::Row | ContainerDirection::RowReverse => {
+                        if inner_h > ch {
+                            match self.align_items {
+                                AlignItems::Center => cross_offset_y = (inner_h - ch) / 2,
+                                AlignItems::End => cross_offset_y = inner_h - ch,
+                                AlignItems::Start => {}
+                            }
+                        }
+                    }
+                    ContainerDirection::Column | ContainerDirection::ColumnReverse => {
+                        if inner_w > cw {
+                            match self.align_items {
+                                AlignItems::Center => cross_offset_x = (inner_w - cw) / 2,
+                                AlignItems::End => cross_offset_x = inner_w - cw,
+                                AlignItems::Start => {}
+                            }
+                        }
+                    }
+                }
+
+                // 4. FIX: Handle Space-Between padding updates for reversed distributions
+                let current_gap = if self.splits.is_empty()
+                    && matches!(self.justify, JustifyContent::SpaceBetween)
+                    && num_children > 1
+                {
+                    let raw_content_w = content_w.saturating_sub(total_gaps);
+                    let raw_content_h = content_h.saturating_sub(total_gaps);
+
+                    match self.direction {
+                        ContainerDirection::Row | ContainerDirection::RowReverse => {
+                            (inner_w.saturating_sub(raw_content_w)) / (num_children as u32 - 1)
+                        }
+                        ContainerDirection::Column | ContainerDirection::ColumnReverse => {
+                            (inner_h.saturating_sub(raw_content_h)) / (num_children as u32 - 1)
+                        }
+                    }
+                } else {
+                    self.gap
+                };
+
+                let mut render_x = cursor_x + (cross_offset_x + cell_align_x) as i32;
+                let mut render_y = cursor_y + (cross_offset_y + cell_align_y) as i32;
+
+                // Offset the child backward into the viewport space
+                if matches!(self.direction, ContainerDirection::RowReverse) {
+                    render_x -= cell_w as i32;
+                }
+                if matches!(self.direction, ContainerDirection::ColumnReverse) {
+                    render_y -= cell_h as i32;
+                }
+
+                child.render(canvas, fonts, render_x, render_y);
+
+                if i < num_children - 1 {
+                    match self.direction {
+                        ContainerDirection::Row => cursor_x += (cell_w + current_gap) as i32,
+                        ContainerDirection::RowReverse => cursor_x -= (cell_w + current_gap) as i32,
+                        ContainerDirection::Column => cursor_y += (cell_h + current_gap) as i32,
+                        ContainerDirection::ColumnReverse => {
+                            cursor_y -= (cell_h + current_gap) as i32
+                        }
+                    }
+                }
+            }
+            return;
+        }
+
+        let (total_w, _) = self.size(fonts);
         let inner_w = total_w.saturating_sub(self.padding.left + self.padding.right);
-        let inner_h = total_h.saturating_sub(self.padding.top + self.padding.bottom);
 
-        // Advance start positions to accommodate internal padding gutters
-        let mut cursor_x = offset_x + self.x as i32 + self.padding.left as i32;
-        let mut cursor_y = offset_y + self.y as i32 + self.padding.top as i32;
+        let start_x = offset_x + self.x + self.padding.left as i32;
+        let mut line_cursor_y = offset_y + self.y + self.padding.top as i32;
 
-        // If reversing, anchor the cursor to the opposing inner gutter wall
-        if matches!(self.direction, ContainerDirection::RowReverse) {
-            cursor_x += inner_w as i32;
-        }
-        if matches!(self.direction, ContainerDirection::ColumnReverse) {
-            cursor_y += inner_h as i32;
-        }
+        let lines = self.pack_lines(fonts, inner_w);
+        let is_reverse = matches!(self.direction, ContainerDirection::RowReverse);
 
-        let num_children = self.children.len();
-        let total_gaps = (num_children as u32).saturating_sub(1) * self.gap;
+        for line in lines {
+            let num_line_children = line.children.len();
+            let total_children_w: u32 = line.children.iter().map(|c| c.size(fonts).0).sum();
 
-        // 1. FIX: Invert the layout shifting logic for Centered Justification
-        if self.splits.is_empty() {
-            match self.direction {
-                ContainerDirection::Row => {
-                    if matches!(self.justify, JustifyContent::Center) && inner_w > content_w {
-                        cursor_x += ((inner_w - content_w) / 2) as i32;
-                    }
-                }
-                ContainerDirection::RowReverse => {
-                    if matches!(self.justify, JustifyContent::Center) && inner_w > content_w {
-                        cursor_x -= ((inner_w - content_w) / 2) as i32;
-                    }
-                }
-                ContainerDirection::Column => {
-                    if matches!(self.justify, JustifyContent::Center) && inner_h > content_h {
-                        cursor_y += ((inner_h - content_h) / 2) as i32;
-                    }
-                }
-                ContainerDirection::ColumnReverse => {
-                    if matches!(self.justify, JustifyContent::Center) && inner_h > content_h {
-                        cursor_y -= ((inner_h - content_h) / 2) as i32;
-                    }
-                }
-            }
-        }
-
-        for (i, child) in self.children.iter().enumerate() {
-            let (cw, ch) = child.size(fonts);
-
-            let mut cell_w = cw;
-            let mut cell_h = ch;
-            let mut cell_align_x = 0;
-            let mut cell_align_y = 0;
-
-            // 2. FIX: Group Row/RowReverse and Column/ColumnReverse for custom cell splits
-            if !self.splits.is_empty() && i < self.splits.len() {
-                match self.direction {
-                    ContainerDirection::Row | ContainerDirection::RowReverse => {
-                        let available_w = inner_w.saturating_sub(total_gaps);
-                        cell_w = (available_w * self.splits[i]) / 100;
-                        if cell_w > cw {
-                            cell_align_x = (cell_w - cw) / 2;
-                        }
-                    }
-                    ContainerDirection::Column | ContainerDirection::ColumnReverse => {
-                        let available_h = inner_h.saturating_sub(total_gaps);
-                        cell_h = (available_h * self.splits[i]) / 100;
-                        if cell_h > ch {
-                            cell_align_y = (cell_h - ch) / 2;
-                        }
-                    }
-                }
-            }
-
-            let mut cross_offset_x = 0;
-            let mut cross_offset_y = 0;
-
-            // 3. Match cross-axis alignment for standard and reversed layout strategies
-            match self.direction {
-                ContainerDirection::Row | ContainerDirection::RowReverse => {
-                    if inner_h > ch {
-                        match self.align_items {
-                            AlignItems::Center => cross_offset_y = (inner_h - ch) / 2,
-                            AlignItems::End => cross_offset_y = inner_h - ch,
-                            AlignItems::Start => {}
-                        }
-                    }
-                }
-                ContainerDirection::Column | ContainerDirection::ColumnReverse => {
-                    if inner_w > cw {
-                        match self.align_items {
-                            AlignItems::Center => cross_offset_x = (inner_w - cw) / 2,
-                            AlignItems::End => cross_offset_x = inner_w - cw,
-                            AlignItems::Start => {}
-                        }
-                    }
-                }
-            }
-
-            // 4. FIX: Handle Space-Between padding updates for reversed distributions
-            let current_gap = if self.splits.is_empty()
-                && matches!(self.justify, JustifyContent::SpaceBetween)
-                && num_children > 1
-            {
-                let raw_content_w = content_w.saturating_sub(total_gaps);
-                let raw_content_h = content_h.saturating_sub(total_gaps);
-
-                match self.direction {
-                    ContainerDirection::Row | ContainerDirection::RowReverse => {
-                        (inner_w.saturating_sub(raw_content_w)) / (num_children as u32 - 1)
-                    }
-                    ContainerDirection::Column | ContainerDirection::ColumnReverse => {
-                        (inner_h.saturating_sub(raw_content_h)) / (num_children as u32 - 1)
-                    }
-                }
+            let current_gap = if matches!(self.justify, JustifyContent::SpaceBetween) && num_line_children > 1 {
+                (inner_w.saturating_sub(total_children_w)) / (num_line_children as u32 - 1)
             } else {
                 self.gap
             };
 
-            let mut render_x = cursor_x + (cross_offset_x + cell_align_x) as i32;
-            let mut render_y = cursor_y + (cross_offset_y + cell_align_y) as i32;
+            let line_w = if matches!(self.justify, JustifyContent::SpaceBetween) && num_line_children > 1 {
+                inner_w
+            } else {
+                line.width
+            };
 
-            // Offset the child backward into the viewport space
-            if matches!(self.direction, ContainerDirection::RowReverse) {
-                render_x -= cell_w as i32;
-            }
-            if matches!(self.direction, ContainerDirection::ColumnReverse) {
-                render_y -= cell_h as i32;
-            }
+            let mut item_cursor_x = if is_reverse {
+                let mut x = start_x + inner_w as i32;
+                if matches!(self.justify, JustifyContent::Center) && inner_w > line_w {
+                    x -= ((inner_w - line_w) / 2) as i32;
+                }
+                x
+            } else {
+                let mut x = start_x;
+                if matches!(self.justify, JustifyContent::Center) && inner_w > line_w {
+                    x += ((inner_w - line_w) / 2) as i32;
+                }
+                x
+            };
 
-            child.render(canvas, fonts, render_x, render_y);
+            for child in line.children {
+                let (cw, ch) = child.size(fonts);
+                let mut cross_offset_y = 0;
 
-            if i < num_children - 1 {
-                match self.direction {
-                    ContainerDirection::Row => cursor_x += (cell_w + current_gap) as i32,
-                    ContainerDirection::RowReverse => cursor_x -= (cell_w + current_gap) as i32,
-                    ContainerDirection::Column => cursor_y += (cell_h + current_gap) as i32,
-                    ContainerDirection::ColumnReverse => cursor_y -= (cell_h + current_gap) as i32,
+                // Handle cross-axis item alignment relative to its current line height
+                if line.height > ch {
+                    match self.align_items {
+                        AlignItems::Center => cross_offset_y = (line.height - ch) / 2,
+                        AlignItems::End => cross_offset_y = line.height - ch,
+                        _ => {}
+                    }
+                }
+
+                let render_x = if is_reverse {
+                    item_cursor_x - cw as i32
+                } else {
+                    item_cursor_x
+                };
+                let render_y = line_cursor_y + cross_offset_y as i32;
+
+                child.render(canvas, fonts, render_x, render_y);
+
+                // Advance item cursor along the current line row
+                if is_reverse {
+                    item_cursor_x -= (cw + current_gap) as i32;
+                } else {
+                    item_cursor_x += (cw + current_gap) as i32;
                 }
             }
+
+            // Move line cursor down to allocate space for the next wrapped row
+            line_cursor_y += (line.height + self.gap) as i32;
         }
     }
 

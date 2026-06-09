@@ -10,17 +10,17 @@ use crate::{
 #[derive(Clone)]
 pub struct Sprite {
     image: RgbaImage,
-    x: u32,
-    y: u32,
+    x: i32,
+    y: i32,
 }
 
 impl Sprite {
-    pub fn new(image: RgbaImage, x: u32, y: u32) -> Self {
+    pub fn new(image: RgbaImage, x: i32, y: i32) -> Self {
         Self { image, x, y }
     }
 
     #[tracing::instrument(fields(path = %path), err)]
-    pub fn from_path(path: &str, x: u32, y: u32) -> TaskResult<Self> {
+    pub fn from_path(path: &str, x: i32, y: i32) -> TaskResult<Self> {
         let image = image::open(path)
             .map_err(TaskError::Image)
             .context("open sprite", path)?
@@ -28,13 +28,13 @@ impl Sprite {
         Ok(Self::new(image, x, y))
     }
 
-    pub fn from_path_checked(path: &str, x: u32, y: u32) -> Result<Self, image::ImageError> {
+    pub fn from_path_checked(path: &str, x: i32, y: i32) -> Result<Self, image::ImageError> {
         let image = image::open(path)?.to_rgba8();
         Ok(Self::new(image, x, y))
     }
 
     #[tracing::instrument(skip(asset), fields(asset = %asset.name, asset_type = ?asset.asset_type), err)]
-    pub async fn from_asset(asset: &Asset, x: u32, y: u32) -> TaskResult<Self> {
+    pub async fn from_asset(asset: &Asset, x: i32, y: i32) -> TaskResult<Self> {
         let path = crate::utils::assets::asset_path(asset)
             .await
             .context("resolve sprite asset path", asset.name.clone())?;
@@ -125,12 +125,12 @@ impl Sprite {
         self.roundify(max_radius);
     }
 
-    pub fn x(mut self, x: u32) -> Self {
+    pub fn x(mut self, x: i32) -> Self {
         self.x = x;
         self
     }
 
-    pub fn y(mut self, y: u32) -> Self {
+    pub fn y(mut self, y: i32) -> Self {
         self.y = y;
         self
     }
@@ -138,8 +138,8 @@ impl Sprite {
 
 impl Renderable for Sprite {
     fn render(&self, canvas: &mut RgbaImage, _fonts: &FontRegistry, offset_x: i32, offset_y: i32) {
-        let new_offset_x = offset_x + self.x as i32;
-        let new_offset_y = offset_y + self.y as i32;
+        let new_offset_x = offset_x + self.x;
+        let new_offset_y = offset_y + self.y;
 
         imageops::overlay(
             canvas,

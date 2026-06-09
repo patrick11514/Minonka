@@ -305,10 +305,10 @@ export const ClashMemberSchema = z.object({
 
 export const MasterySchema = z.object({
     puuid: z.string(),
-    championId: z.number(),
+    championId: z.coerce.bigint(),
     championLevel: z.number(),
     championPoints: z.number(),
-    lastPlayTime: z.number()
+    lastPlayTime: z.coerce.bigint()
 });
 
 export const SpectatorSchema = z.object({

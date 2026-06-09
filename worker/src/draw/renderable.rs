@@ -32,6 +32,11 @@ impl AsRenderable for crate::draw::stack::Stack {
         Box::new(self)
     }
 }
+impl AsRenderable for crate::draw::rich_label::RichLabel {
+    fn as_renderable(self) -> Box<dyn Renderable> {
+        Box::new(self)
+    }
+}
 
 impl AsRenderable for Box<dyn Renderable> {
     fn as_renderable(self) -> Box<dyn Renderable> {

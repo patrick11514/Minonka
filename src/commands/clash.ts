@@ -4,11 +4,11 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
-import { Region } from '$/lib/Riot/types';
+import { Rank, Region } from '$/lib/Riot/types';
 import { SubCommand } from '$/lib/SubCommand';
 import { addRegionOption, getHighestRank } from '$/lib/utilities';
 import { Account } from '$/types/database';
-import { TeamData } from '$/Worker/tasks/team';
+import { TeamTaskInput } from '$/types/worker/TeamTaskInput';
 import {
     ActionRowBuilder,
     ButtonBuilder,
@@ -118,7 +118,7 @@ export default class Clash extends Command {
             if (this.teamId.match(interaction)) {
                 const option = interaction.options.getString('team_id', true);
                 const region = interaction.options.getString('region', true) as Region;
-                await this.handleTeam(interaction, option, region);
+                await this.handleTeam(interaction, option, 'NO_PUUID_PROVIDED', region);
             } else {
                 await this.team.handleAccountCommand(interaction, l);
             }
@@ -203,12 +203,19 @@ export default class Clash extends Command {
         }
 
         const header = `<@${interaction.user.id}> ${account.gameName}#${account.tagLine} (${lang.regions[region] ?? region}):\n`;
-        await this.handleTeam(interaction, team.data[0].teamId, region, header);
+        await this.handleTeam(
+            interaction,
+            team.data[0].teamId,
+            account.puuid,
+            region,
+            header
+        );
     }
 
     private async handleTeam(
         interaction: RepliableInteraction<CacheType>,
         teamId: string,
+        puuid: string,
         region: Region,
         headerPrefix: string = ''
     ) {
@@ -223,7 +230,7 @@ export default class Clash extends Command {
             return;
         }
 
-        let newPlayers: TeamData['players'];
+        let newPlayers: TeamTaskInput['players'];
 
         try {
             newPlayers = await Promise.all(
@@ -248,17 +255,24 @@ export default class Clash extends Command {
                         throw new Error(formatErrorResponse(lang, masteries));
                     }
 
+                    const rankData = new Rank(rank).toRust();
+
                     return {
                         puuid: player.puuid,
                         position: player.position,
                         role: player.role,
                         profileIconId: summoner.data.profileIconId,
                         level: summoner.data.summonerLevel,
-                        highestRank: rank,
+                        highestRank: {
+                            ...rankData,
+                            queueType: rank.queueType,
+                            wins: rank.wins,
+                            losses: rank.losses
+                        },
                         gameName: account.data.gameName,
                         tagLine: account.data.tagLine,
                         masteries: masteries.data
-                    } satisfies TeamData['players'][number];
+                    } satisfies TeamTaskInput['players'][number];
                 })
             );
         } catch (e) {
@@ -293,7 +307,9 @@ export default class Clash extends Command {
             const result = await process.workerServer.addJobWait('team', {
                 ...team.data,
                 players: newPlayers,
-                locale: interaction.locale
+                locale: interaction.locale,
+                puuid,
+                region
             });
 
             const rankRow = new ActionRowBuilder<ButtonBuilder>().addComponents(

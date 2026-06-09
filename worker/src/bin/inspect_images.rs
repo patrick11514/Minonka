@@ -92,14 +92,19 @@ fn scan_for_snapshots(dir: &Path, acc: &mut Vec<ReviewItem>) -> io::Result<()> {
                 // Match any regression file directly by its suffix signature
                 if file_name.ends_with(".actual.png") {
                     if let Some(stem) = file_name.strip_suffix(".actual.png") {
-                        let parent = path.parent().unwrap_or_else(|| Path::new("."));
+                        if let Ok(abs_path) = fs::canonicalize(&path) {
+                            let parent = abs_path
+                                .parent()
+                                .unwrap_or_else(|| Path::new("/"))
+                                .to_path_buf();
 
-                        acc.push(ReviewItem {
-                            base_name: stem.to_string(),
-                            ref_path: parent.join(format!("{}.png", stem)),
-                            actual_path: path.clone(),
-                            diff_path: parent.join(format!("{}.diff.png", stem)),
-                        });
+                            acc.push(ReviewItem {
+                                base_name: stem.to_string(),
+                                ref_path: parent.join(format!("{}.png", stem)),
+                                actual_path: abs_path,
+                                diff_path: parent.join(format!("{}.diff.png", stem)),
+                            });
+                        }
                     }
                 }
             }

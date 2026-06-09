@@ -1,0 +1,283 @@
+{
+    "puuid": "aqA-hgUZ1em__01OSwHDG9kqYGJHWR0j_56y7l94m1BiNyY-Yk9ES7W0PdSmRw6SV8fhF1RaUy7PMw",
+    "region": "eun1",
+    "locale": "cs",
+    "abbreviation": "WIN",
+    "name": "Full Stack Gamers",
+    "iconId": 50,
+    "tier": 1,
+    "captain": "aqA-hgUZ1em__01OSwHDG9kqYGJHWR0j_56y7l94m1BiNyY-Yk9ES7W0PdSmRw6SV8fhF1RaUy7PMw",
+    "players": [
+        {
+            "puuid": "aqA-hgUZ1em__01OSwHDG9kqYGJHWR0j_56y7l94m1BiNyY-Yk9ES7W0PdSmRw6SV8fhF1RaUy7PMw",
+            "position": "TOP",
+            "role": "CAPTAIN",
+            "profileIconId": 6120,
+            "level": 42,
+            "gameName": "TopLaner",
+            "tagLine": "EUW",
+            "highestRank": {
+                "tierIndex": 3,
+                "tier": "GOLD",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 45,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 54,
+                "losses": 50
+            },
+            "masteries": [
+                {
+                    "puuid": "aqA-hgUZ1em__01OSwHDG9kqYGJHWR0j_56y7l94m1BiNyY-Yk9ES7W0PdSmRw6SV8fhF1RaUy7PMw",
+                    "championId": 266,
+                    "championLevel": 56,
+                    "championPoints": 1540300,
+                    "lastPlayTime": 1718114400000
+                },
+                {
+                    "puuid": "aqA-hgUZ1em__01OSwHDG9kqYGJHWR0j_56y7l94m1BiNyY-Yk9ES7W0PdSmRw6SV8fhF1RaUy7PMw",
+                    "championId": 58,
+                    "championLevel": 14,
+                    "championPoints": 320100,
+                    "lastPlayTime": 1718028000000
+                },
+                {
+                    "puuid": "aqA-hgUZ1em__01OSwHDG9kqYGJHWR0j_56y7l94m1BiNyY-Yk9ES7W0PdSmRw6SV8fhF1RaUy7PMw",
+                    "championId": 24,
+                    "championLevel": 5,
+                    "championPoints": 42100,
+                    "lastPlayTime": 1717934400000
+                },
+                {
+                    "puuid": "aqA-hgUZ1em__01OSwHDG9kqYGJHWR0j_56y7l94m1BiNyY-Yk9ES7W0PdSmRw6SV8fhF1RaUy7PMw",
+                    "championId": 2,
+                    "championLevel": 5,
+                    "championPoints": 33100,
+                    "lastPlayTime": 1718020800000
+                },
+                {
+                    "puuid": "aqA-hgUZ1em__01OSwHDG9kqYGJHWR0j_56y7l94m1BiNyY-Yk9ES7W0PdSmRw6SV8fhF1RaUy7PMw",
+                    "championId": 121,
+                    "championLevel": 4,
+                    "championPoints": 15400,
+                    "lastPlayTime": 1717934400000
+                }
+            ]
+        },
+        {
+            "puuid": "TVcBxeiuw6-a401OSwEJsR-5Z-OMyaqmVMVBVp9by3WkWHiADTdzsjx9RpxLzSkuW925ApNRADyk0w",
+            "position": "JUNGLE",
+            "role": "MEMBER",
+            "profileIconId": 904,
+            "level": 612,
+            "gameName": "SmiteMain",
+            "tagLine": "EUNE",
+            "highestRank": {
+                "tierIndex": 7,
+                "tier": "MASTER",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 15,
+                "queueType": "RANKED_FLEX_SR",
+                "wins": 189,
+                "losses": 142
+            },
+            "masteries": [
+                {
+                    "puuid": "TVcBxeiuw6-a401OSwEJsR-5Z-OMyaqmVMVBVp9by3WkWHiADTdzsjx9RpxLzSkuW925ApNRADyk0w",
+                    "championId": 64,
+                    "championLevel": 32,
+                    "championPoints": 874000,
+                    "lastPlayTime": 1718110800000
+                },
+                {
+                    "puuid": "TVcBxeiuw6-a401OSwEJsR-5Z-OMyaqmVMVBVp9by3WkWHiADTdzsjx9RpxLzSkuW925ApNRADyk0w",
+                    "championId": 20,
+                    "championLevel": 7,
+                    "championPoints": 120000,
+                    "lastPlayTime": 1718020800000
+                },
+                {
+                    "puuid": "TVcBxeiuw6-a401OSwEJsR-5Z-OMyaqmVMVBVp9by3WkWHiADTdzsjx9RpxLzSkuW925ApNRADyk0w",
+                    "championId": 76,
+                    "championLevel": 5,
+                    "championPoints": 50000,
+                    "lastPlayTime": 1717934400000
+                },
+                {
+                    "puuid": "TVcBxeiuw6-a401OSwEJsR-5Z-OMyaqmVMVBVp9by3WkWHiADTdzsjx9RpxLzSkuW925ApNRADyk0w",
+                    "championId": 60,
+                    "championLevel": 5,
+                    "championPoints": 45000,
+                    "lastPlayTime": 1717848000000
+                },
+                {
+                    "puuid": "TVcBxeiuw6-a401OSwEJsR-5Z-OMyaqmVMVBVp9by3WkWHiADTdzsjx9RpxLzSkuW925ApNRADyk0w",
+                    "championId": 104,
+                    "championLevel": 4,
+                    "championPoints": 22000,
+                    "lastPlayTime": 1717761600000
+                }
+            ]
+        },
+        {
+            "puuid": "AxAJbz3AJGgTAk1OSwGAE5SCdm30qLn8_kfDQcSOpwh25Wa1gRJ328jPUx46OOt1hy9o4gcJx3Bz5g",
+            "position": "MIDDLE",
+            "role": "MEMBER",
+            "profileIconId": 4412,
+            "level": 15,
+            "gameName": "MidRoamer",
+            "tagLine": "KR1",
+            "highestRank": null,
+            "masteries": [
+                {
+                    "puuid": "AxAJbz3AJGgTAk1OSwGAE5SCdm30qLn8_kfDQcSOpwh25Wa1gRJ328jPUx46OOt1hy9o4gcJx3Bz5g",
+                    "championId": 103,
+                    "championLevel": 120,
+                    "championPoints": 4520100,
+                    "lastPlayTime": 1718118000000
+                },
+                {
+                    "puuid": "AxAJbz3AJGgTAk1OSwGAE5SCdm30qLn8_kfDQcSOpwh25Wa1gRJ328jPUx46OOt1hy9o4gcJx3Bz5g",
+                    "championId": 157,
+                    "championLevel": 15,
+                    "championPoints": 420000,
+                    "lastPlayTime": 1718028000000
+                },
+                {
+                    "puuid": "AxAJbz3AJGgTAk1OSwGAE5SCdm30qLn8_kfDQcSOpwh25Wa1gRJ328jPUx46OOt1hy9o4gcJx3Bz5g",
+                    "championId": 84,
+                    "championLevel": 10,
+                    "championPoints": 150000,
+                    "lastPlayTime": 1717934400000
+                },
+                {
+                    "puuid": "AxAJbz3AJGgTAk1OSwGAE5SCdm30qLn8_kfDQcSOpwh25Wa1gRJ328jPUx46OOt1hy9o4gcJx3Bz5g",
+                    "championId": 127,
+                    "championLevel": 7,
+                    "championPoints": 88000,
+                    "lastPlayTime": 1717848000000
+                },
+                {
+                    "puuid": "AxAJbz3AJGgTAk1OSwGAE5SCdm30qLn8_kfDQcSOpwh25Wa1gRJ328jPUx46OOt1hy9o4gcJx3Bz5g",
+                    "championId": 134,
+                    "championLevel": 6,
+                    "championPoints": 62000,
+                    "lastPlayTime": 1717761600000
+                }
+            ]
+        },
+        {
+            "puuid": "bRLZYVdlg6_9601OSwFetWB7gHFGsR3DTOVSoSJ6E2VqFSUspmNZZIrlpEYYBNjDuXbDeRu0cNDARw",
+            "position": "BOTTOM",
+            "role": "MEMBER",
+            "profileIconId": 1622,
+            "level": 250,
+            "gameName": "AdcCarry",
+            "tagLine": "NA1",
+            "highestRank": {
+                "tierIndex": 1,
+                "tier": "BRONZE",
+                "rankIndex": 0,
+                "rank": "IV",
+                "lp": 0,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 12,
+                "losses": 25
+            },
+            "masteries": [
+                {
+                    "puuid": "bRLZYVdlg6_9601OSwFetWB7gHFGsR3DTOVSoSJ6E2VqFSUspmNZZIrlpEYYBNjDuXbDeRu0cNDARw",
+                    "championId": 222,
+                    "championLevel": 45,
+                    "championPoints": 1104500,
+                    "lastPlayTime": 1718020800000
+                },
+                {
+                    "puuid": "bRLZYVdlg6_9601OSwFetWB7gHFGsR3DTOVSoSJ6E2VqFSUspmNZZIrlpEYYBNjDuXbDeRu0cNDARw",
+                    "championId": 22,
+                    "championLevel": 12,
+                    "championPoints": 150000,
+                    "lastPlayTime": 1717934400000
+                },
+                {
+                    "puuid": "bRLZYVdlg6_9601OSwFetWB7gHFGsR3DTOVSoSJ6E2VqFSUspmNZZIrlpEYYBNjDuXbDeRu0cNDARw",
+                    "championId": 81,
+                    "championLevel": 10,
+                    "championPoints": 99000,
+                    "lastPlayTime": 1717848000000
+                },
+                {
+                    "puuid": "bRLZYVdlg6_9601OSwFetWB7gHFGsR3DTOVSoSJ6E2VqFSUspmNZZIrlpEYYBNjDuXbDeRu0cNDARw",
+                    "championId": 51,
+                    "championLevel": 7,
+                    "championPoints": 64000,
+                    "lastPlayTime": 1717761600000
+                },
+                {
+                    "puuid": "bRLZYVdlg6_9601OSwFetWB7gHFGsR3DTOVSoSJ6E2VqFSUspmNZZIrlpEYYBNjDuXbDeRu0cNDARw",
+                    "championId": 18,
+                    "championLevel": 5,
+                    "championPoints": 32000,
+                    "lastPlayTime": 1717675200000
+                }
+            ]
+        },
+        {
+            "puuid": "pVbKD9emhQ5eYU1OSwEQMFU9fidqD_DQ62iqUHX6zqGwG6FHTMUaKzIn8R0QB7W3eoSXh29lOdx5QA",
+            "position": "FILL",
+            "role": "MEMBER",
+            "profileIconId": 550,
+            "level": 189,
+            "gameName": "FlexFill",
+            "tagLine": "SUPP",
+            "highestRank": {
+                "tierIndex": 5,
+                "tier": "EMERALD",
+                "rankIndex": 2,
+                "rank": "II",
+                "lp": 88,
+                "queueType": "RANKED_FLEX_SR",
+                "wins": 115,
+                "losses": 102
+            },
+            "masteries": [
+                {
+                    "puuid": "pVbKD9emhQ5eYU1OSwEQMFU9fidqD_DQ62iqUHX6zqGwG6FHTMUaKzIn8R0QB7W3eoSXh29lOdx5QA",
+                    "championId": 412,
+                    "championLevel": 28,
+                    "championPoints": 643000,
+                    "lastPlayTime": 1718107200000
+                },
+                {
+                    "puuid": "pVbKD9emhQ5eYU1OSwEQMFU9fidqD_DQ62iqUHX6zqGwG6FHTMUaKzIn8R0QB7W3eoSXh29lOdx5QA",
+                    "championId": 12,
+                    "championLevel": 14,
+                    "championPoints": 220000,
+                    "lastPlayTime": 1718020800000
+                },
+                {
+                    "puuid": "pVbKD9emhQ5eYU1OSwEQMFU9fidqD_DQ62iqUHX6zqGwG6FHTMUaKzIn8R0QB7W3eoSXh29lOdx5QA",
+                    "championId": 53,
+                    "championLevel": 10,
+                    "championPoints": 115000,
+                    "lastPlayTime": 1717934400000
+                },
+                {
+                    "puuid": "pVbKD9emhQ5eYU1OSwEQMFU9fidqD_DQ62iqUHX6zqGwG6FHTMUaKzIn8R0QB7W3eoSXh29lOdx5QA",
+                    "championId": 89,
+                    "championLevel": 8,
+                    "championPoints": 91000,
+                    "lastPlayTime": 1717848000000
+                },
+                {
+                    "puuid": "pVbKD9emhQ5eYU1OSwEQMFU9fidqD_DQ62iqUHX6zqGwG6FHTMUaKzIn8R0QB7W3eoSXh29lOdx5QA",
+                    "championId": 267,
+                    "championLevel": 5,
+                    "championPoints": 42000,
+                    "lastPlayTime": 1717761600000
+                }
+            ]
+        }
+    ]
+}

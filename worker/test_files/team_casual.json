@@ -1,0 +1,110 @@
+{
+    "puuid": "spTF2eT__t3_iU1OSwEEvD3VFlyY4eHegfzh1hYzmXKdFDGuUDAszLB9QwiRJ07SXSGRoFlgMkQBSg",
+    "region": "eun1",
+    "locale": "cs",
+    "abbreviation": "HARD",
+    "name": "Hardstuck Hardies",
+    "iconId": 21,
+    "tier": 4,
+    "captain": "NO3tM1w_siuhrk1OSwHLLpTyzPvPmlPJWPRAPt6NSwKBC_fUYixfCse-I5BgIxtKYSsFBMGT5viKvA",
+    "players": [
+        {
+            "puuid": "NO3tM1w_siuhrk1OSwHLLpTyzPvPmlPJWPRAPt6NSwKBC_fUYixfCse-I5BgIxtKYSsFBMGT5viKvA",
+            "position": "TOP",
+            "role": "CAPTAIN",
+            "profileIconId": 1,
+            "level": 34,
+            "gameName": "BrickLayer",
+            "tagLine": "CZE",
+            "highestRank": {
+                "tierIndex": 0,
+                "tier": "IRON",
+                "rankIndex": 1,
+                "rank": "III",
+                "lp": 0,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 12,
+                "losses": 45
+            },
+            "masteries": [
+                {
+                    "puuid": "NO3tM1w_siuhrk1OSwHLLpTyzPvPmlPJWPRAPt6NSwKBC_fUYixfCse-I5BgIxtKYSsFBMGT5viKvA",
+                    "championId": 86,
+                    "championLevel": 2,
+                    "championPoints": 3400,
+                    "lastPlayTime": 1715000000000
+                }
+            ]
+        },
+        {
+            "puuid": "spTF2eT__t3_iU1OSwEEvD3VFlyY4eHegfzh1hYzmXKdFDGuUDAszLB9QwiRJ07SXSGRoFlgMkQBSg",
+            "position": "JUNGLE",
+            "role": "MEMBER",
+            "profileIconId": 2,
+            "level": 45,
+            "gameName": "SmiteMisser",
+            "tagLine": "007",
+            "highestRank": {
+                "tierIndex": 1,
+                "tier": "BRONZE",
+                "rankIndex": 0,
+                "rank": "IV",
+                "lp": 0,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 22,
+                "losses": 31
+            },
+            "masteries": []
+        },
+        {
+            "puuid": "THQGV0e56mB74E1OSwEjxAtH6OdjscmrQHyHgy338Oo_nVhsIYnv201o03ucoApJQOsyadLyJgL0WQ",
+            "position": "MIDDLE",
+            "role": "MEMBER",
+            "profileIconId": 5,
+            "level": 12,
+            "gameName": "GreyScreenEnthusiast",
+            "tagLine": "FEED",
+            "highestRank": null,
+            "masteries": []
+        },
+        {
+            "puuid": "sCxC1c4BDKB2tE1OSwG6CWEsyFgsYcrTgxHt_ZdNTma_ttrtTZn_pbN5O_VDiO4_MsGB3ZGNKQC09w",
+            "position": "BOTTOM",
+            "role": "MEMBER",
+            "profileIconId": 10,
+            "level": 78,
+            "gameName": "RightClicker",
+            "tagLine": "SLOW",
+            "highestRank": {
+                "tierIndex": 1,
+                "tier": "BRONZE",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 0,
+                "queueType": "RANKED_FLEX_SR",
+                "wins": 40,
+                "losses": 42
+            },
+            "masteries": [
+                {
+                    "puuid": "sCxC1c4BDKB2tE1OSwG6CWEsyFgsYcrTgxHt_ZdNTma_ttrtTZn_pbN5O_VDiO4_MsGB3ZGNKQC09w",
+                    "championId": 21,
+                    "championLevel": 4,
+                    "championPoints": 12500,
+                    "lastPlayTime": 1717000000000
+                }
+            ]
+        },
+        {
+            "puuid": "nHUNbr7Cvba3Qk1OSwFueZwC3GzWmb1bgukELDNTQ3Iz-k6nfcq70CobcPVCybp9IR_NsafbLeCa-g",
+            "position": "UTILITY",
+            "role": "MEMBER",
+            "profileIconId": 14,
+            "level": 55,
+            "gameName": "AfkYuumi",
+            "tagLine": "MEOW",
+            "highestRank": null,
+            "masteries": []
+        }
+    ]
+}

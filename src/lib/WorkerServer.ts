@@ -4,6 +4,7 @@ import { FileResult } from '$/types/worker/FileResult';
 import { MatchTaskInput } from '$/types/worker/MatchTaskInput';
 import { RankTaskInput } from '$/types/worker/RankTaskInput';
 import { SummonerTaskInput } from '$/types/worker/SummonerTaskInput';
+import { TeamTaskInput } from '$/types/worker/TeamTaskInput';
 import assert from 'node:assert';
 import crypto from 'node:crypto';
 import { WebSocket, WebSocketServer } from 'ws';
@@ -22,9 +23,9 @@ const Workers: Record<
 type Jobs = {
     summoner: SummonerTaskInput;
     rank: RankTaskInput;
-    match: MatchTaskInput; //MatchData;
+    match: MatchTaskInput;
     cherryMatch: CherryMatchTaskInput;
-    team: any; //TeamData;
+    team: TeamTaskInput;
     spectator: any; //SpectatorData;
 };
 

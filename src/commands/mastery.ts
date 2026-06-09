@@ -88,7 +88,7 @@ export default class Mastery extends AccountCommand {
         const filteredMasteries = masteries.slice(offset, offset + LIMIT - cutDown);
 
         const options = await filteredMasteries.asyncMap(async (mastery) => {
-            const champion = champions.get(mastery.championId);
+            const champion = champions.get(Number(mastery.championId));
             const emoji = await process.emoji.getEmoji('champion', champion?.id ?? '');
             if (!emoji) return null;
 
@@ -287,7 +287,7 @@ export default class Mastery extends AccountCommand {
         const champion = champions.get(championId)!;
         const championEmoji = await process.emoji.getEmoji('champion', champion.id);
 
-        const date = new Date(championData.data.lastPlayTime);
+        const date = new Date(Number(championData.data.lastPlayTime));
 
         const lvl = championData.data.championLevel;
         const mastery = await process.emoji.getEmoji(

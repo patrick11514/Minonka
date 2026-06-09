@@ -10,8 +10,8 @@ use crate::draw::stack::Stack;
 use crate::tasks::task::SaveStrategy;
 use crate::tasks::types::DefaultParametersInput;
 use crate::utils::assets::{
-    Asset, AssetType, Stat, get_champion_asset, get_item_asset, get_rune_asset, get_stat_asset,
-    get_summoner_asset,
+    Asset, AssetType, Stat, get_background_asset, get_champion_asset, get_item_asset,
+    get_rune_asset, get_stat_asset, get_summoner_asset,
 };
 use crate::utils::deser::deserialize_ban_id;
 use crate::utils::locale::AppLocale;
@@ -276,8 +276,8 @@ impl RenderContext {
                         let mut sprite = Sprite::from_asset(&asset, 0, 0)
                             .await
                             .expect("Failed to read item asset")
-                            .x(item_spacing)
-                            .y(item_spacing);
+                            .x(item_spacing as i32)
+                            .y(item_spacing as i32);
                         sprite.resize_to_width(item_background.dimensions().0 - item_spacing * 2);
                         Some(sprite)
                     } else {
@@ -473,8 +473,6 @@ impl Task for MatchTask {
             .map(|t| t.win)
             .expect("User team not found in match teams");
 
-        let background = Asset::new(AssetType::Other, "background.png");
-
         let cross = Asset::new(AssetType::Other, "ban-x.png");
         let mut cross = Sprite::from_asset(&cross, 0, 0).await?;
         cross.resize_to_width(60);
@@ -498,7 +496,7 @@ impl Task for MatchTask {
 
         let center_spacing = 440;
 
-        let canvas = MasterCanvas::from_asset(background, context.into())
+        let canvas = MasterCanvas::from_asset(get_background_asset(), context.into())
             .await?
             .with_layout(|root| {
                 root.y(20)

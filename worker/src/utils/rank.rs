@@ -1,6 +1,8 @@
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
+use crate::{draw::color::Color, utils::locale::AppLocale};
+
 #[derive(Debug, Clone, Serialize, Deserialize, TS, PartialEq, PartialOrd)]
 #[serde(rename_all = "UPPERCASE")]
 #[cfg_attr(feature = "export-ts", ts(export))]
@@ -43,6 +45,21 @@ impl Tier {
     pub fn as_str(&self) -> String {
         format!("{:?}", self)
     }
+
+    pub fn color(&self) -> Color {
+        match self {
+            Tier::Iron => Color::Iron,
+            Tier::Bronze => Color::Bronze,
+            Tier::Silver => Color::Silver,
+            Tier::Gold => Color::Gold,
+            Tier::Platinum => Color::Platinum,
+            Tier::Emerald => Color::Emerald,
+            Tier::Diamond => Color::Diamond,
+            Tier::Master => Color::Master,
+            Tier::Grandmaster => Color::Grandmaster,
+            Tier::Challenger => Color::Challenger,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -79,5 +96,17 @@ impl RankTier {
 
     pub fn tier(&self) -> &Tier {
         &self.tier
+    }
+
+    pub fn as_str(&self, locale: &AppLocale) -> String {
+        if self.tier < Tier::Master {
+            format!(
+                "{} {}",
+                locale.tier_label(&self.tier.as_str()),
+                self.rank.as_str()
+            )
+        } else {
+            locale.tier_label(&self.tier.as_str())
+        }
     }
 }

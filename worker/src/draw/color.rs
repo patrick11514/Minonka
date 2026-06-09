@@ -4,12 +4,25 @@ use image::Rgba;
 pub enum Color {
     Rgba(u8, u8, u8, u8),
 
+    //Other
     White,
     Black,
     Yellow,
     Green,
     Red,
     Gray,
+
+    //RANK
+    Iron,        //'#99978b',
+    Bronze,      // '#966502',
+    Silver,      // '#99978b',
+    Gold,        //: '#e6c41c',
+    Platinum,    //: '#49ebaa',
+    Emerald,     //: '#1b9627',
+    Diamond,     //: '#5149eb',
+    Master,      //: '#8117b3',
+    Grandmaster, //: '#9e0606',
+    Challenger,  // '#e5f051',
 }
 
 impl Color {
@@ -23,6 +36,16 @@ impl Color {
             Color::Green => Rgba([0, 255, 0, 255]),
             Color::Red => Rgba([255, 0, 0, 255]),
             Color::Gray => Rgba([138, 133, 120, 255]),
+            Color::Iron => Rgba([153, 151, 139, 255]),
+            Color::Bronze => Rgba([150, 101, 2, 255]),
+            Color::Silver => Rgba([153, 151, 139, 255]),
+            Color::Gold => Rgba([230, 196, 28, 255]),
+            Color::Platinum => Rgba([73, 235, 170, 255]),
+            Color::Emerald => Rgba([27, 150, 39, 255]),
+            Color::Diamond => Rgba([81, 73, 235, 255]),
+            Color::Master => Rgba([129, 23, 179, 255]),
+            Color::Grandmaster => Rgba([158, 6, 6, 255]),
+            Color::Challenger => Rgba([229, 240, 81, 255]),
         }
     }
 

@@ -1,0 +1,111 @@
+{
+    "puuid": "v4p836kNXLAY2E1OSwFsOMWkUhdGcSbiSYPPi4WJm805mAAcrSkbJhdAIUB9zcdGc7wM6gucM4f4gQ",
+    "region": "eun1",
+    "locale": "en-US",
+    "abbreviation": "FILL",
+    "name": "Flexibility Inc",
+    "iconId": 15,
+    "tier": 2,
+    "captain": "v4p836kNXLAY2E1OSwFsOMWkUhdGcSbiSYPPi4WJm805mAAcrSkbJhdAIUB9zcdGc7wM6gucM4f4gQ",
+    "players": [
+        {
+            "puuid": "v4p836kNXLAY2E1OSwFsOMWkUhdGcSbiSYPPi4WJm805mAAcrSkbJhdAIUB9zcdGc7wM6gucM4f4gQ",
+            "position": "FILL",
+            "role": "CAPTAIN",
+            "profileIconId": 412,
+            "level": 421,
+            "gameName": "VersatilePlayer",
+            "tagLine": "FILL",
+            "highestRank": {
+                "tierIndex": 5,
+                "tier": "EMERALD",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 0,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 165,
+                "losses": 140
+            },
+            "masteries": [
+                {
+                    "puuid": "v4p836kNXLAY2E1OSwFsOMWkUhdGcSbiSYPPi4WJm805mAAcrSkbJhdAIUB9zcdGc7wM6gucM4f4gQ",
+                    "championId": 2,
+                    "championLevel": 5,
+                    "championPoints": 33100,
+                    "lastPlayTime": 1718020800000
+                }
+            ]
+        },
+        {
+            "puuid": "-OUs-pOPCBhRR01OSwH7SQKDmChpO6dql_73T-jDjpaL-SZdyloyuQySTdckHN7AxZVDZREnT5s1Pw",
+            "position": "FILL",
+            "role": "MEMBER",
+            "profileIconId": 711,
+            "level": 115,
+            "gameName": "AdaptOrLose",
+            "tagLine": "RAND",
+            "highestRank": {
+                "tierIndex": 3,
+                "tier": "GOLD",
+                "rankIndex": 0,
+                "rank": "IV",
+                "lp": 0,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 42,
+                "losses": 48
+            },
+            "masteries": []
+        },
+        {
+            "puuid": "lHEfuifraqd3301OSwHgr-fh431VBDsZSBXGAnJImh5EIfQyvCYfeR12SFuWzuLlan4nRuD-mLxABA",
+            "position": "FILL",
+            "role": "MEMBER",
+            "profileIconId": 832,
+            "level": 198,
+            "gameName": "JackOfAllTrades",
+            "tagLine": "NONE",
+            "highestRank": null,
+            "masteries": []
+        },
+        {
+            "puuid": "8baViDp3v6495U1OSwGVFPyds8P0qUXPmsNy3mfCyIxl1GvtfdOZi8y_rbUIl5G0A6FRgT4F7vZJpA",
+            "position": "FILL",
+            "role": "MEMBER",
+            "profileIconId": 12,
+            "level": 284,
+            "gameName": "QueueFill",
+            "tagLine": "WILD",
+            "highestRank": {
+                "tierIndex": 4,
+                "tier": "PLATINUM",
+                "rankIndex": 2,
+                "rank": "II",
+                "lp": 0,
+                "queueType": "RANKED_FLEX_SR",
+                "wins": 89,
+                "losses": 75
+            },
+            "masteries": []
+        },
+        {
+            "puuid": "WJ_3wq2jFL3UqU1OSwEWdMj-FnJs3yYkjjzFLM0srfuuz2CsjondZMe_eRIJBa9K-8YTK9ZjzU8kaA",
+            "position": "FILL",
+            "role": "MEMBER",
+            "profileIconId": 55,
+            "level": 167,
+            "gameName": "AnyRoleDesignated",
+            "tagLine": "OKAY",
+            "highestRank": {
+                "tierIndex": 3,
+                "tier": "GOLD",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 0,
+                "queueType": "RANKED_SOLO_5x5",
+                "wins": 73,
+                "losses": 68
+            },
+            "masteries": []
+        }
+    ]
+}

@@ -259,6 +259,13 @@ pub fn get_stat_asset(stat: &Stat) -> Asset {
     Asset::new(AssetType::Other, name)
 }
 
+pub fn get_rooster_asset(id: u32) -> Asset {
+    Asset::new(
+        AssetType::Online(OnlineAsset::CommunityDragon),
+        format!("/game/assets/clash/roster-logos/{}/1_64.png", id),
+    )
+}
+
 #[derive(Debug, Clone)]
 pub struct Asset {
     pub asset_type: AssetType,

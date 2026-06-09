@@ -9,8 +9,8 @@ pub enum StackAlignment {
 }
 
 pub struct Stack {
-    x: u32,
-    y: u32,
+    x: i32,
+    y: i32,
     width: Option<u32>,
     height: Option<u32>,
     alignment: StackAlignment,
@@ -29,12 +29,12 @@ impl Stack {
         }
     }
 
-    pub fn x(mut self, x: u32) -> Self {
+    pub fn x(mut self, x: i32) -> Self {
         self.x = x;
         self
     }
 
-    pub fn y(mut self, y: u32) -> Self {
+    pub fn y(mut self, y: i32) -> Self {
         self.y = y;
         self
     }
@@ -76,8 +76,8 @@ impl Stack {
 
 impl Renderable for Stack {
     fn render(&self, canvas: &mut RgbaImage, fonts: &FontRegistry, offset_x: i32, offset_y: i32) {
-        let new_offset_x = offset_x + self.x as i32;
-        let new_offset_y = offset_y + self.y as i32;
+        let new_offset_x = offset_x + self.x;
+        let new_offset_y = offset_y + self.y;
 
         let (total_w, total_h) = self.size(fonts);
 

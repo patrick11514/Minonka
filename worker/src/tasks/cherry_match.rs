@@ -23,7 +23,8 @@ use crate::tasks::{
     types::{MatchMetadataInput, WorkerJob},
 };
 use crate::utils::assets::{
-    Asset, AssetType, OnlineAsset, Stat, get_item_asset, get_stat_asset, get_summoner_asset,
+    Asset, AssetType, OnlineAsset, Stat, get_background_asset, get_item_asset, get_stat_asset,
+    get_summoner_asset,
 };
 use crate::utils::locale::AppLocale;
 use crate::utils::storage::get_persistent_result;
@@ -290,8 +291,8 @@ impl RenderContext {
                         let mut sprite = Sprite::from_asset(&asset, 0, 0)
                             .await
                             .expect("Failed to read item asset")
-                            .x(item_spacing)
-                            .y(item_spacing);
+                            .x(item_spacing as i32)
+                            .y(item_spacing as i32);
                         sprite.resize_to_width(item_background.dimensions().0 - item_spacing * 2);
                         Some(sprite)
                     } else {
@@ -541,8 +542,6 @@ impl Task for CherryMatchTask {
             return Ok(TaskOutcome::Existing(result));
         }
 
-        let background = Asset::new(AssetType::Other, "background.png");
-
         let locale = AppLocale::from_str(&input.default.locale);
         let json: JsonCache = context.clone().into();
 
@@ -577,7 +576,7 @@ impl Task for CherryMatchTask {
 
         let half = (teams.len() / 2) as u32;
 
-        let canvas = MasterCanvas::from_asset(background, context.into()).await?;
+        let canvas = MasterCanvas::from_asset(get_background_asset(), context.into()).await?;
         let background_height = canvas.dimensions().1;
 
         let (left_players, right_players) = ctx

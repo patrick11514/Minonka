@@ -112,4 +112,27 @@ impl AppLocale {
             AppLocale::En => "place".to_string(),
         }
     }
+
+    pub fn lane(&self, lane: &str) -> String {
+        match self {
+            AppLocale::Cz => match lane {
+                "TOP" => "Horní".to_string(),
+                "JUNGLE" => "Džungle".to_string(),
+                "MIDDLE" => "Středová".to_string(),
+                "BOTTOM" => "Spodní".to_string(),
+                "UTILITY" => "Podpora".to_string(),
+                "FILL" => "Výplň".to_string(),
+                _ => lane.to_string(),
+            },
+            AppLocale::En => match lane {
+                "TOP" => "Top".to_string(),
+                "JUNGLE" => "Jungle".to_string(),
+                "MIDDLE" => "Mid".to_string(),
+                "BOTTOM" => "Bot".to_string(),
+                "UTILITY" => "Support".to_string(),
+                "FILL" => "Fill".to_string(),
+                _ => lane.to_string(),
+            },
+        }
+    }
 }

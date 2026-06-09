@@ -137,3 +137,39 @@ pub fn format_with_spaces(n: u32) -> String {
 
     result
 }
+
+pub enum FormatNumber {
+    Thousands,
+    Millions,
+    Highest,
+}
+
+/// Format number to specified format (e.g., 1500 -> 1.5K, 2000000 -> 2M)
+/// Or if selected format is `Highest`, it will format to the highest possible (e.g., 1500 -> 1.5K, 2000000 -> 2M)
+pub fn format_number(n: u32, format: FormatNumber) -> String {
+    match format {
+        FormatNumber::Thousands => {
+            if n >= 1000 {
+                format!("{:.1}K", n as f64 / 1000.0)
+            } else {
+                n.to_string()
+            }
+        }
+        FormatNumber::Millions => {
+            if n >= 1_000_000 {
+                format!("{:.1}M", n as f64 / 1_000_000.0)
+            } else {
+                n.to_string()
+            }
+        }
+        FormatNumber::Highest => {
+            if n >= 1_000_000 {
+                format!("{:.1}M", n as f64 / 1_000_000.0)
+            } else if n >= 1000 {
+                format!("{:.1}K", n as f64 / 1000.0)
+            } else {
+                n.to_string()
+            }
+        }
+    }
+}
