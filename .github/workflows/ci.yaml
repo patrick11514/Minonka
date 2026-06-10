@@ -128,6 +128,9 @@ jobs:
                     --exclude "assets/lanes/" \
                     --exclude "assets/ranks/" \
                     --exclude "worker/target/"
+            - name: Stop Worker
+              run: |
+                  sudo systemctl stop minonka_worker
             - name: Copy Rust binary
               run: |
                   mkdir -p /opt/apps/Minonka/worker/target/release
@@ -139,4 +142,4 @@ jobs:
                   pnpm run migrate
                   pnpm run start:register
                   sudo systemctl restart minonka
-                  sudo systemctl restart minonka_worker
+                  sudo systemctl start minonka_worker
