@@ -47,6 +47,11 @@ jobs:
                   rustup update stable
                   rustup default stable
 
+            - name: Rust Cache
+              uses: Swatinem/rust-cache@v2
+              with:
+                  workspaces: worker
+
             - name: Cache assets
               uses: actions/cache@v3
               with:
@@ -128,6 +133,9 @@ jobs:
                     --exclude "assets/lanes/" \
                     --exclude "assets/ranks/" \
                     --exclude "worker/target/"
+            - name: Stop Worker
+              run: |
+                  sudo systemctl stop minonka_worker
             - name: Copy Rust binary
               run: |
                   mkdir -p /opt/apps/Minonka/worker/target/release
@@ -139,4 +147,4 @@ jobs:
                   pnpm run migrate
                   pnpm run start:register
                   sudo systemctl restart minonka
-                  sudo systemctl restart minonka_worker
+                  sudo systemctl start minonka_worker

@@ -388,6 +388,12 @@ export const queues = [
         notes: '16 player lobby'
     },
     {
+        queueId: 1750,
+        map: 'Rings of Wrath',
+        description: 'Arena',
+        notes: '18 player lobby'
+    },
+    {
         queueId: 1810,
         map: 'Swarm',
         description: 'Swarm Mode Games',

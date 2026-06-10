@@ -187,6 +187,7 @@ export default template.parse({
         1400: 'Ultimate Spellbook',
         1700: 'Arena',
         1710: 'Arena (4v4v4v4)',
+        1750: 'Arena (3v3v3v3v3v3)',
         1810: 'Swarm',
         1820: 'Swarm',
         1830: 'Swarm',
