@@ -1,212 +1,232 @@
-#TODO REWRITE FOR RUST PART
-INFO ABOUT TESTING, HGOW TO RUN TESTS
-
-cargo watch -w src -x "test test_match_draft --features save -- --no-capture"
-
-watchign images:
-sxiv image.pmg
-
-anoynnizing files:
-node anonymize.js
-
-formatting:
-pnpm format
-
-and then crarting the test files
-
-etc...
-
-TODO TODO
-
 # Minonka
 
-Minonka is discordbot, which provides some **League of Legends** stats on discord primarly via images.
-It is written in discord.js and uses [Riot API](https://developer.riotgames.com/) to get the data _straight from source_.
+Minonka is a Discord bot that provides comprehensive **League of Legends** statistics directly on Discord, primarily rendered as beautiful, rich images.
 
-## Content
+---
 
-- [Features](#features)
-- [Installation](#installation)
-- [Env file](#env)
+## Architecture
 
-## Features
+Minonka utilizes a hybrid **TypeScript + Rust** architecture:
 
-Link the riot account with discord account.
+- **Discord Bot (TypeScript)**: Handles user interaction, slash command routing, event listeners, cron jobs, and database interactions (via Kysely and MySQL).
+- **Image Generation Worker (Rust)**: Offloads the heavy image rendering operations from the single-threaded Node.js environment to a high-performance Rust service.
+- **Communication**: The bot and worker communicate over WebSockets (configured via `WEBSOCKET_HOST` and `WEBSOCKET_PORT`).
 
-- /link \<riot-username\> \<riot-tag\> \<region\> - Links riot account with discord account
-- /links - Show your linked accounts, and by selecting one, you unlink it
-  ![linking process](https://upload.patrick115.eu/screenshot/f3bd2968e9.png)
+---
 
-Command, which shows some stats have 3 sub-commands:
+## Installation & Setup
 
-- me - if you have linked one account, it will immidietly show result. If you have more accounts, it will prompt you for selection.
-- other - you will need to provide \<riot-username\> \<riot-tag\> and \<region\>
-- mention - mention someone on discord and then it will fork same as **me**
-
-Summoner command will show your summoner profile, similarly as you see it in your profile in League Client.
-![summoner profile](https://upload.patrick115.eu/screenshot/c41d641e06.png)
-
-- /summoner me - shows your summoner profile
-- /summoner other \<riot-username\> \<riot-tag\> \<region\> - shows summoner profile of provided account
-- /summoner mention \<mentoin\> - shows summoner profile of mentioned user
-
-History command will show your game history. By default it show last 6 games, but you can specify game count 1-6, offset and queue type. Then the result message will have 3 buttons:
-
-- previous - move offset by count towards present
-- reload + info - shows currently showed matches range (eg. 0-6) and will reload result for current offset + count. Usefull, when you play game(s) and want to reload history.
-- next - move offset by count towards past
-
-![history](https://upload.patrick115.eu/screenshot/3836975a86.png)
-![history moved](https://upload.patrick115.eu/screenshot/ef316dead1.png)
-
-- /history me [\<count\>] [\<offset\>] [\<queue\>] - shows your game history
-- /history other \<riot-username\> \<riot-tag\> \<region\> [\<count\>] [\<offset\>] [\<queue\>] - shows game history of provided account
-- /history mention \<mention\> [\<count\>] [\<offset\>] [\<queue\>] - shows game history of mentioned user
-
-Clash command will show information about upcomming clash tournaments. Also you can scout teams, by searching by member of team, or team id, if you used command previously.
-
-![clash schedule](https://upload.patrick115.eu/screenshot/0469e98338.png)
-![clash team](https://upload.patrick115.eu/screenshot/Sn%C3%ADmek%20obrazovky%202025-04-18%20122319.png)
-
-- /clash schedule \<region\> - shows scheduled clash tournaments for specific region
-- /clash team id \<id\> \<region\> - shows team based of their id (its showed /clash team NOTE: the id can change, so don't always depends on it. Usually before the team enter clash its UUID and after team star playing is usually number)
-- /clash team me - shows team in which are you
-- /clash team other - \<riot-username\> \<riot-tag\> \<region\> - shows team in which are user joined
-- /clash team mention \<mention\> - shows team in which mentioned user is joined
-
-Master command will show you information about user's masteries.
-![mastery command first](https://upload.patrick115.eu/screenshot/73db893067.png)
-![mastery command select](https://upload.patrick115.eu/screenshot/22dbf9e0e8.png)
-![mastery command listing](https://upload.patrick115.eu/screenshot/425cc310ea.png)
-
-- /mastery me - shows select for your masteries
-- /mastery other \<riot-username\> \<riot-tag\> \<region\> - shows select for provided account
-- /mastery mention \<mention\> - shows select for mentioned user
-
-## Installation
-
-Clone repo:
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/patrick11514/Minonka.git
+cd Minonka
 ```
 
-Install node modules
+### 2. Install Node.js dependencies
 
 ```bash
-npm i  # npm
-pnpm i # pnpm
+pnpm install
+# or: npm install
 ```
 
-Create .env file
+### 3. Configure the environment
+
+Copy the example environment file and fill in your details (API keys, database credentials, WebSocket configuration, etc.):
 
 ```bash
 cp .env.example .env
 ```
 
-and fill it with your data
+### 4. Download Assets & Setup Fonts
 
-Install assets
+Minonka requires League of Legends assets (Data Dragon, banners, rank emblems, lane icons, fonts) to render cards:
 
 ```bash
 cd assets
-./download.sh # download all assets (ddragon, banners...)
-cd fonts
-./setupFonts.sh # will put fonts into your lcocal fonts directory
+./download.sh       # Downloads DDragon assets, banners, ranks, lanes, etc.
+cd ../..
 ```
 
-Build bot
+### 5. Build and Migrate
+
+Build the TypeScript bot and migrate the database:
 
 ```bash
-npm run build # npm
-pnpm build    # pnpm
+pnpm build
+pnpm migrate
 ```
 
-Migrate database
+---
+
+## Running the Services
+
+### Start Bot
 
 ```bash
-npm run migrate # npm
-pnpm migrate    # pnpm
+pnpm start
 ```
 
-Run bot
+### Start Worker
+
+The worker can be compiled and run via Cargo:
 
 ```bash
-npm start  # npm
-pnpm start # pnpm
+cd worker
+cargo run --release --bin main
 ```
 
-Because generating images is quite heavy operation, for single process NodeApp, the images are distributed across `Workers`. Worker can be run using:
+_Note: Ensure the bot is running or the WebSocket server port is open so the worker can connect._
+
+---
+
+## Testing & Development
+
+### 1. Formatting & Linting
+
+Format the TypeScript code:
 
 ```bash
-npm run start:worker # npm
-pnpm start:worker    # pnpm
+pnpm format
 ```
 
-### Worker Modes
-
-Workers can run in two modes:
-
-**Local Mode (default)**: Workers run on the same server and share the filesystem with the main application.
-
-**Remote Mode**: Workers can run on separate servers and communicate via websocket with base64-encoded image transfer.
-
-To run a worker in remote mode:
+Check TypeScript linting:
 
 ```bash
-npm run start:worker:remote # npm
-pnpm start:worker:remote    # pnpm
+pnpm lint
 ```
 
-For development:
+### 2. Running Worker Tests
+
+To run the Rust worker unit and integration tests:
 
 ```bash
-# Local worker development
-npm run dev:worker # npm
-pnpm dev:worker    # pnpm
-
-# Remote worker development
-npm run dev:worker:remote # npm
-pnpm dev:worker:remote    # pnpm
+pnpm worker:test
 ```
 
-Remote workers automatically handle:
+### 3. Visual Layout Regression Testing
 
-- Base64 encoding of generated images
-- Websocket communication with the main server
-- Riot game data updates (version checking)
-- File persistence operations
+The worker uses snapshot testing to ensure that changes to drawing logic do not break the visual layout.
 
-The bot logs all info into logs folder, the worker logs can be separated by setting `INSTANCE_ID` environment variable, so it's better to run worker with their specific id, eg.:
+- **Reference Baselines**: Pre-rendered images are stored under `snapshots/` directories in the test folders.
+- **Capturing Deviations**: If a test fails due to visual mismatch, a `.actual.png` (what the code rendered) and a `.diff.png` (mismatched pixels highlighted in pink) are created.
+- **Watch and Save Mode**: While developing or tweaking canvas positioning, you can watch specific tests and auto-save the generated image:
+
+    ```bash
+    # Inside the worker directory:
+    cargo watch -w src -x "test test_match_draft --features save -- --no-capture"
+    ```
+
+    _(Tip: Use a fast image viewer like `sxiv` to watch the generated PNG update in real-time.)_
+
+- **Interactive Snapshot Inspection**: To review and bless visual changes, run the inspection CLI tool:
+    ```bash
+    pnpm worker:inspect
+    ```
+    This will scan for visual differences and prompt you interactively:
+    - `[a]ccept`: Overwrites the baseline reference image with the new actual output.
+    - `[r]eject`: Deletes the temporary actual/diff images and rejects the change.
+    - `[s]kip`: Skips the item to decide later.
+
+### 4. Anonymizing Fixtures
+
+When creating new test data fixtures from real Riot API matches, run the anonymizer to strip player-sensitive PUUIDs and replace them with generated signed PUUIDs:
 
 ```bash
-INSTANCE_ID=1 npm run start:worker # npm
-INSTANCE_ID=1 pnpm start:worker    # pnpm
+node worker/test_files/anonymize.js [optional_directory_path]
 ```
 
-## Env
+_(By default, this walks the `worker/test_files/` directory and anonymizes all `.json` files in place)._
+
+---
+
+## Slash Commands
+
+Minonka provides a set of user commands. Stats commands support three subcommands:
+
+- `me`: Runs the command for your linked account.
+- `other <riot-username> <riot-tag> <region>`: Runs for a specified Riot account.
+- `mention <@discord-user>`: Runs for the account linked to the mentioned user.
+
+### Account Linking
+
+- `/link <riot-username> <riot-tag> <region>` - Link a Riot account to your Discord profile.
+- `/links` - Show and manage your linked accounts.
+  ![linking process](https://upload.patrick115.eu/raw/images/ad16ede8-f45f-4b26-bd70-ce15021f13af.png)
+
+### Summoner Profile
+
+- `/summoner [me/other/mention]` - Show summoner level, profile icon, and customized champion crest background.
+  ![summoner profile](worker/test_files/summoner_rich.png)
+
+### Rank Profile
+
+- `/rank [me/other/mention]` - Shows ranked stats, tier, LP, and win/loss ratio for Solo/Duo and Flex queues.
+  ![rank profile](worker/test_files/rank_multiple.png)
+
+### Match History
+
+- `/history [me/other/mention] [count] [offset] [queue]` - Fetch and display game summaries (default shows last 6 matches). The response features navigation buttons to scroll through past matches or reload.
+  ![history](worker/test_files/match_solo_gain.png)
+
+### Live Game Spectator
+
+- `/spectator [me/other/mention]` - Check details of a player's active live game, including participants, ranks, banned champions, queue type, and map.
+  ![spectator](worker/test_files/spectator.png)
+
+### Clash Teams & Schedules
+
+- `/clash schedule <region>` - Displays upcoming Clash tournaments.
+- `/clash team [me/other/mention/id]` - View team members, their tiers, and lanes.
+  ![clash team](worker/test_files/team_rich.png)
+
+### Mastery Stats
+
+- `/mastery [me/other/mention]` - Shows top champion masteries and points.
+  ![mastery command first](https://upload.patrick115.eu/raw/images/7337f4a0-9f42-4fd7-81ab-7566dcbba335.png)
+
+### User Settings
+
+- `/settings language set <language>` - Change bot display language (choices: English, Czech).
+- `/settings language reset` - Revert language settings back to Discord client default.
+- `/settings default history [queue]` - Configure default queue filters for your history commands.
+- `/settings default reset <command>` - Reset presets for a command.
+
+### Help Guide
+
+- `/help` - Show help details, description, usage, and subcommands.
+
+---
+
+## Configuration (.env)
+
+Below is an example of configurations in `.env` file:
 
 ```env
-#database connection
-DATABASE_IP=10.10.10.223
+# Database Connection
+DATABASE_IP=127.0.0.1
 DATABASE_PORT=3306
-DATABASE_USER=superclovek
-DATABASE_PASSWORD=tajnyheslo123456
-DATABASE_NAME=db
-#database url don't need to be filled, because its used only using genDatabaseSchema script while developing
-DATABASE_URL=mysql://superclovek:tajnyheslo123456@10.10.10.223:3306/db
-#riotgames
-RIOT_API_KEY=RGAPI-123
-#discordjs
-CLIENT_ID=651515615616511645156
-CLIENT_TOKEN=4561651651516556156165
-#WORKER config
-#this is websocket, via which the worker communicates with main process
+DATABASE_USER=minonka
+DATABASE_PASSWORD=your_secure_password
+DATABASE_NAME=minonka_db
+DATABASE_URL=mysql://minonka:your_secure_password@127.0.0.1:3306/minonka_db
+
+# Riot API Key
+RIOT_API_KEY=RGAPI-XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+
+# Discord Credentials
+CLIENT_ID=123456789012345678
+CLIENT_TOKEN=your_discord_bot_token
+
+# WebSocket Configuration
 WEBSOCKET_PORT=8080
-WEBSOCKET_HOST=ws://localhost # Use wss://hostname for secure connections in production
-CACHE_PATH=/tmp # this is the cache path, it is ment to be temporarily, so you can use /tmp if mounted in memory, or for example /dev/shm instead
-PERSISTANT_CACHE_PATH=cache # this is persistant cache path, it is ment to be used for storing images, which will be used multiple times, eg. match history images, because its unlike, that data from past match will be modified
-#Emoji settings
+WEBSOCKET_HOST=ws://localhost
+
+# Cache Directories
+CACHE_PATH=/tmp
+PERSISTANT_CACHE_PATH=cache
+
+# Discord Emoji Guild IDs (for displaying ingame emojis)
 EMOJI_GUILD_CHAMPIONS=955054979192881162,955053883103780894
 EMOJI_GUILD_ITEMS=973334813467611146
 EMOJI_GUILD_MISC=967816629557817354
