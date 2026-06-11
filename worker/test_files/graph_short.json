@@ -1,0 +1,32 @@
+{
+    "puuid": "mock-puuid-graph-short",
+    "region": "EUN1",
+    "locale": "cs",
+    "level": 150,
+    "gameName": "ShortHistory",
+    "tagLine": "EUNE",
+    "profileIconId": 500,
+    "queue": "RANKED_SOLO_5x5",
+    "history": [
+        {"lp": 50, "rank": "II", "tier": "SILVER", "time": "11.06. 10:00"},
+        {"lp": 68, "rank": "II", "tier": "SILVER", "time": "11.06. 10:30"},
+        {"lp": 85, "rank": "II", "tier": "SILVER", "time": "11.06. 11:00"},
+        {"lp": 70, "rank": "II", "tier": "SILVER", "time": "11.06. 11:30"},
+        {"lp": 90, "rank": "II", "tier": "SILVER", "time": "11.06. 12:00"},
+        {"lp": 5, "rank": "I", "tier": "SILVER", "time": "11.06. 12:30"},
+        {"lp": 25, "rank": "I", "tier": "SILVER", "time": "11.06. 13:00"},
+        {"lp": 10, "rank": "I", "tier": "SILVER", "time": "11.06. 13:30"},
+        {"lp": 0, "rank": "I", "tier": "SILVER", "time": "11.06. 14:00"},
+        {"lp": 20, "rank": "I", "tier": "SILVER", "time": "11.06. 14:30"},
+        {"lp": 45, "rank": "I", "tier": "SILVER", "time": "11.06. 15:00"},
+        {"lp": 68, "rank": "I", "tier": "SILVER", "time": "11.06. 15:30"},
+        {"lp": 89, "rank": "I", "tier": "SILVER", "time": "11.06. 16:00"},
+        {"lp": 72, "rank": "I", "tier": "SILVER", "time": "11.06. 16:30"},
+        {"lp": 95, "rank": "I", "tier": "SILVER", "time": "11.06. 17:00"},
+        {"lp": 10, "rank": "IV", "tier": "GOLD", "time": "11.06. 17:30"},
+        {"lp": 30, "rank": "IV", "tier": "GOLD", "time": "11.06. 18:00"},
+        {"lp": 15, "rank": "IV", "tier": "GOLD", "time": "11.06. 18:30"},
+        {"lp": 0, "rank": "IV", "tier": "GOLD", "time": "11.06. 19:00"},
+        {"lp": 20, "rank": "IV", "tier": "GOLD", "time": "11.06. 19:30"}
+    ]
+}

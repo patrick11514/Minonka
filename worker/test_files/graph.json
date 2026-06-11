@@ -1,0 +1,25 @@
+{
+    "puuid": "mock-puuid-graph-testing",
+    "region": "EUN1",
+    "locale": "cs",
+    "level": 420,
+    "gameName": "MinonkaTester",
+    "tagLine": "CZ",
+    "profileIconId": 29,
+    "queue": "RANKED_SOLO_5x5",
+    "history": [
+        {"lp": 20, "rank": "I", "tier": "GOLD", "time": "11.06. 20:00"},
+        {"lp": 40, "rank": "I", "tier": "GOLD", "time": "11.06. 20:15"},
+        {"lp": 60, "rank": "I", "tier": "GOLD", "time": "11.06. 20:30"},
+        {"lp": 90, "rank": "I", "tier": "GOLD", "time": "11.06. 20:45"},
+        {"lp": 10, "rank": "IV", "tier": "PLATINUM", "time": "11.06. 21:00"},
+        {"lp": 95, "rank": "I", "tier": "GOLD", "time": "11.06. 21:15"},
+        {"lp": 18, "rank": "IV", "tier": "PLATINUM", "time": "11.06. 21:30"},
+        {"lp": 50, "rank": "IV", "tier": "PLATINUM", "time": "11.06. 21:45"},
+        {"lp": 40, "rank": "IV", "tier": "PLATINUM", "time": "11.06. 22:00"},
+        {"lp": 90, "rank": "IV", "tier": "PLATINUM", "time": "11.06. 22:15"},
+        {"lp": 2, "rank": "III", "tier": "PLATINUM", "time": "11.06. 22:30"},
+        {"lp": 95, "rank": "IV", "tier": "PLATINUM", "time": "11.06. 22:45"},
+        {"lp": 10, "rank": "III", "tier": "PLATINUM", "time": "11.06. 23:00"}
+    ]
+}

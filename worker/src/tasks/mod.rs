@@ -7,6 +7,7 @@ pub mod summoner;
 pub mod task;
 pub mod team;
 pub mod types;
+pub mod graph;
 
 use crate::context::AppContext;
 use tracing::error;
@@ -20,6 +21,7 @@ use self::summoner::SummonerTask;
 use self::task::Task;
 use self::team::TeamTask;
 use self::types::FileResult;
+use self::graph::GraphTask;
 
 #[instrument(skip(payload, context), fields(job_name = %job_name), err)]
 pub async fn dispatch(
@@ -34,6 +36,7 @@ pub async fn dispatch(
         SpectatorTask::NAME => SpectatorTask::run_from_json(payload, context).await,
         SummonerTask::NAME => SummonerTask::run_from_json(payload, context).await,
         TeamTask::NAME => TeamTask::run_from_json(payload, context).await,
+        GraphTask::NAME => GraphTask::run_from_json(payload, context).await,
         _ => Err(error::TaskError::UnknownJob(job_name.to_string())),
     };
 

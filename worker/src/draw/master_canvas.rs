@@ -9,7 +9,7 @@ use std::io::Cursor;
 pub struct MasterCanvas {
     pub background: RgbaImage,
     pub container: Container,
-    fonts: FontRegistry,
+    pub fonts: FontRegistry,
 }
 
 impl MasterCanvas {
