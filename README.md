@@ -164,6 +164,11 @@ Minonka provides a set of user commands. Stats commands support three subcommand
 - `/rank [me/other/mention]` - Shows ranked stats, tier, LP, and win/loss ratio for Solo/Duo and Flex queues.
   ![rank profile](worker/test_files/rank_multiple.png)
 
+### LP History Graph
+
+- `/graph [me/other/mention] <queue>` - Generates a visual line graph tracking the last 50 LP changes in either Solo/Duo or Flex queue.
+  ![lp history graph](worker/src/tasks/snapshots/tasks__graph__test__test_graph.png)
+
 ### Match History
 
 - `/history [me/other/mention] [count] [offset] [queue]` - Fetch and display game summaries (default shows last 6 matches). The response features navigation buttons to scroll through past matches or reload.
