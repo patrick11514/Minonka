@@ -122,7 +122,8 @@ impl RichLabel {
         bold: bool,
         size: u32,
     ) -> Self {
-        self.spans.push(TextSpan::new(text).color(color).bold(bold).size(size));
+        self.spans
+            .push(TextSpan::new(text).color(color).bold(bold).size(size));
         self
     }
 }
@@ -152,7 +153,9 @@ impl Renderable for RichLabel {
             };
 
             // Draw the span text
-            draw_text_mut(canvas, rgba_color, current_x, final_y, scale, font, &span.text);
+            draw_text_mut(
+                canvas, rgba_color, current_x, final_y, scale, font, &span.text,
+            );
 
             // Advance cursor
             let (w, _h) = text_size(scale, font, &span.text);

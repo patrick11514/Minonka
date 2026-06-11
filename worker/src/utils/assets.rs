@@ -44,7 +44,9 @@ impl Display for AssetType {
 fn get_online_asset_url(name: &str, asset: &OnlineAsset) -> String {
     let clean_name = name.strip_prefix('/').unwrap_or(name);
     match asset {
-        OnlineAsset::CommunityDragon => format!("https://raw.communitydragon.org/latest/{}", clean_name),
+        OnlineAsset::CommunityDragon => {
+            format!("https://raw.communitydragon.org/latest/{}", clean_name)
+        }
     }
 }
 
@@ -104,12 +106,17 @@ async fn get_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<PathBuf
     let tmp_path = path.with_extension(format!("tmp-{}", crate::utils::unique_id()));
     if let Err(err) = tokio::fs::write(&tmp_path, data).await {
         let _ = tokio::fs::remove_file(&tmp_path).await;
-        return Err(TaskError::Io(err).context("write online asset tmp", tmp_path.to_string_lossy().to_string()));
+        return Err(TaskError::Io(err).context(
+            "write online asset tmp",
+            tmp_path.to_string_lossy().to_string(),
+        ));
     }
 
     if let Err(err) = tokio::fs::rename(&tmp_path, &path).await {
         let _ = tokio::fs::remove_file(&tmp_path).await;
-        return Err(TaskError::Io(err).context("rename online asset", path.to_string_lossy().to_string()));
+        return Err(
+            TaskError::Io(err).context("rename online asset", path.to_string_lossy().to_string())
+        );
     }
 
     Ok(path)

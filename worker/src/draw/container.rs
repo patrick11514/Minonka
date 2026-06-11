@@ -505,17 +505,19 @@ impl Renderable for Container {
             let num_line_children = line.children.len();
             let total_children_w: u32 = line.children.iter().map(|c| c.size(fonts).0).sum();
 
-            let current_gap = if matches!(self.justify, JustifyContent::SpaceBetween) && num_line_children > 1 {
-                (inner_w.saturating_sub(total_children_w)) / (num_line_children as u32 - 1)
-            } else {
-                self.gap
-            };
+            let current_gap =
+                if matches!(self.justify, JustifyContent::SpaceBetween) && num_line_children > 1 {
+                    (inner_w.saturating_sub(total_children_w)) / (num_line_children as u32 - 1)
+                } else {
+                    self.gap
+                };
 
-            let line_w = if matches!(self.justify, JustifyContent::SpaceBetween) && num_line_children > 1 {
-                inner_w
-            } else {
-                line.width
-            };
+            let line_w =
+                if matches!(self.justify, JustifyContent::SpaceBetween) && num_line_children > 1 {
+                    inner_w
+                } else {
+                    line.width
+                };
 
             let mut item_cursor_x = if is_reverse {
                 let mut x = start_x + inner_w as i32;

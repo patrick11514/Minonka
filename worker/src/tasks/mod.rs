@@ -1,5 +1,6 @@
 pub mod cherry_match;
 pub mod error;
+pub mod graph;
 pub mod match_task;
 pub mod rank;
 pub mod spectator;
@@ -7,13 +8,13 @@ pub mod summoner;
 pub mod task;
 pub mod team;
 pub mod types;
-pub mod graph;
 
 use crate::context::AppContext;
 use tracing::error;
 use tracing::instrument;
 
 use self::cherry_match::CherryMatchTask;
+use self::graph::GraphTask;
 use self::match_task::MatchTask;
 use self::rank::RankTask;
 use self::spectator::SpectatorTask;
@@ -21,7 +22,6 @@ use self::summoner::SummonerTask;
 use self::task::Task;
 use self::team::TeamTask;
 use self::types::FileResult;
-use self::graph::GraphTask;
 
 #[instrument(skip(payload, context), fields(job_name = %job_name), err)]
 pub async fn dispatch(

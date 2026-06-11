@@ -8,25 +8,125 @@
     "profileIconId": 29,
     "queue": "RANKED_SOLO_5x5",
     "history": [
-        {"lp": 10, "rank": "IV", "tier": "EMERALD", "time": "11.06. 01:00"},
-        {"lp": 32, "rank": "IV", "tier": "EMERALD", "time": "11.06. 02:00"},
-        {"lp": 12, "rank": "IV", "tier": "EMERALD", "time": "11.06. 03:00"},
-        {"lp": 0, "rank": "IV", "tier": "EMERALD", "time": "11.06. 04:00"},
-        {"lp": 21, "rank": "IV", "tier": "EMERALD", "time": "11.06. 05:00"},
-        {"lp": 43, "rank": "IV", "tier": "EMERALD", "time": "11.06. 06:00"},
-        {"lp": 65, "rank": "IV", "tier": "EMERALD", "time": "11.06. 07:00"},
-        {"lp": 45, "rank": "IV", "tier": "EMERALD", "time": "11.06. 08:00"},
-        {"lp": 25, "rank": "IV", "tier": "EMERALD", "time": "11.06. 09:00"},
-        {"lp": 5, "rank": "IV", "tier": "EMERALD", "time": "11.06.10:00"},
-        {"lp": 25, "rank": "IV", "tier": "EMERALD", "time": "11.06. 11:00"},
-        {"lp": 47, "rank": "IV", "tier": "EMERALD", "time": "11.06. 12:00"},
-        {"lp": 69, "rank": "IV", "tier": "EMERALD", "time": "11.06. 13:00"},
-        {"lp": 51, "rank": "IV", "tier": "EMERALD", "time": "11.06. 14:00"},
-        {"lp": 73, "rank": "IV", "tier": "EMERALD", "time": "11.06. 15:00"},
-        {"lp": 95, "rank": "IV", "tier": "EMERALD", "time": "11.06. 16:00"},
-        {"lp": 12, "rank": "III", "tier": "EMERALD", "time": "11.06. 17:00"},
-        {"lp": 0, "rank": "III", "tier": "EMERALD", "time": "11.06. 18:00"},
-        {"lp": 80, "rank": "IV", "tier": "EMERALD", "time": "11.06. 19:00"},
-        {"lp": 60, "rank": "IV", "tier": "EMERALD", "time": "11.06. 20:00"}
+        {
+            "lp": 10,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 01:00"
+        },
+        {
+            "lp": 32,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 02:00"
+        },
+        {
+            "lp": 12,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 03:00"
+        },
+        {
+            "lp": 0,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 04:00"
+        },
+        {
+            "lp": 21,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 05:00"
+        },
+        {
+            "lp": 43,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 06:00"
+        },
+        {
+            "lp": 65,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 07:00"
+        },
+        {
+            "lp": 45,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 08:00"
+        },
+        {
+            "lp": 25,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 09:00"
+        },
+        {
+            "lp": 5,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06.10:00"
+        },
+        {
+            "lp": 25,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 11:00"
+        },
+        {
+            "lp": 47,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 12:00"
+        },
+        {
+            "lp": 69,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 13:00"
+        },
+        {
+            "lp": 51,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 14:00"
+        },
+        {
+            "lp": 73,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 15:00"
+        },
+        {
+            "lp": 95,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 16:00"
+        },
+        {
+            "lp": 12,
+            "rank": "III",
+            "tier": "EMERALD",
+            "time": "11.06. 17:00"
+        },
+        {
+            "lp": 0,
+            "rank": "III",
+            "tier": "EMERALD",
+            "time": "11.06. 18:00"
+        },
+        {
+            "lp": 80,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 19:00"
+        },
+        {
+            "lp": 60,
+            "rank": "IV",
+            "tier": "EMERALD",
+            "time": "11.06. 20:00"
+        }
     ]
 }
