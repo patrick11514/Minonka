@@ -211,6 +211,11 @@ export default o({
         generatingImage: _,
         sentToChannel: _
     }),
+    graph: o({
+        noRank: _,
+        generatingImage: _,
+        sentToChannel: _
+    }),
     settings: o({
         invalid_command: _,
         unknown_queue: _,

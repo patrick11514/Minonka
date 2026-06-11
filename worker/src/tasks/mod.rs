@@ -1,5 +1,6 @@
 pub mod cherry_match;
 pub mod error;
+pub mod graph;
 pub mod match_task;
 pub mod rank;
 pub mod spectator;
@@ -13,6 +14,7 @@ use tracing::error;
 use tracing::instrument;
 
 use self::cherry_match::CherryMatchTask;
+use self::graph::GraphTask;
 use self::match_task::MatchTask;
 use self::rank::RankTask;
 use self::spectator::SpectatorTask;
@@ -34,6 +36,7 @@ pub async fn dispatch(
         SpectatorTask::NAME => SpectatorTask::run_from_json(payload, context).await,
         SummonerTask::NAME => SummonerTask::run_from_json(payload, context).await,
         TeamTask::NAME => TeamTask::run_from_json(payload, context).await,
+        GraphTask::NAME => GraphTask::run_from_json(payload, context).await,
         _ => Err(error::TaskError::UnknownJob(job_name.to_string())),
     };
 

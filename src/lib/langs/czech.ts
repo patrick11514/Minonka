@@ -245,6 +245,11 @@ export default template.parse({
         generatingImage: 'Generuji summoner obrázek...',
         sentToChannel: 'Odesláno do kanálu'
     },
+    graph: {
+        noRank: 'Tento hráč nemá v této frontě žádný rank',
+        generatingImage: 'Generuji graf...',
+        sentToChannel: 'Odesláno do kanálu'
+    },
     settings: {
         invalid_command: 'Neplatný příkaz nastavení. Zkuste to prosím znovu.',
         unknown_queue: 'Neznámá fronta',

@@ -244,6 +244,11 @@ export default template.parse({
         generatingImage: 'Generating summoner image...',
         sentToChannel: 'Sent to channel'
     },
+    graph: {
+        noRank: 'This player does not have any rank in this queue',
+        generatingImage: 'Generating graph image...',
+        sentToChannel: 'Sent to channel'
+    },
     settings: {
         invalid_command: 'Invalid settings command. Please try again.',
         unknown_queue: 'Unknown Queue',

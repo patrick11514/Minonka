@@ -6,6 +6,7 @@ import { RankTaskInput } from '$/types/worker/RankTaskInput';
 import { SummonerTaskInput } from '$/types/worker/SummonerTaskInput';
 import { TeamTaskInput } from '$/types/worker/TeamTaskInput';
 import { SpectatorTaskInput } from '$/types/worker/SpectatorTaskInput';
+import { GraphTaskInput } from '$/types/worker/GraphTaskInput';
 import assert from 'node:assert';
 import crypto from 'node:crypto';
 import { WebSocket, WebSocketServer } from 'ws';
@@ -27,6 +28,7 @@ type Jobs = {
     cherryMatch: CherryMatchTaskInput;
     team: TeamTaskInput;
     spectator: SpectatorTaskInput;
+    graph: GraphTaskInput;
 };
 
 const l = new Logger('WorkerServer', 'magenta');
