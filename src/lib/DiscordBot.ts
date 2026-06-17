@@ -331,20 +331,17 @@ export class DiscordBot extends EventEmitter<Events> {
         }
 
         // --- Final formatted message ---
-        let formatted = `## Hey, some error occurred!
+        let header = `## Hey, some error occurred!
 **Time:** ${new Date().toLocaleString()}
 **Interaction:** ${extendedInfo}`;
         if (interactionOrContext instanceof BaseInteraction) {
-            formatted += `
+            header += `
 **Server:** ${interactionOrContext.guild?.name ?? 'DM'} (${interactionOrContext.guildId ?? 'N/A'})
 **Executor:** <@${interactionOrContext.user.id}> (${interactionOrContext.user.id})`;
         }
-        formatted += `
 
-\`\`\`js
-${errName}: ${errMessage}
-${stack}
-\`\`\``;
+        const details = `${errName}: ${errMessage}\n${stack}`;
+        const formatted = `${header}\n\n\`\`\`js\n${details}\n\`\`\``;
 
         /* eslint-disable no-console */
         // Log original error details to console as a fallback
@@ -360,7 +357,17 @@ ${stack}
                 );
                 return;
             }
-            await channel.send(formatted);
+
+            if (formatted.length <= 2000) {
+                await channel.send(formatted);
+            } else {
+                await channel.send(header);
+                const MAX_CHUNK_SIZE = 1900;
+                for (let i = 0; i < details.length; i += MAX_CHUNK_SIZE) {
+                    const chunk = details.substring(i, i + MAX_CHUNK_SIZE);
+                    await channel.send(`\`\`\`js\n${chunk}\n\`\`\``);
+                }
+            }
         } catch (e) {
             console.log('Failed to report error to channel:', e);
         }
