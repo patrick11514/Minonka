@@ -62,7 +62,7 @@ pub struct SpectatorTaskInput {
     #[serde(flatten)]
     pub default: DefaultParametersInput,
     pub queue_name: String,
-    pub game_length: u32,
+    pub game_length: i32,
     pub map_name: String,
     pub participants: Vec<SpectatorParticipantInput>,
     pub banned_champions: Vec<SpectatorBannedChampionInput>,
@@ -298,9 +298,16 @@ impl Task for SpectatorTask {
                                     .child(left_bans),
                             )
                             .child(
-                                Label::new(format_duration(input.game_length))
-                                    .size(80)
-                                    .bold(),
+                                if input.game_length <= -145 {
+                                    Label::new(render_context.locale.loading_game())
+                                        .size(80)
+                                        .bold()
+                                } else {
+                                    let adjusted_length = (input.game_length + 145) as u32;
+                                    Label::new(format_duration(adjusted_length))
+                                        .size(80)
+                                        .bold()
+                                }
                             )
                             .child(
                                 Container::new()

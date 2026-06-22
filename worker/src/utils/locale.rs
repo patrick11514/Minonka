@@ -135,4 +135,12 @@ impl AppLocale {
             },
         }
     }
+
+    pub fn loading_game(&self) -> &'static str {
+        match self {
+            AppLocale::Cz => "Načítání hry",
+            AppLocale::En => "Loading game",
+        }
+    }
 }
+
