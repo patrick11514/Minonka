@@ -111,10 +111,6 @@ export class EmojiManager {
                 const image = (await getItemAsset(item))!;
 
                 if (guildIndex === null || guilds[guildIndex].capacity === 0) {
-                    if (guildIndex != null) {
-                        guildIndex++;
-                    }
-
                     if (guildIndex === null) {
                         guildIndex = await guilds.asyncFindIndex(async (guild) => {
                             if (guild.capacity === null) {
@@ -126,7 +122,24 @@ export class EmojiManager {
                         });
 
                         //if no guilds available, just set to length and return undefined on lines below
-                        if (guildIndex === null) guildIndex = guilds.length;
+                        if (guildIndex === -1) guildIndex = guilds.length;
+                    } else {
+                        // find the next guild starting after current guildIndex that has capacity > 0
+                        let found = false;
+                        for (let i = guildIndex + 1; i < guilds.length; i++) {
+                            if (guilds[i].capacity === null) {
+                                const emojis = await guilds[i].guild.emojis.fetch();
+                                guilds[i].capacity = GUILD_MAX_EMOJIS - emojis.size;
+                            }
+                            if (guilds[i].capacity! > 0) {
+                                guildIndex = i;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            guildIndex = guilds.length;
+                        }
                     }
 
                     if (guildIndex >= guilds.length) {
@@ -214,8 +227,11 @@ export class EmojiManager {
         );
 
         if (championEmojis === undefined) {
-            l.stopError('Failed to upload champion emojis, because no guilds available');
-            return;
+            const err = 'Failed to upload champion emojis, because no guilds available';
+            l.stopError(err);
+            await process.discordBot?.handleError(new Error(err), 'EmojiManager Sync');
+            await new Promise((resolve) => setTimeout(resolve, 60000));
+            process.exit(1);
         }
 
         syncCount += championEmojis;
@@ -234,8 +250,11 @@ export class EmojiManager {
         );
 
         if (miscEmojis === undefined) {
-            l.stopError('Failed to upload misc emojis, because no guilds available');
-            return;
+            const err = 'Failed to upload misc emojis, because no guilds available';
+            l.stopError(err);
+            await process.discordBot?.handleError(new Error(err), 'EmojiManager Sync');
+            await new Promise((resolve) => setTimeout(resolve, 60000));
+            process.exit(1);
         }
 
         syncCount += miscEmojis;
