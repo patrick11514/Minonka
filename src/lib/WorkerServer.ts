@@ -45,6 +45,7 @@ class ErrorWithStack extends Error {
 }
 
 export class WorkerServer extends EventEmitter<Events> {
+    private WSS: WebSocketServer;
     private workerSocket: WebSocket | null = null;
     private jobResults = new Map<string, JobResult>();
 
