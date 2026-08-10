@@ -14,13 +14,6 @@ import { EventEmitter } from './EventEmitter';
 import { asyncExists } from './fsAsync';
 import Logger from './logger';
 
-const Workers: Record<
-    string,
-    {
-        socket: WebSocket;
-    }
-> = {};
-
 type Jobs = {
     summoner: SummonerTaskInput;
     rank: RankTaskInput;
@@ -52,7 +45,7 @@ class ErrorWithStack extends Error {
 }
 
 export class WorkerServer extends EventEmitter<Events> {
-    private WSS: WebSocketServer;
+    private workerSocket: WebSocket | null = null;
     private jobResults = new Map<string, JobResult>();
 
     constructor() {
@@ -64,10 +57,11 @@ export class WorkerServer extends EventEmitter<Events> {
         });
 
         this.WSS.on('connection', (ws) => {
-            const newId = crypto.randomBytes(16).toString('hex');
-            Workers[newId] = {
-                socket: ws
-            };
+            if (this.workerSocket) {
+                l.log('Replacing existing worker connection');
+                this.workerSocket.close();
+            }
+            this.workerSocket = ws;
 
             ws.on('message', (message) => {
                 const str = message.toString();
@@ -108,7 +102,9 @@ export class WorkerServer extends EventEmitter<Events> {
             });
 
             ws.on('close', () => {
-                delete Workers[newId];
+                if (this.workerSocket === ws) {
+                    this.workerSocket = null;
+                }
             });
         });
     }
@@ -120,20 +116,15 @@ export class WorkerServer extends EventEmitter<Events> {
             );
         }
 
-        const workerIds = Object.keys(Workers);
-        if (workerIds.length === 0) {
-            throw new Error('No workers available');
+        if (!this.workerSocket) {
+            throw new Error('No worker available');
         }
 
         const jobId = crypto.randomBytes(16).toString('hex');
 
-        //TODO: round robin on multiple workers
-        const workerId = workerIds[0];
-        const worker = Workers[workerId];
-
         l.log('Started job ' + jobId);
 
-        worker.socket.send(
+        this.workerSocket.send(
             jobName + ';' + jobId + ';' + Date.now() + ';' + JSON.stringify(data)
         );
 
