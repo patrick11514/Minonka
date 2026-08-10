@@ -113,9 +113,8 @@ export const runVersionCheck = async () => {
                         clearAssetCache();
                         await clearPersistentCache();
 
-                        //if we are in remote woker, we don't need to sync emojis, because
-                        //its just the worker
-                        if (process.env.WORKER_MODE !== 'remote') {
+                        //if we are in remote worker or bot isn't connected yet, skip emoji sync
+                        if (process.env.WORKER_MODE !== 'remote' && process.client) {
                             //sync emojis
                             await process.emoji?.sync();
                         }
