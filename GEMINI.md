@@ -8,6 +8,7 @@
   1. Switch to the `main` branch.
   2. Pull and rebase (`git pull --rebase`).
   3. Create a new branch for the specific implementation (e.g. `feat/feature-name` or `fix/issue-name`).
+
 ## Verification & Testing
 - Before testing, run `assets/download.sh` to update assets.
 - Always verify code quality using `pnpm check`, `pnpm lint`, and `pnpm worker:test`.
@@ -18,4 +19,3 @@
   - Examples:
     - `feat: Added something`
     - `fix(EmojiManager): something`
-
