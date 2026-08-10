@@ -11,10 +11,11 @@ use crate::tasks::task::SaveStrategy;
 use crate::tasks::types::DefaultParametersInput;
 use crate::utils::assets::{
     Asset, AssetType, Stat, get_background_asset, get_champion_asset, get_item_asset,
-    get_rune_asset, get_stat_asset, get_summoner_asset,
+    get_rank_asset, get_rune_asset, get_stat_asset, get_summoner_asset,
 };
 use crate::utils::deser::deserialize_ban_id;
 use crate::utils::locale::AppLocale;
+use crate::utils::rank::{Rank, Tier};
 use crate::utils::storage::get_persistent_result;
 use crate::utils::{fix_champion_name, format_date, format_duration, format_with_spaces};
 use futures::future::{join_all, try_join_all};
@@ -32,12 +33,24 @@ use crate::tasks::{
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(feature = "export-ts", ts(export))]
+pub struct TierChangeInput {
+    pub is_promotion: bool,
+    pub tier: Tier,
+    #[cfg_attr(feature = "export-ts", ts(optional))]
+    pub rank: Option<Rank>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct MatchTaskInput {
     #[serde(flatten)]
     pub default: DefaultParametersInput,
     pub metadata: MatchMetadataInput,
     pub info: MatchInfoInput,
     pub lp_gain: Option<i32>,
+    #[cfg_attr(feature = "export-ts", ts(optional))]
+    pub tier_change: Option<TierChangeInput>,
     pub queue_name: String,
 }
 
@@ -496,6 +509,59 @@ impl Task for MatchTask {
 
         let center_spacing = 440;
 
+        let tier_change_container = if let Some(change) = &input.tier_change {
+            let rank_icon = match Sprite::from_asset(&get_rank_asset(&change.tier), 0, 0).await {
+                Ok(mut sprite) => {
+                    sprite.resize_to_width(72);
+                    Some(sprite)
+                }
+                Err(_) => None,
+            };
+
+            let label_text = locale.tier_change_label(change.is_promotion);
+            let color = if change.is_promotion {
+                Color::Green
+            } else {
+                Color::Red
+            };
+
+            let text_container = Container::new()
+                .direction(ContainerDirection::Column)
+                .align_items(AlignItems::Center)
+                .child(Label::new(label_text).color(color).bold().size(36));
+
+            let text_container = if let Some(rank) = &change.rank {
+                text_container.child(
+                    Label::new(format!(
+                        "{} {}",
+                        locale.tier_label(&change.tier.as_str()),
+                        rank.as_str()
+                    ))
+                    .color(change.tier.color())
+                    .bold()
+                    .size(32),
+                )
+            } else {
+                text_container.child(
+                    Label::new(locale.tier_label(&change.tier.as_str()))
+                        .color(change.tier.color())
+                        .bold()
+                        .size(32),
+                )
+            };
+
+            Some(
+                Container::new()
+                    .direction(ContainerDirection::Column)
+                    .align_items(AlignItems::Center)
+                    .gap(5)
+                    .child(text_container)
+                    .child_if(rank_icon),
+            )
+        } else {
+            None
+        };
+
         let canvas = MasterCanvas::from_asset(get_background_asset(), context.into())
             .await?
             .with_layout(|root| {
@@ -559,7 +625,8 @@ impl Task for MatchTask {
                                         } else {
                                             None
                                         },
-                                    ),
+                                    )
+                                    .child_if(tier_change_container),
                             )
                             .child(right_players),
                     )
@@ -603,5 +670,37 @@ mod test {
     #[tokio::test]
     async fn test_match_draft() {
         crate::assert_task!(super::MatchTask, "test_files/match_draft.json");
+    }
+
+    #[tokio::test]
+    async fn test_match_prom_silver_gold() {
+        crate::assert_task!(
+            super::MatchTask,
+            "test_files/match_prom_silver_gold.json"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_match_prom_diamond_master() {
+        crate::assert_task!(
+            super::MatchTask,
+            "test_files/match_prom_diamond_master.json"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_match_dem_platinum_gold() {
+        crate::assert_task!(
+            super::MatchTask,
+            "test_files/match_dem_platinum_gold.json"
+        );
+    }
+
+    #[tokio::test]
+    async fn test_match_dem_challenger_gm() {
+        crate::assert_task!(
+            super::MatchTask,
+            "test_files/match_dem_challenger_gm.json"
+        );
     }
 }
