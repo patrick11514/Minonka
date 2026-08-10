@@ -145,10 +145,10 @@ impl AppLocale {
 
     pub fn tier_change_label(&self, is_promotion: bool) -> &'static str {
         match (self, is_promotion) {
-            (AppLocale::Cz, true) => "Povýšení",
-            (AppLocale::Cz, false) => "Sestup",
-            (AppLocale::En, true) => "Rank Up",
-            (AppLocale::En, false) => "Rank Down",
+            (AppLocale::Cz, true) => "Povýšení do",
+            (AppLocale::Cz, false) => "Sestup do",
+            (AppLocale::En, true) => "Rank Up to",
+            (AppLocale::En, false) => "Rank Down to",
         }
     }
 }

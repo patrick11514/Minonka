@@ -1150,11 +1150,11 @@
             }
         ]
     },
-    "locale": "cs",
+    "locale": "en",
     "region": "EUN1",
     "puuid": "Xo4p0vDpX_N-Ok1OSwEFT_4VCFh5J4h4oS6Pzo6jMndFqU96NnCes-4O-AWK45kZueUaL0vZ8Z-DMw",
     "lpGain": -24,
-    "queueName": "Solo/Tandem",
+    "queueName": "Solo/Duo",
     "tierChange": {
         "isPromotion": false,
         "tier": "GRANDMASTER",
