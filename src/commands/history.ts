@@ -3,7 +3,7 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
-import { getLpGain } from '$/lib/Riot/lp';
+import { getLpDetails } from '$/lib/Riot/lp';
 import { CherryMatchSchema, MatchSchema } from '$/lib/Riot/schemes';
 import { queues, Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
@@ -211,17 +211,20 @@ export default class History extends AccountCommand<CustomData> {
                 } else {
                     const regularMatchData = matchData;
 
+                    const lpDetails = await getLpDetails(
+                        regularMatchData.metadata.matchId,
+                        regularMatchData.info.queueId,
+                        puuid,
+                        region
+                    );
+
                     const payload: MatchTaskInput = {
                         ...regularMatchData,
                         locale,
                         region,
                         puuid,
-                        lpGain: await getLpGain(
-                            regularMatchData.metadata.matchId,
-                            regularMatchData.info.queueId,
-                            puuid,
-                            region
-                        ),
+                        lpGain: lpDetails.gain,
+                        tierChange: lpDetails.tierChange || undefined,
                         queueName: getLocale(locale).queues[regularMatchData.info.queueId]
                     };
 
