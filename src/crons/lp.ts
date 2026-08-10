@@ -7,32 +7,47 @@ import { sql } from 'kysely';
 
 const l = new Logger('LP', 'magenta');
 
-export const updateLpForUser = async (user: {
+type RecentLp = {
     id: number;
-    region: string;
-    puuid: string;
-    gameName: string;
-    tagLine: string;
-}) => {
+    account_id: number;
+    LP: number;
+    queue: string;
+    rank: _Rank;
+    tier: _Tier;
+    time: Date | null;
+};
+
+export const updateLpForUser = async (
+    user: {
+        id: number;
+        region: string;
+        puuid: string;
+        gameName: string;
+        tagLine: string;
+    },
+    userRecentQueues?: RecentLp[]
+) => {
     const leagues = await api[user.region as Region].league.byPuuid(user.puuid);
     if (!leagues.status) return;
 
-    const recentQueues = await conn
-        .with('Ranked', (db) =>
-            db
-                .selectFrom('lp')
-                .selectAll()
-                .select(() =>
-                    sql<number>`ROW_NUMBER() OVER(PARTITION BY account_id, queue ORDER BY time DESC)`.as(
-                        'rn'
+    const recentQueues =
+        userRecentQueues ??
+        (await conn
+            .with('Ranked', (db) =>
+                db
+                    .selectFrom('lp')
+                    .selectAll()
+                    .select(() =>
+                        sql<number>`ROW_NUMBER() OVER(PARTITION BY account_id, queue ORDER BY time DESC)`.as(
+                            'rn'
+                        )
                     )
-                )
-                .where('account_id', '=', user.id)
-        )
-        .selectFrom('Ranked')
-        .select(['id', 'account_id', 'LP', 'queue', 'rank', 'tier', 'time'])
-        .where('rn', '=', 1)
-        .execute();
+                    .where('account_id', '=', user.id)
+            )
+            .selectFrom('Ranked')
+            .select(['id', 'account_id', 'LP', 'queue', 'rank', 'tier', 'time'])
+            .where('rn', '=', 1)
+            .execute());
 
     try {
         for (const league of leagues.data) {
@@ -172,9 +187,42 @@ export default [
         l.start('Updating LPs...');
 
         const users = await conn.selectFrom('account').selectAll().execute();
+        if (users.length === 0) {
+            l.stop('LPs update completed (0 users)');
+            return;
+        }
+
+        const userIds = users.map((u) => u.id);
+
+        const allRecentQueues = await conn
+            .with('Ranked', (db) =>
+                db
+                    .selectFrom('lp')
+                    .selectAll()
+                    .select(() =>
+                        sql<number>`ROW_NUMBER() OVER(PARTITION BY account_id, queue ORDER BY time DESC)`.as(
+                            'rn'
+                        )
+                    )
+                    .where('account_id', 'in', userIds)
+            )
+            .selectFrom('Ranked')
+            .select(['id', 'account_id', 'LP', 'queue', 'rank', 'tier', 'time'])
+            .where('rn', '=', 1)
+            .execute();
+
+        const recentQueuesByUser = new Map<number, RecentLp[]>();
+        for (const item of allRecentQueues) {
+            const list = recentQueuesByUser.get(item.account_id) ?? [];
+            list.push(item as RecentLp);
+            recentQueuesByUser.set(item.account_id, list);
+        }
 
         await batchPromises(
-            users.map((user) => () => updateLpForUser(user)),
+            users.map(
+                (user) => () =>
+                    updateLpForUser(user, recentQueuesByUser.get(user.id) ?? [])
+            ),
             5,
             1000
         );

@@ -41,6 +41,10 @@ if (process.argv.includes('--register')) {
     const emoji = new EmojiManager();
     process.emoji = emoji;
 
+    // First check for asset updates on startup and wait for it to finish
+    const { runVersionCheck } = await import('./crons/version');
+    await runVersionCheck();
+
     registerCrons();
 
     l.start('Starting Discord Bot...');
@@ -51,8 +55,6 @@ if (process.argv.includes('--register')) {
     discordBot.on('login', (client) => {
         l.stop('Connected to discord as ' + client.user.tag);
 
-        //Only sync, when its not patching on startup, because
-        //after patch it will automatically sync emojis
-        if (!process.patching) emoji.sync();
+        emoji.sync();
     });
 }

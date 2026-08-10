@@ -251,15 +251,13 @@ export const getChallenges = async (lang: RiotLanguage) => {
     );
 
     try {
-        const challenges = schema.parse(
-            JSON.parse(
-                (await getAsset(
-                    AssetType.DDRAGON_DATA,
-                    'challenges.json',
-                    lang
-                ))!.toString()
-            )
-        );
+        const asset = await getAsset(AssetType.DDRAGON_DATA, 'challenges.json', lang);
+        if (!asset) {
+            l.error(`Asset challenges.json for ${lang} not found on disk.`);
+            return null;
+        }
+
+        const challenges = schema.parse(JSON.parse(asset.toString()));
         return challenges;
     } catch (e) {
         l.error(e);
@@ -297,15 +295,13 @@ export const getRunesReforged = async (lang: RiotLanguage) => {
     );
 
     try {
-        const runes = schema.parse(
-            JSON.parse(
-                (await getAsset(
-                    AssetType.DDRAGON_DATA,
-                    'runesReforged.json',
-                    lang
-                ))!.toString()
-            )
-        );
+        const asset = await getAsset(AssetType.DDRAGON_DATA, 'runesReforged.json', lang);
+        if (!asset) {
+            l.error(`Asset runesReforged.json for ${lang} not found on disk.`);
+            return null;
+        }
+
+        const runes = schema.parse(JSON.parse(asset.toString()));
         return runes;
     } catch (e) {
         l.error(e);
@@ -330,15 +326,13 @@ export const getSummonerSpells = async (lang: RiotLanguage) => {
     });
 
     try {
-        const spells = schema.parse(
-            JSON.parse(
-                (await getAsset(
-                    AssetType.DDRAGON_DATA,
-                    'summoner.json',
-                    lang
-                ))!.toString()
-            )
-        );
+        const asset = await getAsset(AssetType.DDRAGON_DATA, 'summoner.json', lang);
+        if (!asset) {
+            l.error(`Asset summoner.json for ${lang} not found on disk.`);
+            return null;
+        }
+
+        const spells = schema.parse(JSON.parse(asset.toString()));
         return spells;
     } catch (e) {
         l.error(e);
@@ -364,15 +358,17 @@ export const getAugments = async (lang: RiotLanguage) => {
     });
 
     try {
-        const augments = schema.parse(
-            JSON.parse(
-                (await getAsset(
-                    AssetType.COMMUNITY_DDRAGON,
-                    `cdragon/arena/${lang.toLowerCase()}.json`,
-                    lang
-                ))!.toString()
-            )
+        const asset = await getAsset(
+            AssetType.COMMUNITY_DDRAGON,
+            `cdragon/arena/${lang.toLowerCase()}.json`,
+            lang
         );
+        if (!asset) {
+            l.error(`Asset arena augment json for ${lang} not found.`);
+            return null;
+        }
+
+        const augments = schema.parse(JSON.parse(asset.toString()));
         return augments;
     } catch (e) {
         l.error(e);
@@ -412,15 +408,13 @@ export const getChampions = async (lang: RiotLanguage) => {
     });
 
     try {
-        const champions = schema.parse(
-            JSON.parse(
-                (await getAsset(
-                    AssetType.DDRAGON_DATA,
-                    'champion.json',
-                    lang
-                ))!.toString()
-            )
-        );
+        const asset = await getAsset(AssetType.DDRAGON_DATA, 'champion.json', lang);
+        if (!asset) {
+            l.error(`Asset champion.json for ${lang} not found on disk.`);
+            return null;
+        }
+
+        const champions = schema.parse(JSON.parse(asset.toString()));
         return champions;
     } catch (e) {
         l.error(e);
@@ -453,11 +447,13 @@ export const getMaps = async (lang: RiotLanguage) => {
     });
 
     try {
-        const maps = schema.parse(
-            JSON.parse(
-                (await getAsset(AssetType.DDRAGON_DATA, 'map.json', lang))!.toString()
-            )
-        );
+        const asset = await getAsset(AssetType.DDRAGON_DATA, 'map.json', lang);
+        if (!asset) {
+            l.error(`Asset map.json for ${lang} not found on disk.`);
+            return null;
+        }
+
+        const maps = schema.parse(JSON.parse(asset.toString()));
         return maps;
     } catch (e) {
         l.error(e);
