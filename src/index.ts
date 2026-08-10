@@ -41,6 +41,10 @@ if (process.argv.includes('--register')) {
     const emoji = new EmojiManager();
     process.emoji = emoji;
 
+    // First check for asset updates on startup and wait for it to finish
+    const { runVersionCheck } = await import('./crons/version');
+    await runVersionCheck();
+
     registerCrons();
 
     l.start('Starting Discord Bot...');
