@@ -512,7 +512,7 @@ impl Task for MatchTask {
         let tier_change_container = if let Some(change) = &input.tier_change {
             let rank_icon = match Sprite::from_asset(&get_rank_asset(&change.tier), 0, 0).await {
                 Ok(mut sprite) => {
-                    sprite.resize_to_width(110);
+                    sprite.resize_to_width(200);
                     Some(sprite)
                 }
                 Err(_) => None,
@@ -528,7 +528,7 @@ impl Task for MatchTask {
             let text_container = Container::new()
                 .direction(ContainerDirection::Column)
                 .align_items(AlignItems::Center)
-                .child(Label::new(label_text).color(color).bold().size(34));
+                .child(Label::new(label_text).color(color).bold().size(58));
 
             let text_container = if let Some(rank) = &change.rank {
                 text_container.child(
@@ -539,14 +539,14 @@ impl Task for MatchTask {
                     ))
                     .color(change.tier.color())
                     .bold()
-                    .size(34),
+                    .size(56),
                 )
             } else {
                 text_container.child(
                     Label::new(locale.tier_label(&change.tier.as_str()))
                         .color(change.tier.color())
                         .bold()
-                        .size(34),
+                        .size(56),
                 )
             };
 
@@ -554,8 +554,8 @@ impl Task for MatchTask {
                 Container::new()
                     .direction(ContainerDirection::Column)
                     .align_items(AlignItems::Center)
-                    .padding_ltrb(0, 15, 0, 0)
-                    .gap(4)
+                    .padding_ltrb(0, 40, 0, 0)
+                    .gap(8)
                     .child(text_container)
                     .child_if(rank_icon),
             )
