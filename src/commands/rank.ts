@@ -3,6 +3,7 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
+import { getRecentStreakForQueue } from '$/lib/Riot/streak';
 import { Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
 import { RankTaskInput } from '$/types/worker/RankTaskInput';
@@ -101,14 +102,32 @@ export default class Rank extends AccountCommand {
             return;
         }
 
+        const ranksWithStreaks = await Promise.all(
+            league.data.map(async (r) => {
+                const queueId =
+                    r.queueType === 'RANKED_SOLO_5x5'
+                        ? 420
+                        : r.queueType === 'RANKED_FLEX_SR'
+                          ? 440
+                          : undefined;
+                const streak = queueId
+                    ? await getRecentStreakForQueue(summoner.data.puuid, region, queueId)
+                    : null;
+                return {
+                    ...r,
+                    streak: streak || undefined
+                };
+            })
+        );
+
         const data = {
-            puuid: DBaccount.puuid,
-            region,
+            puuid: summoner.data.puuid,
+            region: region,
             gameName: account.data.gameName,
             tagLine: account.data.tagLine,
             profileIconId: summoner.data.profileIconId,
             level: summoner.data.summonerLevel,
-            ranks: league.data as RankTaskInput['ranks'],
+            ranks: ranksWithStreaks as RankTaskInput['ranks'],
             locale: interaction.locale
         } satisfies RankTaskInput;
 

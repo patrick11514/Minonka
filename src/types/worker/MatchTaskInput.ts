@@ -3,4 +3,5 @@ import type { MatchInfoInput } from "./MatchInfoInput";
 import type { MatchMetadataInput } from "./MatchMetadataInput";
 import type { TierChangeInput } from "./TierChangeInput";
 
-export type MatchTaskInput = { metadata: MatchMetadataInput, info: MatchInfoInput, lpGain: number | null, tierChange?: TierChangeInput, queueName: string, puuid: string, region: string, locale: string, };
+export type MatchTaskInput = { metadata: MatchMetadataInput, info: MatchInfoInput, lpGain: number | null, tierChange?: TierChangeInput, teams?: Record<string, number>, queueName: string, puuid: string, region: string, locale: string, };
+

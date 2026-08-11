@@ -3,6 +3,7 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
+import { getRecentStreakForQueue } from '$/lib/Riot/streak';
 import { Rank, Region } from '$/lib/Riot/types';
 import { getHighestRank } from '$/lib/utilities';
 import { Account } from '$/types/database';
@@ -84,7 +85,12 @@ export default class Summoner extends AccountCommand {
             return;
         }
 
-        const highestRank = await getHighestRank(summoner.data.puuid, region, lang);
+        const [highestRank, streak] = await Promise.all([
+            getHighestRank(summoner.data.puuid, region, lang),
+            getRecentStreakForQueue(summoner.data.puuid, region, 420).then(async (s) =>
+                s ? s : getRecentStreakForQueue(summoner.data.puuid, region, 440)
+            )
+        ]);
         const bannerType = challenges.data.preferences.bannerAccent ?? 1;
 
         let banner: BannerType;
@@ -109,6 +115,7 @@ export default class Summoner extends AccountCommand {
             banner,
             crest: challenges.data.preferences.crestBorder ?? 1,
             prestigeCrest: challenges.data.preferences.prestigeCrestBorderLevel ?? 1,
+            streak: streak || undefined,
             challenges: challenges.data.preferences.challengeIds ?? [],
             userChallenges: challenges.data.challenges,
             locale: interaction.locale,

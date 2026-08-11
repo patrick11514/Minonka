@@ -18,7 +18,9 @@ use crate::tasks::{
     task::{Task, TaskOutcome},
     types::{DefaultParametersInput, WorkerJob},
 };
-use crate::utils::assets::{Asset, AssetType, OnlineAsset, get_profile_icon};
+use crate::utils::assets::{
+    Asset, AssetType, OnlineAsset, get_lossstreak_asset, get_profile_icon, get_winstreak_asset,
+};
 use crate::utils::locale::AppLocale;
 use crate::utils::rank::{RankTier, Tier};
 use tracing::debug;
@@ -42,6 +44,14 @@ pub enum BannerType {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(feature = "export-ts", ts(export))]
+pub struct StreakInput {
+    pub r#type: String,
+    pub count: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct SummonerTaskInput {
     #[serde(flatten)]
     pub default: DefaultParametersInput,
@@ -52,6 +62,8 @@ pub struct SummonerTaskInput {
     pub prestige_crest: u32,
     pub banner: BannerType,
     pub highest_rank: Option<RankTier>,
+    #[cfg_attr(feature = "export-ts", ts(optional))]
+    pub streak: Option<StreakInput>,
     pub challenges: Vec<i64>,
     pub user_challenges: Vec<SummonerChallengeInput>,
 }
@@ -271,6 +283,38 @@ impl Task for SummonerTask {
                 })
         });
 
+        let streak_container = if let Some(streak) = &input.streak {
+            let is_win = streak.r#type == "win";
+            let asset = if is_win {
+                get_winstreak_asset()
+            } else {
+                get_lossstreak_asset()
+            };
+
+            if let Ok(mut icon) = Sprite::from_asset(&asset, 0, 0).await {
+                icon.resize_to_width(32);
+                let text = format!("{}{}", if is_win { "W" } else { "L" }, streak.count);
+                let color = if is_win {
+                    Color::Rgba(255, 153, 0, 255)
+                } else {
+                    Color::Rgba(51, 153, 255, 255)
+                };
+
+                Some(
+                    Container::new()
+                        .direction(ContainerDirection::Row)
+                        .gap(6)
+                        .align_items(AlignItems::Center)
+                        .child(icon)
+                        .child(Label::new(text).bold().size(22).color(color)),
+                )
+            } else {
+                None
+            }
+        } else {
+            None
+        };
+
         let canvas = MasterCanvas::from_asset(background, context.into())
             .await
             .context(
@@ -343,6 +387,7 @@ impl Task for SummonerTask {
                             )
                             .child_if(title.map(|t| Label::new(t).size(20).color(Color::Gray))),
                     )
+                    .child_if(streak_container)
                     .child(
                         Container::new()
                             .direction(ContainerDirection::Row)

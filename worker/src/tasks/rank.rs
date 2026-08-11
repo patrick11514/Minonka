@@ -16,11 +16,14 @@ use crate::tasks::{
     types::{DefaultParametersInput, WorkerJob},
 };
 use crate::utils::assets::{
-    Asset, AssetType, asset_path, get_background_asset, get_profile_icon, get_rank_asset,
+    Asset, AssetType, asset_path, get_background_asset, get_lossstreak_asset, get_profile_icon,
+    get_rank_asset, get_winstreak_asset,
 };
 use crate::utils::locale::AppLocale;
 use crate::utils::rank::Tier;
 use crate::utils::rank_to_label;
+
+use crate::tasks::summoner::StreakInput;
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -32,6 +35,8 @@ pub struct RankQueueEntryInput {
     pub tier: String,
     pub rank: String,
     pub league_points: i32,
+    #[cfg_attr(feature = "export-ts", ts(optional))]
+    pub streak: Option<StreakInput>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -124,6 +129,38 @@ impl Task for RankTask {
                 0.0
             };
 
+            let streak_container = if let Some(streak) = &rank_entry.streak {
+                let is_win = streak.r#type == "win";
+                let asset = if is_win {
+                    get_winstreak_asset()
+                } else {
+                    get_lossstreak_asset()
+                };
+
+                if let Ok(mut icon) = Sprite::from_asset(&asset, 0, 0).await {
+                    icon.resize_to_width(40);
+                    let text = format!("{}{}", if is_win { "W" } else { "L" }, streak.count);
+                    let color = if is_win {
+                        Color::Rgba(255, 153, 0, 255)
+                    } else {
+                        Color::Rgba(51, 153, 255, 255)
+                    };
+
+                    Some(
+                        Container::new()
+                            .direction(ContainerDirection::Row)
+                            .gap(6)
+                            .align_items(AlignItems::Center)
+                            .child(icon)
+                            .child(Label::new(text).bold().size(44).color(color)),
+                    )
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+
             ranks_row = ranks_row.child(
                 Container::new()
                     .direction(ContainerDirection::Column)
@@ -162,7 +199,8 @@ impl Task for RankTask {
                             .size(60)
                             .bold()
                             .color(Color::Red),
-                    ),
+                    )
+                    .child_if(streak_container),
             );
         }
 

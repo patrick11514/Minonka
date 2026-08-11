@@ -3,6 +3,7 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
+import { getMatchTeamIndicators, recordMatchDataAndDuoPairs } from '$/lib/Riot/duo';
 import { getLpDetails } from '$/lib/Riot/lp';
 import { CherryMatchSchema, MatchSchema } from '$/lib/Riot/schemes';
 import { queues, Region } from '$/lib/Riot/types';
@@ -211,12 +212,18 @@ export default class History extends AccountCommand<CustomData> {
                 } else {
                     const regularMatchData = matchData;
 
-                    const lpDetails = await getLpDetails(
-                        regularMatchData.metadata.matchId,
-                        regularMatchData.info.queueId,
-                        puuid,
-                        region
-                    );
+                    // Record detailed match participant stats & duo pairs in database
+                    await recordMatchDataAndDuoPairs(regularMatchData);
+
+                    const [lpDetails, teamsMap] = await Promise.all([
+                        getLpDetails(
+                            regularMatchData.metadata.matchId,
+                            regularMatchData.info.queueId,
+                            puuid,
+                            region
+                        ),
+                        getMatchTeamIndicators(regularMatchData)
+                    ]);
 
                     const payload: MatchTaskInput = {
                         ...regularMatchData,
@@ -225,6 +232,7 @@ export default class History extends AccountCommand<CustomData> {
                         puuid,
                         lpGain: lpDetails.gain,
                         tierChange: lpDetails.tierChange || undefined,
+                        teams: Object.keys(teamsMap).length > 0 ? teamsMap : undefined,
                         queueName: getLocale(locale).queues[regularMatchData.info.queueId]
                     };
 
