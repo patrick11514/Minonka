@@ -143,7 +143,7 @@ impl Task for GraphTask {
 
         let locale = AppLocale::from_str(&input.default.locale);
 
-        // Draw division bands
+        // Draw division bands with dimmed solid tier colors
         let mut current_div = y_min;
         while current_div < y_max {
             let div_start = current_div;
@@ -158,7 +158,16 @@ impl Task for GraphTask {
 
             let (tier, rank_str) = get_tier_rank_from_total_lp(div_start);
             let base_color = tier.color().to_rgba();
-            let band_color = Rgba([base_color[0], base_color[1], base_color[2], 20]);
+            let factor = 0.35;
+            let bg_r = 10.0;
+            let bg_g = 22.0;
+            let bg_b = 28.0;
+            let band_color = Rgba([
+                (bg_r + (base_color[0] as f32 - bg_r) * factor) as u8,
+                (bg_g + (base_color[1] as f32 - bg_g) * factor) as u8,
+                (bg_b + (base_color[2] as f32 - bg_b) * factor) as u8,
+                255,
+            ]);
 
             draw_filled_rect_mut(
                 &mut canvas.background,
@@ -167,7 +176,7 @@ impl Task for GraphTask {
             );
 
             if div_start > y_min {
-                let boundary_line_color = Rgba([base_color[0], base_color[1], base_color[2], 50]);
+                let boundary_line_color = Rgba([255, 255, 255, 255]);
                 draw_line_segment_mut(
                     &mut canvas.background,
                     (x_start as f32, y_canvas_start as f32),
@@ -195,7 +204,7 @@ impl Task for GraphTask {
         }
 
         // Draw borders
-        let border_color = Rgba([255, 255, 255, 40]);
+        let border_color = Rgba([255, 255, 255, 255]);
         draw_line_segment_mut(
             &mut canvas.background,
             (x_start as f32, y_end as f32),
@@ -233,7 +242,7 @@ impl Task for GraphTask {
             };
 
             if i % step == 0 || i == n_points - 1 {
-                let grid_color = Rgba([255, 255, 255, 15]);
+                let grid_color = Rgba([200, 200, 200, 255]);
                 draw_line_segment_mut(
                     &mut canvas.background,
                     (x_i as f32, y_end as f32),
@@ -254,8 +263,33 @@ impl Task for GraphTask {
             }
         }
 
-        // Draw graph lines
-        let line_color = Rgba([0, 240, 255, 255]);
+        // Draw graph lines with dark outline for high contrast on all tier background colors
+        let outline_color = Rgba([10, 16, 22, 255]);
+        let line_color = Rgba([0, 225, 240, 255]);
+
+        // Outer dark shadow/outline stroke
+        for i in 0..(n_points - 1) {
+            let x_i = x_start + (i as f32 / (n_points - 1) as f32 * plot_w as f32) as i32;
+            let y_i = y_start
+                - (((pts[i] - y_min) as f32 / (y_max - y_min) as f32) * plot_h as f32) as i32;
+
+            let x_next = x_start + ((i + 1) as f32 / (n_points - 1) as f32 * plot_w as f32) as i32;
+            let y_next = y_start
+                - (((pts[i + 1] - y_min) as f32 / (y_max - y_min) as f32) * plot_h as f32) as i32;
+
+            for dx in -2..=2 {
+                for dy in -2..=2 {
+                    draw_line_segment_mut(
+                        &mut canvas.background,
+                        ((x_i + dx) as f32, (y_i + dy) as f32),
+                        ((x_next + dx) as f32, (y_next + dy) as f32),
+                        outline_color,
+                    );
+                }
+            }
+        }
+
+        // Inner main cyan line
         for i in 0..(n_points - 1) {
             let x_i = x_start + (i as f32 / (n_points - 1) as f32 * plot_w as f32) as i32;
             let y_i = y_start
@@ -287,6 +321,7 @@ impl Task for GraphTask {
             let y_i = y_start
                 - (((pts[i] - y_min) as f32 / (y_max - y_min) as f32) * plot_h as f32) as i32;
 
+            draw_filled_circle_mut(&mut canvas.background, (x_i, y_i), 8, outline_color);
             draw_filled_circle_mut(&mut canvas.background, (x_i, y_i), 6, line_color);
             draw_filled_circle_mut(
                 &mut canvas.background,
