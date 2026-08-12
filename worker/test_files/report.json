@@ -41,23 +41,29 @@
         "visionScore": 32,
         "win": true,
         "perks": {
+            "statPerks": {
+                "defense": 5002,
+                "flex": 5008,
+                "offense": 5005
+            },
             "styles": [
                 {
                     "description": "primaryStyle",
                     "style": 8000,
                     "selections": [
-                        {
-                            "perk": 8005,
-                            "var1": 0,
-                            "var2": 0,
-                            "var3": 0
-                        }
+                        { "perk": 8005, "var1": 0, "var2": 0, "var3": 0 },
+                        { "perk": 9111, "var1": 0, "var2": 0, "var3": 0 },
+                        { "perk": 9104, "var1": 0, "var2": 0, "var3": 0 },
+                        { "perk": 8014, "var1": 0, "var2": 0, "var3": 0 }
                     ]
                 },
                 {
                     "description": "subStyle",
                     "style": 8400,
-                    "selections": []
+                    "selections": [
+                        { "perk": 8444, "var1": 0, "var2": 0, "var3": 0 },
+                        { "perk": 8453, "var1": 0, "var2": 0, "var3": 0 }
+                    ]
                 }
             ]
         }

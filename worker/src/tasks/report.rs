@@ -10,7 +10,8 @@ use crate::tasks::match_task::MatchParticipantInput;
 use crate::tasks::task::{SaveStrategy, Task, TaskOutcome};
 use crate::tasks::types::{DefaultParametersInput, MatchMetadataInput, ProfileParametersInput, WorkerJob};
 use crate::utils::assets::{
-    Asset, AssetType, get_item_asset, get_profile_icon, get_rune_asset, get_summoner_asset,
+    Asset, AssetType, get_item_asset, get_perk_asset, get_profile_icon, get_rune_asset,
+    get_summoner_asset,
 };
 use crate::utils::locale::AppLocale;
 use crate::utils::storage::get_persistent_result;
@@ -101,39 +102,57 @@ impl Task for ReportTask {
 
         let profile_icon_asset = get_profile_icon(input.profile.profile_icon_id).await?;
         let mut profile_icon = Sprite::from_asset(&profile_icon_asset, 0, 0).await?;
-        profile_icon.resize_to_width(70);
+        profile_icon.resize_to_width(90);
 
-        // Runes
-        let (style, selection) = player
-            .perks
-            .styles
-            .first()
-            .map(|style| {
-                (
-                    style.style,
-                    style
-                        .selections
-                        .first()
-                        .map(|s| s.perk)
-                        .expect("No primary rune selected"),
-                )
-            })
-            .expect("No rune path found");
+        // Runes: full tree (4 primary + 2 secondary + 3 stat shards)
+        let primary_style_info = player.perks.styles.first();
+        let secondary_style_info = player.perks.styles.iter().nth(1);
 
-        let primary_rune_asset = get_rune_asset(style, Some(selection), &json, &locale).await?;
-        let mut primary_rune = Sprite::from_asset(&primary_rune_asset, 0, 0).await?;
-        primary_rune.resize_to_width(48);
+        let mut primary_rune_sprites = Vec::new();
+        if let Some(primary_style) = primary_style_info {
+            let primary_tree_asset = get_rune_asset(primary_style.style, None, &json, &locale).await?;
+            if let Ok(mut sprite) = Sprite::from_asset(&primary_tree_asset, 0, 0).await {
+                sprite.resize_to_width(32);
+                primary_rune_sprites.push(sprite);
+            }
+            for (idx, sel) in primary_style.selections.iter().enumerate() {
+                let asset = get_perk_asset(sel.perk, &json, &locale).await?;
+                if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
+                    let width = if idx == 0 { 44 } else { 32 };
+                    sprite.resize_to_width(width);
+                    primary_rune_sprites.push(sprite);
+                }
+            }
+        }
 
-        let secondary_style = player
-            .perks
-            .styles
-            .iter()
-            .nth(1)
-            .map(|perk| perk.style)
-            .expect("Second perk not found");
-        let secondary_rune_asset = get_rune_asset(secondary_style, None, &json, &locale).await?;
-        let mut secondary_rune = Sprite::from_asset(&secondary_rune_asset, 0, 0).await?;
-        secondary_rune.resize_to_width(36);
+        let mut secondary_rune_sprites = Vec::new();
+        if let Some(secondary_style) = secondary_style_info {
+            let secondary_tree_asset = get_rune_asset(secondary_style.style, None, &json, &locale).await?;
+            if let Ok(mut sprite) = Sprite::from_asset(&secondary_tree_asset, 0, 0).await {
+                sprite.resize_to_width(32);
+                secondary_rune_sprites.push(sprite);
+            }
+            for sel in &secondary_style.selections {
+                let asset = get_perk_asset(sel.perk, &json, &locale).await?;
+                if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
+                    sprite.resize_to_width(30);
+                    secondary_rune_sprites.push(sprite);
+                }
+            }
+        }
+
+        let mut stat_shard_sprites = Vec::new();
+        if let Some(stat_perks) = &player.perks.stat_perks {
+            for perk_id in [stat_perks.offense, stat_perks.flex, stat_perks.defense] {
+                if perk_id > 0 {
+                    let asset = get_perk_asset(perk_id, &json, &locale).await?;
+                    if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
+                        sprite.resize_to_width(26);
+                        stat_shard_sprites.push(sprite);
+                    }
+                }
+            }
+        }
 
         // Summoner Spells
         let sum1_asset = get_summoner_asset(player.summoner1_id, &json, &locale).await?;
@@ -193,24 +212,52 @@ impl Task for ReportTask {
             0.0
         };
 
+        // Localized Labels
+        let is_cz = matches!(locale, AppLocale::Cz);
+        let dmg_label = if is_cz {
+            "Poškození:"
+        } else {
+            "Damage dealt:"
+        };
+        let vision_label = if is_cz {
+            "Skóre vize:"
+        } else {
+            "Vision score:"
+        };
+        let gold_farm_label = if is_cz {
+            "Zlato a farm:"
+        } else {
+            "Gold & Farm:"
+        };
+        let p_kill_label = if is_cz {
+            "P/Zabití"
+        } else {
+            "P/Kill"
+        };
+        let team_share_label = if is_cz {
+            "z týmu"
+        } else {
+            "of team"
+        };
+
         // Render layout
         let canvas = canvas.with_layout(|root| {
             root
-                // 1. Top Header Bar
+                // 1. Top Header Bar (Enlarged)
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Row)
-                        .gap(16)
+                        .gap(20)
                         .align_items(AlignItems::Center)
                         .child(profile_icon)
                         .child(
                             Container::new()
                                 .direction(ContainerDirection::Column)
-                                .gap(2)
+                                .gap(4)
                                 .child(
                                     Label::new(format!("{}#{}", input.profile.game_name, input.profile.tag_line))
                                         .bold()
-                                        .size(32),
+                                        .size(40),
                                 )
                                 .child(
                                     Label::new(format!(
@@ -219,7 +266,7 @@ impl Task for ReportTask {
                                         format_date(input.game_creation, &locale),
                                         format_duration(input.game_duration)
                                     ))
-                                    .size(20)
+                                    .size(24)
                                     .color(Color::Gray),
                                 ),
                         ),
@@ -253,7 +300,7 @@ impl Task for ReportTask {
                                         .size(44),
                                 )
                                 .child(
-                                    Label::new(format!("{:.2}:1 KDA  |  P/Kill: {:.0}%", kda_ratio, kp_pct))
+                                    Label::new(format!("{:.2}:1 KDA  |  {}: {:.0}%", kda_ratio, p_kill_label, kp_pct))
                                         .bold()
                                         .size(24)
                                         .color(Color::Rgba(0, 225, 240, 255)),
@@ -265,29 +312,54 @@ impl Task for ReportTask {
                                 ),
                         ),
                 )
-                // 4. Spells & Runes Row
+                // 4. Spells & Full Runes Breakdown Row
                 .child(
                     Container::new()
-                        .direction(ContainerDirection::Row)
-                        .gap(20)
+                        .direction(ContainerDirection::Column)
+                        .gap(10)
                         .align_items(AlignItems::Center)
                         .child(
                             Container::new()
                                 .direction(ContainerDirection::Row)
-                                .gap(8)
-                                .child(sum1)
-                                .child(sum2),
+                                .gap(16)
+                                .align_items(AlignItems::Center)
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Row)
+                                        .gap(8)
+                                        .child(sum1)
+                                        .child(sum2),
+                                )
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Row)
+                                        .gap(6)
+                                        .align_items(AlignItems::Center)
+                                        .childs(primary_rune_sprites),
+                                ),
                         )
                         .child(
                             Container::new()
                                 .direction(ContainerDirection::Row)
-                                .gap(8)
+                                .gap(12)
                                 .align_items(AlignItems::Center)
-                                .child(primary_rune)
-                                .child(secondary_rune),
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Row)
+                                        .gap(6)
+                                        .align_items(AlignItems::Center)
+                                        .childs(secondary_rune_sprites),
+                                )
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Row)
+                                        .gap(4)
+                                        .align_items(AlignItems::Center)
+                                        .childs(stat_shard_sprites),
+                                ),
                         ),
                 )
-                // 5. Performance Stat Grid (Cards)
+                // 5. Performance Stat Grid (Cards with Czech/English Translation)
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Column)
@@ -299,9 +371,11 @@ impl Task for ReportTask {
                                 .gap(4)
                                 .child(
                                     Label::new(format!(
-                                        "DAMAGE DEALT: {} ({:.1}% of team)",
+                                        "{} {} ({:.1}% {})",
+                                        dmg_label,
                                         format_with_spaces(player.total_damage_dealt_to_champions),
-                                        dmg_pct
+                                        dmg_pct,
+                                        team_share_label
                                     ))
                                     .bold()
                                     .size(22)
@@ -315,7 +389,8 @@ impl Task for ReportTask {
                                 .gap(4)
                                 .child(
                                     Label::new(format!(
-                                        "VISION SCORE: {}",
+                                        "{} {}",
+                                        vision_label,
                                         player.vision_score
                                     ))
                                     .bold()
@@ -324,7 +399,8 @@ impl Task for ReportTask {
                                 )
                                 .child(
                                     Label::new(format!(
-                                        "GOLD & FARM: {} Gold • {} CS ({:.1} CS/min)",
+                                        "{} {} Gold • {} CS ({:.1} CS/min)",
+                                        gold_farm_label,
                                         format_with_spaces(player.gold_earned),
                                         total_cs,
                                         cs_per_min

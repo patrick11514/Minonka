@@ -301,6 +301,13 @@ export default class Report extends AccountCommand<undefined> {
                 visionScore: participant.visionScore,
                 win: participant.win,
                 perks: {
+                    statPerks: participant.perks.statPerks
+                        ? {
+                              defense: participant.perks.statPerks.defense,
+                              flex: participant.perks.statPerks.flex,
+                              offense: participant.perks.statPerks.offense
+                          }
+                        : undefined,
                     styles: participant.perks.styles.map((style) => ({
                         description: style.description,
                         style: style.style,

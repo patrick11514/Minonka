@@ -119,8 +119,19 @@ pub struct MatchParticipantInput {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(feature = "export-ts", ts(export))]
+pub struct MatchStatPerksInput {
+    pub defense: u32,
+    pub flex: u32,
+    pub offense: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct MatchPerksInput {
     pub styles: Vec<MatchPerkStyleInput>,
+    #[cfg_attr(feature = "export-ts", ts(optional))]
+    pub stat_perks: Option<MatchStatPerksInput>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]

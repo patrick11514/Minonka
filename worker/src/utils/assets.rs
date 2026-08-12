@@ -245,6 +245,47 @@ pub async fn get_rune_asset(
     Ok(Asset::new(AssetType::DDragon, format!("/img/{}", key)))
 }
 
+pub async fn get_perk_asset(
+    perk_id: u32,
+    cache: &JsonCache,
+    lang: &AppLocale,
+) -> TaskResult<Asset> {
+    // Stat shard perks mapping (ddragon or online asset)
+    let stat_perk_icon = match perk_id {
+        5001 => Some("perk-images/StatMods/StatModsHealthScalingIcon.png"),
+        5002 => Some("perk-images/StatMods/StatModsArmorIcon.png"),
+        5003 => Some("perk-images/StatMods/StatModsMagicRes.png"),
+        5005 => Some("perk-images/StatMods/StatModsAttackSpeedIcon.png"),
+        5007 => Some("perk-images/StatMods/StatModsCDRScalingIcon.png"),
+        5008 => Some("perk-images/StatMods/StatModsAdaptiveForceIcon.png"),
+        5010 => Some("perk-images/StatMods/StatModsMovementSpeedIcon.png"),
+        5011 => Some("perk-images/StatMods/StatModsHealthPlusIcon.png"),
+        5013 => Some("perk-images/StatMods/StatModsTenacityIcon.png"),
+        _ => None,
+    };
+
+    if let Some(icon) = stat_perk_icon {
+        return Ok(Asset::new(AssetType::DDragon, format!("/img/{}", icon)));
+    }
+
+    let runes = cache.get_runes(lang).await?.expect("Failed to load runes");
+
+    for tree in &runes {
+        if tree.id == perk_id {
+            return Ok(Asset::new(AssetType::DDragon, format!("/img/{}", tree.icon)));
+        }
+        for slot in &tree.slots {
+            for rune in &slot.runes {
+                if rune.id == perk_id {
+                    return Ok(Asset::new(AssetType::DDragon, format!("/img/{}", rune.icon)));
+                }
+            }
+        }
+    }
+
+    Ok(get_fallback_asset())
+}
+
 pub fn get_item_asset(id: u32) -> Asset {
     Asset::new(AssetType::DDragon, format!("_ROOT_/img/item/{}.png", id))
 }
