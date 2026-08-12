@@ -7,6 +7,7 @@ import { SummonerTaskInput } from '$/types/worker/SummonerTaskInput';
 import { TeamTaskInput } from '$/types/worker/TeamTaskInput';
 import { SpectatorTaskInput } from '$/types/worker/SpectatorTaskInput';
 import { GraphTaskInput } from '$/types/worker/GraphTaskInput';
+import { ReportTaskInput } from '$/types/worker/ReportTaskInput';
 import assert from 'node:assert';
 import crypto from 'node:crypto';
 import { WebSocket, WebSocketServer } from 'ws';
@@ -22,6 +23,7 @@ type Jobs = {
     team: TeamTaskInput;
     spectator: SpectatorTaskInput;
     graph: GraphTaskInput;
+    report: ReportTaskInput;
 };
 
 const l = new Logger('WorkerServer', 'magenta');

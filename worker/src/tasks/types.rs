@@ -19,6 +19,8 @@ pub enum WorkerJob {
     Team,
     #[serde(rename = "graph")]
     Graph,
+    #[serde(rename = "report")]
+    Report,
 }
 
 impl WorkerJob {
@@ -31,6 +33,7 @@ impl WorkerJob {
             Self::Summoner => "summoner",
             Self::Team => "team",
             Self::Graph => "graph",
+            Self::Report => "report",
         }
     }
 }

@@ -136,6 +136,11 @@ export default o({
         uploading: _,
         sentToChannel: _
     }),
+    report: o({
+        selectPlaceholder: _,
+        generatingImage: _,
+        sentToChannel: _
+    }),
     clash: o({
         title: _,
         day: _,

@@ -112,6 +112,7 @@ pub struct MatchParticipantInput {
     pub total_damage_dealt_to_champions: u32,
     pub total_minions_killed: u32,
     pub vision_score: u32,
+    pub win: bool,
     pub perks: MatchPerksInput,
 }
 
