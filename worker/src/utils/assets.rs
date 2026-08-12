@@ -284,6 +284,19 @@ pub fn get_stat_asset(stat: &Stat) -> Asset {
     Asset::new(AssetType::Other, name)
 }
 
+pub fn get_team_asset() -> Asset {
+    Asset::new(AssetType::Other, "team.png")
+}
+
+pub fn get_winstreak_asset() -> Asset {
+    Asset::new(AssetType::Other, "winstreak.png")
+}
+
+pub fn get_lossstreak_asset() -> Asset {
+    Asset::new(AssetType::Other, "lossstreak.png")
+}
+
+
 pub fn get_rooster_asset(id: u32) -> Asset {
     Asset::new(
         AssetType::Online(OnlineAsset::CommunityDragon),

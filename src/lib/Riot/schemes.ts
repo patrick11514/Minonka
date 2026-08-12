@@ -154,8 +154,11 @@ export const ParticipantSchema = z.object({
         .or(z.literal('')),
     totalDamageDealt: z.number(),
     totalDamageDealtToChampions: z.number(),
+    totalDamageTaken: z.number().optional().default(0),
     totalMinionsKilled: z.number(),
     visionScore: z.number(),
+    wardsPlaced: z.number().optional().default(0),
+    wardsKilled: z.number().optional().default(0),
     win: z.boolean(),
     puuid: z.string()
 });

@@ -11,7 +11,7 @@ use crate::tasks::task::SaveStrategy;
 use crate::tasks::types::DefaultParametersInput;
 use crate::utils::assets::{
     Asset, AssetType, Stat, get_background_asset, get_champion_asset, get_item_asset,
-    get_rank_asset, get_rune_asset, get_stat_asset, get_summoner_asset,
+    get_rank_asset, get_rune_asset, get_stat_asset, get_summoner_asset, get_team_asset,
 };
 use crate::utils::deser::deserialize_ban_id;
 use crate::utils::locale::AppLocale;
@@ -51,6 +51,8 @@ pub struct MatchTaskInput {
     pub lp_gain: Option<i32>,
     #[cfg_attr(feature = "export-ts", ts(optional))]
     pub tier_change: Option<TierChangeInput>,
+    #[cfg_attr(feature = "export-ts", ts(optional))]
+    pub teams: Option<std::collections::HashMap<String, u32>>,
     pub queue_name: String,
 }
 
@@ -182,6 +184,7 @@ impl RenderContext {
         player: &MatchParticipantInput,
         me: bool,
         reversed: bool,
+        team_number: Option<u32>,
     ) -> TaskResult<Container> {
         let champion = Asset::new(
             AssetType::DDragon,
@@ -298,7 +301,7 @@ impl RenderContext {
                     });
 
                 if i == 6 {
-                    stack.child(
+                    let mut vision_stack = stack.child(
                         Container::new()
                             .align_items(AlignItems::Center)
                             .justify(JustifyContent::Center)
@@ -309,7 +312,35 @@ impl RenderContext {
                                     .size(36)
                                     .stroke(Color::Black, 2),
                             ),
-                    )
+                    );
+
+                    if let Some(team_num) = team_number {
+                        let team_asset = get_team_asset();
+                        if let Ok(mut icon) = Sprite::from_asset(&team_asset, 0, 0).await {
+                            icon.resize_to_width(24);
+                            vision_stack = vision_stack.child(
+                                Container::new()
+                                    .align_items(AlignItems::Start)
+                                    .justify(JustifyContent::Start)
+                                    .size(item_background.dimensions())
+                                    .child(
+                                        Container::new()
+                                            .direction(ContainerDirection::Row)
+                                            .gap(2)
+                                            .align_items(AlignItems::Center)
+                                            .child(icon)
+                                            .child(
+                                                Label::new(team_num.to_string())
+                                                    .bold()
+                                                    .size(22)
+                                                    .stroke(Color::Black, 2),
+                                            ),
+                                    ),
+                            );
+                        }
+                    }
+
+                    vision_stack
                 } else {
                     stack
                 }
@@ -429,10 +460,12 @@ impl RenderContext {
         &self,
         me_puuid: &str,
         participants: &[MatchParticipantInput],
+        teams: Option<&std::collections::HashMap<String, u32>>,
     ) -> TaskResult<(Container, Container)> {
         let mut players = try_join_all(participants.into_iter().enumerate().map(|(i, p)| {
             let ctx = self.clone();
-            async move { ctx.player_component(p, p.puuid == me_puuid, i >= 5).await }
+            let team_num = teams.and_then(|t| t.get(&p.puuid)).cloned();
+            async move { ctx.player_component(p, p.puuid == me_puuid, i >= 5, team_num).await }
         }))
         .await?;
 
@@ -504,7 +537,7 @@ impl Task for MatchTask {
         );
 
         let (left_players, right_players) = ctx
-            .make_teams(&input.default.puuid, &input.info.participants)
+            .make_teams(&input.default.puuid, &input.info.participants, input.teams.as_ref())
             .await?;
 
         let center_spacing = 440;

@@ -49,6 +49,35 @@ export interface MatchLp {
     matchId: string;
 }
 
+export interface DuoMatch {
+    created_at: Generated<Date | null>;
+    id: Generated<number>;
+    match_id: string;
+    puuid1: string;
+    puuid2: string;
+}
+
+export interface MatchParticipantStat {
+    account_id: number | null;
+    assists: number;
+    champion_id: number;
+    created_at: Generated<Date | null>;
+    damage_dealt: number;
+    damage_taken: number;
+    deaths: number;
+    gold_earned: number;
+    id: Generated<number>;
+    kills: number;
+    match_id: string;
+    minions_killed: number;
+    puuid: string;
+    queue_id: number;
+    vision_score: number;
+    wards_killed: number;
+    wards_placed: number;
+    win: boolean;
+}
+
 export interface UserSettings {
     command_presets: Generated<string | null>;
     discord_id: string;
@@ -57,9 +86,11 @@ export interface UserSettings {
 
 export interface DB {
     account: Account;
+    duo_match: DuoMatch;
     emoji: Emoji;
     in_memory: InMemory;
     lp: Lp;
     match_lp: MatchLp;
+    match_participant_stat: MatchParticipantStat;
     user_settings: UserSettings;
 }
