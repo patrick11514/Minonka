@@ -5,4 +5,3 @@ import type { StreakInput } from "./StreakInput";
 import type { SummonerChallengeInput } from "./SummonerChallengeInput";
 
 export type SummonerTaskInput = { titleId: string | null, crest: number, prestigeCrest: number, banner: BannerType, highestRank: RankTier | null, streak?: StreakInput, challenges: Array<bigint>, userChallenges: Array<SummonerChallengeInput>, puuid: string, region: string, locale: string, level: number, gameName: string, tagLine: string, profileIconId: number, };
-
