@@ -139,9 +139,9 @@ impl Task for RankTask {
 
                 if let Ok(mut icon) = Sprite::from_asset(&asset, 0, 0).await {
                     icon.resize_to_width(40);
-                    let text = format!("{}{}", if is_win { "W" } else { "L" }, streak.count);
+                    let text = streak.count.to_string();
                     let color = if is_win {
-                        Color::Rgba(255, 153, 0, 255)
+                        Color::Rgba(255, 68, 68, 255)
                     } else {
                         Color::Rgba(51, 153, 255, 255)
                     };
