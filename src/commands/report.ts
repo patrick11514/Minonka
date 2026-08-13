@@ -297,8 +297,12 @@ export default class Report extends AccountCommand<undefined> {
                 summoner2Id: participant.summoner2Id,
                 teamId: participant.teamId,
                 totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
+                totalDamageTaken: participant.totalDamageTaken ?? 0,
                 totalMinionsKilled: participant.totalMinionsKilled,
                 visionScore: participant.visionScore,
+                wardsPlaced: participant.wardsPlaced ?? 0,
+                wardsKilled: participant.wardsKilled ?? 0,
+                largestMultiKill: participant.largestMultiKill ?? 0,
                 win: participant.win,
                 perks: {
                     statPerks: participant.perks.statPerks

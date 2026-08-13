@@ -10,8 +10,8 @@ use crate::tasks::match_task::MatchParticipantInput;
 use crate::tasks::task::{SaveStrategy, Task, TaskOutcome};
 use crate::tasks::types::{DefaultParametersInput, MatchMetadataInput, ProfileParametersInput, WorkerJob};
 use crate::utils::assets::{
-    Asset, AssetType, get_item_asset, get_perk_asset, get_profile_icon, get_rune_asset,
-    get_summoner_asset,
+    Asset, AssetType, Stat, get_item_asset, get_perk_asset, get_profile_icon, get_rune_asset,
+    get_stat_asset, get_summoner_asset,
 };
 use crate::utils::locale::AppLocale;
 use crate::utils::storage::get_persistent_result;
@@ -212,38 +212,45 @@ impl Task for ReportTask {
             0.0
         };
 
+        // Icon Assets for Stat Cards
+        let damage_icon_asset = get_stat_asset(&Stat::Damage);
+        let mut damage_icon = Sprite::from_asset(&damage_icon_asset, 0, 0).await?;
+        damage_icon.resize_to_width(24);
+
+        let minion_icon_asset = get_stat_asset(&Stat::Minions);
+        let mut minion_icon = Sprite::from_asset(&minion_icon_asset, 0, 0).await?;
+        minion_icon.resize_to_width(24);
+
+        let coins_icon_asset = get_stat_asset(&Stat::Golds);
+        let mut coins_icon = Sprite::from_asset(&coins_icon_asset, 0, 0).await?;
+        coins_icon.resize_to_width(24);
+
         // Localized Labels
         let is_cz = matches!(locale, AppLocale::Cz);
-        let dmg_label = if is_cz {
-            "Poškození:"
-        } else {
-            "Damage dealt:"
-        };
-        let vision_label = if is_cz {
-            "Skóre vize:"
-        } else {
-            "Vision score:"
-        };
-        let gold_farm_label = if is_cz {
-            "Zlato a farm:"
-        } else {
-            "Gold & Farm:"
-        };
-        let p_kill_label = if is_cz {
-            "P/Zabití"
-        } else {
-            "P/Kill"
-        };
-        let team_share_label = if is_cz {
-            "z týmu"
-        } else {
-            "of team"
+        let dmg_label = if is_cz { "POŠKOZENÍ A TANKOVÁNÍ" } else { "DAMAGE & TANKING" };
+        let dmg_dealt_label = if is_cz { "Udělené hrdinům:" } else { "Dealt to Champs:" };
+        let dmg_taken_label = if is_cz { "Obdržené poškození:" } else { "Damage Taken:" };
+        let vision_title = if is_cz { "VIZE A WARDOVÁNÍ" } else { "VISION & WARDS" };
+        let vision_score_label = if is_cz { "Skóre vize:" } else { "Vision Score:" };
+        let wards_label = if is_cz { "Položeno / Zničeno:" } else { "Placed / Killed:" };
+        let economy_title = if is_cz { "EKONOMIKA A FARMING" } else { "ECONOMY & FARMING" };
+        let gold_label = if is_cz { "Získané zlato:" } else { "Gold Earned:" };
+        let minion_label = if is_cz { "Farm:" } else { "Minions Killed:" };
+        let p_kill_label = if is_cz { "P/Zabití" } else { "P/Kill" };
+        let team_share_label = if is_cz { "z týmu" } else { "of team" };
+
+        let multikill_str = match player.largest_multi_kill {
+            5 => Some(if is_cz { "PENTAKILL" } else { "PENTAKILL" }),
+            4 => Some(if is_cz { "QUADRAKILL" } else { "QUADRAKILL" }),
+            3 => Some(if is_cz { "TRIPLEKILL" } else { "TRIPLEKILL" }),
+            2 => Some(if is_cz { "DOUBLEKILL" } else { "DOUBLEKILL" }),
+            _ => None,
         };
 
         // Render layout
         let canvas = canvas.with_layout(|root| {
             root
-                // 1. Top Header Bar (Enlarged)
+                // 1. Top Header Bar (Enlarged Profile Info)
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Row)
@@ -271,9 +278,11 @@ impl Task for ReportTask {
                                 ),
                         ),
                 )
-                // 2. Outcome Banner
+                // 2. Outcome Banner & Multikill Badge
                 .child(
                     Container::new()
+                        .direction(ContainerDirection::Column)
+                        .gap(6)
                         .align_items(AlignItems::Center)
                         .justify(JustifyContent::Center)
                         .child(
@@ -281,7 +290,13 @@ impl Task for ReportTask {
                                 .bold()
                                 .size(48)
                                 .color(outcome_color),
-                        ),
+                        )
+                        .child_if(multikill_str.map(|mk| {
+                            Label::new(mk)
+                                .bold()
+                                .size(22)
+                                .color(Color::Rgba(255, 215, 0, 255))
+                        })),
                 )
                 // 3. Main Champion & KDA Spotlight Card
                 .child(
@@ -297,7 +312,7 @@ impl Task for ReportTask {
                                 .child(
                                     Label::new(format!("{}/{}/{}", player.kills, player.deaths, player.assists))
                                         .bold()
-                                        .size(44),
+                                        .size(46),
                                 )
                                 .child(
                                     Label::new(format!("{:.2}:1 KDA  |  {}: {:.0}%", kda_ratio, p_kill_label, kp_pct))
@@ -307,7 +322,7 @@ impl Task for ReportTask {
                                 )
                                 .child(
                                     Label::new(format!("Lvl {} {}", player.champ_level, player.champion_name))
-                                        .size(20)
+                                        .size(22)
                                         .color(Color::Gray),
                                 ),
                         ),
@@ -359,55 +374,103 @@ impl Task for ReportTask {
                                 ),
                         ),
                 )
-                // 5. Performance Stat Grid (Cards with Czech/English Translation)
+                // 5. Detailed Performance Stat Cards
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Column)
-                        .gap(16)
+                        .gap(18)
                         .child(
-                            // Damage Card
+                            // Combat & Damage Card
                             Container::new()
                                 .direction(ContainerDirection::Column)
-                                .gap(4)
+                                .gap(6)
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Row)
+                                        .gap(8)
+                                        .align_items(AlignItems::Center)
+                                        .child(damage_icon)
+                                        .child(
+                                            Label::new(dmg_label)
+                                                .bold()
+                                                .size(22)
+                                                .color(Color::Rgba(255, 90, 90, 255)),
+                                        ),
+                                )
                                 .child(
                                     Label::new(format!(
                                         "{} {} ({:.1}% {})",
-                                        dmg_label,
+                                        dmg_dealt_label,
                                         format_with_spaces(player.total_damage_dealt_to_champions),
                                         dmg_pct,
                                         team_share_label
                                     ))
-                                    .bold()
-                                    .size(22)
-                                    .color(Color::Rgba(255, 90, 90, 255)),
-                                ),
-                        )
-                        .child(
-                            // Vision & Economy Card
-                            Container::new()
-                                .direction(ContainerDirection::Column)
-                                .gap(4)
-                                .child(
-                                    Label::new(format!(
-                                        "{} {}",
-                                        vision_label,
-                                        player.vision_score
-                                    ))
-                                    .bold()
-                                    .size(22)
-                                    .color(Color::Rgba(240, 200, 80, 255)),
+                                    .size(20)
+                                    .color(Color::White),
                                 )
                                 .child(
                                     Label::new(format!(
-                                        "{} {} Gold • {} CS ({:.1} CS/min)",
-                                        gold_farm_label,
+                                        "{} {}",
+                                        dmg_taken_label,
+                                        format_with_spaces(player.total_damage_taken)
+                                    ))
+                                    .size(20)
+                                    .color(Color::Gray),
+                                ),
+                        )
+                        .child(
+                            // Vision & Control Card
+                            Container::new()
+                                .direction(ContainerDirection::Column)
+                                .gap(6)
+                                .child(
+                                    Label::new(vision_title)
+                                        .bold()
+                                        .size(22)
+                                        .color(Color::Rgba(240, 200, 80, 255)),
+                                )
+                                .child(
+                                    Label::new(format!(
+                                        "{} {}  |  {} {} / {}",
+                                        vision_score_label,
+                                        player.vision_score,
+                                        wards_label,
+                                        player.wards_placed,
+                                        player.wards_killed
+                                    ))
+                                    .size(20)
+                                    .color(Color::White),
+                                ),
+                        )
+                        .child(
+                            // Economy & Farming Card
+                            Container::new()
+                                .direction(ContainerDirection::Column)
+                                .gap(6)
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Row)
+                                        .gap(8)
+                                        .align_items(AlignItems::Center)
+                                        .child(coins_icon)
+                                        .child(
+                                            Label::new(economy_title)
+                                                .bold()
+                                                .size(22)
+                                                .color(Color::Rgba(0, 225, 120, 255)),
+                                        ),
+                                )
+                                .child(
+                                    Label::new(format!(
+                                        "{} {} Gold  |  {} {} CS ({:.1} CS/min)",
+                                        gold_label,
                                         format_with_spaces(player.gold_earned),
+                                        minion_label,
                                         total_cs,
                                         cs_per_min
                                     ))
-                                    .bold()
-                                    .size(22)
-                                    .color(Color::Rgba(220, 220, 220, 255)),
+                                    .size(20)
+                                    .color(Color::White),
                                 ),
                         ),
                 )

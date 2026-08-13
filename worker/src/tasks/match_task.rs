@@ -110,8 +110,16 @@ pub struct MatchParticipantInput {
     pub summoner2_id: u32,
     pub team_id: u32,
     pub total_damage_dealt_to_champions: u32,
+    #[serde(default)]
+    pub total_damage_taken: u32,
     pub total_minions_killed: u32,
     pub vision_score: u32,
+    #[serde(default)]
+    pub wards_placed: u32,
+    #[serde(default)]
+    pub wards_killed: u32,
+    #[serde(default)]
+    pub largest_multi_kill: u32,
     pub win: bool,
     pub perks: MatchPerksInput,
 }

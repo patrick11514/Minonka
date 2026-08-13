@@ -37,8 +37,12 @@
         "summoner2Id": 12,
         "teamId": 100,
         "totalDamageDealtToChampions": 28500,
+        "totalDamageTaken": 19400,
         "totalMinionsKilled": 240,
         "visionScore": 32,
+        "wardsPlaced": 14,
+        "wardsKilled": 5,
+        "largestMultiKill": 2,
         "win": true,
         "perks": {
             "statPerks": {
