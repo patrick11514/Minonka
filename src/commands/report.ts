@@ -1,5 +1,5 @@
 import { AccountCommand } from '$/lib/AccountCommand';
-import { getLocale, replacePlaceholders } from '$/lib/langs';
+import { getLocale } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
@@ -17,8 +17,7 @@ import {
     MessageFlags,
     RepliableInteraction,
     StringSelectMenuBuilder,
-    StringSelectMenuOptionBuilder,
-    TextChannel
+    StringSelectMenuOptionBuilder
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import crypto from 'node:crypto';
@@ -332,36 +331,14 @@ export default class Report extends AccountCommand<undefined> {
 
         const buffer = await fs.readFile(resultPath);
 
-        const textChannel = interaction.channel as TextChannel | null;
-        let channelMessage;
-        if (textChannel && typeof textChannel.send === 'function') {
-            channelMessage = await textChannel.send({
-                files: [
-                    {
-                        attachment: buffer,
-                        name: 'report.png'
-                    }
-                ]
-            });
-        }
-
-        if (channelMessage) {
-            await interaction.editReply({
-                content: replacePlaceholders(
-                    lang.report.sentToChannel,
-                    channelMessage.url
-                )
-            });
-        } else {
-            await interaction.editReply({
-                files: [
-                    {
-                        attachment: buffer,
-                        name: 'report.png'
-                    }
-                ]
-            });
-        }
+        await interaction.editReply({
+            files: [
+                {
+                    attachment: buffer,
+                    name: 'report.png'
+                }
+            ]
+        });
 
         await fs.unlink(resultPath);
     }

@@ -109,7 +109,7 @@ impl Task for ReportTask {
         let mut profile_icon = Sprite::from_asset(&profile_icon_asset, 0, 0).await?;
         profile_icon.resize_to_width(96);
 
-        // Runes: 2 Columns layout (Column 1: 4 Primary Runes enlarged; Column 2: 2 Secondary + 3 Stat Shards)
+        // Runes: 2 Vertical Columns (Column 1: 4 Primary Runes stacked vertically; Column 2: 2 Secondary + 3 Stat Shards stacked vertically)
         let primary_style_info = player.perks.styles.first();
         let secondary_style_info = player.perks.styles.iter().nth(1);
 
@@ -118,7 +118,7 @@ impl Task for ReportTask {
             for (idx, sel) in primary_style.selections.iter().enumerate() {
                 let asset = get_perk_asset(sel.perk, &json, &locale).await?;
                 if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                    let width = if idx == 0 { 54 } else { 40 };
+                    let width = if idx == 0 { 40 } else { 32 };
                     sprite.resize_to_width(width);
                     primary_rune_sprites.push(sprite);
                 }
@@ -130,7 +130,7 @@ impl Task for ReportTask {
             for sel in &secondary_style.selections {
                 let asset = get_perk_asset(sel.perk, &json, &locale).await?;
                 if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                    sprite.resize_to_width(38);
+                    sprite.resize_to_width(30);
                     secondary_and_shards.push(sprite);
                 }
             }
@@ -141,7 +141,7 @@ impl Task for ReportTask {
                 if perk_id > 0 {
                     let asset = get_perk_asset(perk_id, &json, &locale).await?;
                     if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                        sprite.resize_to_width(32);
+                        sprite.resize_to_width(24);
                         secondary_and_shards.push(sprite);
                     }
                 }
@@ -292,11 +292,11 @@ impl Task for ReportTask {
                                 .color(Color::Rgba(255, 215, 0, 255))
                         })),
                 )
-                // 3. Main Champion & KDA Spotlight Card (KDA without :1)
+                // 3. Main Champion & KDA Spotlight Card with 2 Vertical Rune Columns next to it
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Row)
-                        .gap(28)
+                        .gap(24)
                         .align_items(AlignItems::Center)
                         .child(champ_sprite)
                         .child(
@@ -318,43 +318,35 @@ impl Task for ReportTask {
                                     Label::new(format!("Lvl {} {}", player.champ_level, player.champion_name))
                                         .size(24)
                                         .color(Color::Gray),
-                                ),
-                        ),
-                )
-                // 4. Spells (Row 1) & 2-Column Runes (Row 2)
-                .child(
-                    Container::new()
-                        .direction(ContainerDirection::Column)
-                        .gap(14)
-                        .align_items(AlignItems::Center)
-                        // Spells Row
-                        .child(
-                            Container::new()
-                                .direction(ContainerDirection::Row)
-                                .gap(12)
-                                .align_items(AlignItems::Center)
-                                .child(sum1)
-                                .child(sum2),
-                        )
-                        // Runes Row: 2 Columns
-                        .child(
-                            Container::new()
-                                .direction(ContainerDirection::Row)
-                                .gap(30)
-                                .align_items(AlignItems::Center)
-                                // Column 1: Primary Runes (Keystone enlarged + 3 primaries)
+                                )
                                 .child(
                                     Container::new()
                                         .direction(ContainerDirection::Row)
                                         .gap(8)
                                         .align_items(AlignItems::Center)
-                                        .childs(primary_rune_sprites),
-                                )
-                                // Column 2: Secondary Runes & Stat Shards
+                                        .child(sum1)
+                                        .child(sum2),
+                                ),
+                        )
+                        // 2 Vertical Rune Columns
+                        .child(
+                            Container::new()
+                                .direction(ContainerDirection::Row)
+                                .gap(14)
+                                .align_items(AlignItems::Center)
+                                // Column 1: Primary Runes (stacked top to bottom)
                                 .child(
                                     Container::new()
-                                        .direction(ContainerDirection::Row)
+                                        .direction(ContainerDirection::Column)
                                         .gap(6)
+                                        .align_items(AlignItems::Center)
+                                        .childs(primary_rune_sprites),
+                                )
+                                // Column 2: Secondary Runes & Stat Shards (stacked top to bottom)
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Column)
+                                        .gap(5)
                                         .align_items(AlignItems::Center)
                                         .childs(secondary_and_shards),
                                 ),
