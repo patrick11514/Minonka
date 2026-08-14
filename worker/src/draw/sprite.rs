@@ -60,6 +60,25 @@ impl Sprite {
         self.image = imageops::resize(&self.image, width, height, imageops::FilterType::Lanczos3);
     }
 
+    pub fn resize_to_height(&mut self, height: u32) {
+        if height == 0 {
+            return;
+        }
+
+        let original_width = self.image.width();
+        let original_height = self.image.height();
+        if original_width == 0 || original_height == 0 {
+            return;
+        }
+
+        let width = (original_width.saturating_mul(height) / original_height).max(1);
+        self.image = imageops::resize(&self.image, width, height, imageops::FilterType::Lanczos3);
+    }
+
+    pub fn rotate90(&mut self) {
+        self.image = imageops::rotate90(&self.image);
+    }
+
     pub fn dimensions(&self) -> (u32, u32) {
         (self.image.width(), self.image.height())
     }

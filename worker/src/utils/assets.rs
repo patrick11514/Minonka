@@ -337,6 +337,10 @@ pub fn get_lossstreak_asset() -> Asset {
     Asset::new(AssetType::Other, "lossstreak.png")
 }
 
+pub fn get_ban_x_asset() -> Asset {
+    Asset::new(AssetType::Other, "ban-x.png")
+}
+
 
 pub fn get_rooster_asset(id: u32) -> Asset {
     Asset::new(

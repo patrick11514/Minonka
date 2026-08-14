@@ -10,8 +10,8 @@ use crate::tasks::match_task::MatchParticipantInput;
 use crate::tasks::task::{SaveStrategy, Task, TaskOutcome};
 use crate::tasks::types::{DefaultParametersInput, MatchMetadataInput, ProfileParametersInput, WorkerJob};
 use crate::utils::assets::{
-    Asset, AssetType, Stat, get_item_asset, get_perk_asset, get_profile_icon, get_rune_asset,
-    get_stat_asset, get_summoner_asset,
+    Asset, AssetType, Stat, get_background_asset, get_item_asset, get_perk_asset,
+    get_profile_icon, get_stat_asset, get_summoner_asset,
 };
 use crate::utils::locale::AppLocale;
 use crate::utils::storage::get_persistent_result;
@@ -60,19 +60,24 @@ impl Task for ReportTask {
 
         let player = &input.participant;
 
-        // 1. Base Canvas - 900 x 1200 (3:4 ratio)
-        // Solid black background as WIP, elements padded inside
-        let mut base_bg = image::RgbaImage::new(900, 1200);
-        for pixel in base_bg.pixels_mut() {
-            *pixel = image::Rgba([12, 16, 22, 255]);
+        // 1. Base Canvas - 900 x 1200 (3:4 ratio) with 90-degree rotated match background
+        let mut bg_asset = Sprite::from_asset(&get_background_asset(), 0, 0).await?;
+        bg_asset.rotate90();
+        bg_asset.resize_to_width(900);
+        if bg_asset.dimensions().1 < 1200 {
+            bg_asset.resize_to_height(1200);
         }
+        let full_bg = bg_asset.into_image();
+        let base_bg = image::imageops::crop_imm(&full_bg, 0, 0, 900, 1200).to_image();
 
         let canvas = MasterCanvas::new(base_bg, context.into())
             .with_layout(|root| {
                 root.direction(ContainerDirection::Column)
                     .align_items(AlignItems::Center)
-                    .gap(20)
-                    .padding(30)
+                    .gap(18)
+                    .padding_xy(40, 30)
+                    .width(900)
+                    .height(1200)
             });
 
         let outcome_str = if input.participant.win {
@@ -82,9 +87,9 @@ impl Task for ReportTask {
         };
 
         let outcome_color = if input.participant.win {
-            Color::Rgba(0, 225, 120, 255)
+            Color::Rgba(0, 230, 130, 255)
         } else {
-            Color::Rgba(255, 65, 65, 255)
+            Color::Rgba(255, 60, 60, 255)
         };
 
         // Champion Splash / Icon
@@ -98,57 +103,46 @@ impl Task for ReportTask {
         let mut champ_sprite = Sprite::from_asset(&champion, 0, 0)
             .await
             .expect("Failed to read champion asset");
-        champ_sprite.resize_to_width(120);
+        champ_sprite.resize_to_width(130);
 
         let profile_icon_asset = get_profile_icon(input.profile.profile_icon_id).await?;
         let mut profile_icon = Sprite::from_asset(&profile_icon_asset, 0, 0).await?;
-        profile_icon.resize_to_width(90);
+        profile_icon.resize_to_width(96);
 
-        // Runes: full tree (4 primary + 2 secondary + 3 stat shards)
+        // Runes: 2 Columns layout (Column 1: 4 Primary Runes enlarged; Column 2: 2 Secondary + 3 Stat Shards)
         let primary_style_info = player.perks.styles.first();
         let secondary_style_info = player.perks.styles.iter().nth(1);
 
         let mut primary_rune_sprites = Vec::new();
         if let Some(primary_style) = primary_style_info {
-            let primary_tree_asset = get_rune_asset(primary_style.style, None, &json, &locale).await?;
-            if let Ok(mut sprite) = Sprite::from_asset(&primary_tree_asset, 0, 0).await {
-                sprite.resize_to_width(32);
-                primary_rune_sprites.push(sprite);
-            }
             for (idx, sel) in primary_style.selections.iter().enumerate() {
                 let asset = get_perk_asset(sel.perk, &json, &locale).await?;
                 if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                    let width = if idx == 0 { 44 } else { 32 };
+                    let width = if idx == 0 { 54 } else { 40 };
                     sprite.resize_to_width(width);
                     primary_rune_sprites.push(sprite);
                 }
             }
         }
 
-        let mut secondary_rune_sprites = Vec::new();
+        let mut secondary_and_shards = Vec::new();
         if let Some(secondary_style) = secondary_style_info {
-            let secondary_tree_asset = get_rune_asset(secondary_style.style, None, &json, &locale).await?;
-            if let Ok(mut sprite) = Sprite::from_asset(&secondary_tree_asset, 0, 0).await {
-                sprite.resize_to_width(32);
-                secondary_rune_sprites.push(sprite);
-            }
             for sel in &secondary_style.selections {
                 let asset = get_perk_asset(sel.perk, &json, &locale).await?;
                 if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                    sprite.resize_to_width(30);
-                    secondary_rune_sprites.push(sprite);
+                    sprite.resize_to_width(38);
+                    secondary_and_shards.push(sprite);
                 }
             }
         }
 
-        let mut stat_shard_sprites = Vec::new();
         if let Some(stat_perks) = &player.perks.stat_perks {
             for perk_id in [stat_perks.offense, stat_perks.flex, stat_perks.defense] {
                 if perk_id > 0 {
                     let asset = get_perk_asset(perk_id, &json, &locale).await?;
                     if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                        sprite.resize_to_width(26);
-                        stat_shard_sprites.push(sprite);
+                        sprite.resize_to_width(32);
+                        secondary_and_shards.push(sprite);
                     }
                 }
             }
@@ -157,13 +151,13 @@ impl Task for ReportTask {
         // Summoner Spells
         let sum1_asset = get_summoner_asset(player.summoner1_id, &json, &locale).await?;
         let mut sum1 = Sprite::from_asset(&sum1_asset, 0, 0).await?;
-        sum1.resize_to_width(44);
+        sum1.resize_to_width(52);
 
         let sum2_asset = get_summoner_asset(player.summoner2_id, &json, &locale).await?;
         let mut sum2 = Sprite::from_asset(&sum2_asset, 0, 0).await?;
-        sum2.resize_to_width(44);
+        sum2.resize_to_width(52);
 
-        // Items (0..6 + 6 for trinket)
+        // Final Inventory Items (0..6 + 6 for trinket)
         let item_sprites = try_join_all((0..7).map(|idx| {
             let item_id = match idx {
                 0 => player.item0,
@@ -177,7 +171,7 @@ impl Task for ReportTask {
             async move {
                 let asset = get_item_asset(item_id);
                 if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                    sprite.resize_to_width(56);
+                    sprite.resize_to_width(64);
                     Ok::<Option<Sprite>, crate::tasks::error::TaskError>(Some(sprite))
                 } else {
                     Ok::<Option<Sprite>, crate::tasks::error::TaskError>(None)
@@ -215,15 +209,15 @@ impl Task for ReportTask {
         // Icon Assets for Stat Cards
         let damage_icon_asset = get_stat_asset(&Stat::Damage);
         let mut damage_icon = Sprite::from_asset(&damage_icon_asset, 0, 0).await?;
-        damage_icon.resize_to_width(24);
+        damage_icon.resize_to_width(28);
 
         let minion_icon_asset = get_stat_asset(&Stat::Minions);
         let mut minion_icon = Sprite::from_asset(&minion_icon_asset, 0, 0).await?;
-        minion_icon.resize_to_width(24);
+        minion_icon.resize_to_width(28);
 
         let coins_icon_asset = get_stat_asset(&Stat::Golds);
         let mut coins_icon = Sprite::from_asset(&coins_icon_asset, 0, 0).await?;
-        coins_icon.resize_to_width(24);
+        coins_icon.resize_to_width(28);
 
         // Localized Labels
         let is_cz = matches!(locale, AppLocale::Cz);
@@ -235,7 +229,7 @@ impl Task for ReportTask {
         let wards_label = if is_cz { "Položeno / Zničeno:" } else { "Placed / Killed:" };
         let economy_title = if is_cz { "EKONOMIKA A FARMING" } else { "ECONOMY & FARMING" };
         let gold_label = if is_cz { "Získané zlato:" } else { "Gold Earned:" };
-        let minion_label = if is_cz { "Farm:" } else { "Minions Killed:" };
+        let minion_label = if is_cz { "Farma:" } else { "Minions Killed:" };
         let p_kill_label = if is_cz { "P/Zabití" } else { "P/Kill" };
         let team_share_label = if is_cz { "z týmu" } else { "of team" };
 
@@ -264,7 +258,7 @@ impl Task for ReportTask {
                                 .child(
                                     Label::new(format!("{}#{}", input.profile.game_name, input.profile.tag_line))
                                         .bold()
-                                        .size(40),
+                                        .size(42),
                                 )
                                 .child(
                                     Label::new(format!(
@@ -273,7 +267,7 @@ impl Task for ReportTask {
                                         format_date(input.game_creation, &locale),
                                         format_duration(input.game_duration)
                                     ))
-                                    .size(24)
+                                    .size(26)
                                     .color(Color::Gray),
                                 ),
                         ),
@@ -288,21 +282,21 @@ impl Task for ReportTask {
                         .child(
                             Label::new(outcome_str)
                                 .bold()
-                                .size(48)
+                                .size(52)
                                 .color(outcome_color),
                         )
                         .child_if(multikill_str.map(|mk| {
                             Label::new(mk)
                                 .bold()
-                                .size(22)
+                                .size(24)
                                 .color(Color::Rgba(255, 215, 0, 255))
                         })),
                 )
-                // 3. Main Champion & KDA Spotlight Card
+                // 3. Main Champion & KDA Spotlight Card (KDA without :1)
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Row)
-                        .gap(24)
+                        .gap(28)
                         .align_items(AlignItems::Center)
                         .child(champ_sprite)
                         .child(
@@ -312,88 +306,81 @@ impl Task for ReportTask {
                                 .child(
                                     Label::new(format!("{}/{}/{}", player.kills, player.deaths, player.assists))
                                         .bold()
-                                        .size(46),
+                                        .size(50),
                                 )
                                 .child(
-                                    Label::new(format!("{:.2}:1 KDA  |  {}: {:.0}%", kda_ratio, p_kill_label, kp_pct))
+                                    Label::new(format!("{:.2} KDA  |  {}: {:.0}%", kda_ratio, p_kill_label, kp_pct))
                                         .bold()
-                                        .size(24)
+                                        .size(26)
                                         .color(Color::Rgba(0, 225, 240, 255)),
                                 )
                                 .child(
                                     Label::new(format!("Lvl {} {}", player.champ_level, player.champion_name))
-                                        .size(22)
+                                        .size(24)
                                         .color(Color::Gray),
                                 ),
                         ),
                 )
-                // 4. Spells & Full Runes Breakdown Row
+                // 4. Spells (Row 1) & 2-Column Runes (Row 2)
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Column)
-                        .gap(10)
+                        .gap(14)
                         .align_items(AlignItems::Center)
-                        .child(
-                            Container::new()
-                                .direction(ContainerDirection::Row)
-                                .gap(16)
-                                .align_items(AlignItems::Center)
-                                .child(
-                                    Container::new()
-                                        .direction(ContainerDirection::Row)
-                                        .gap(8)
-                                        .child(sum1)
-                                        .child(sum2),
-                                )
-                                .child(
-                                    Container::new()
-                                        .direction(ContainerDirection::Row)
-                                        .gap(6)
-                                        .align_items(AlignItems::Center)
-                                        .childs(primary_rune_sprites),
-                                ),
-                        )
+                        // Spells Row
                         .child(
                             Container::new()
                                 .direction(ContainerDirection::Row)
                                 .gap(12)
                                 .align_items(AlignItems::Center)
-                                .child(
-                                    Container::new()
-                                        .direction(ContainerDirection::Row)
-                                        .gap(6)
-                                        .align_items(AlignItems::Center)
-                                        .childs(secondary_rune_sprites),
-                                )
-                                .child(
-                                    Container::new()
-                                        .direction(ContainerDirection::Row)
-                                        .gap(4)
-                                        .align_items(AlignItems::Center)
-                                        .childs(stat_shard_sprites),
-                                ),
-                        ),
-                )
-                // 5. Detailed Performance Stat Cards
-                .child(
-                    Container::new()
-                        .direction(ContainerDirection::Column)
-                        .gap(18)
+                                .child(sum1)
+                                .child(sum2),
+                        )
+                        // Runes Row: 2 Columns
                         .child(
-                            // Combat & Damage Card
                             Container::new()
-                                .direction(ContainerDirection::Column)
-                                .gap(6)
+                                .direction(ContainerDirection::Row)
+                                .gap(30)
+                                .align_items(AlignItems::Center)
+                                // Column 1: Primary Runes (Keystone enlarged + 3 primaries)
                                 .child(
                                     Container::new()
                                         .direction(ContainerDirection::Row)
                                         .gap(8)
                                         .align_items(AlignItems::Center)
+                                        .childs(primary_rune_sprites),
+                                )
+                                // Column 2: Secondary Runes & Stat Shards
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Row)
+                                        .gap(6)
+                                        .align_items(AlignItems::Center)
+                                        .childs(secondary_and_shards),
+                                ),
+                        ),
+                )
+                // 5. Detailed Performance Stat Cards (Full Width, Larger Fonts)
+                .child(
+                    Container::new()
+                        .direction(ContainerDirection::Column)
+                        .gap(20)
+                        .width(820)
+                        .child(
+                            // Combat & Damage Card
+                            Container::new()
+                                .direction(ContainerDirection::Column)
+                                .gap(8)
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Row)
+                                        .gap(10)
+                                        .align_items(AlignItems::Center)
                                         .child(damage_icon)
                                         .child(
                                             Label::new(dmg_label)
                                                 .bold()
-                                                .size(22)
+                                                .size(26)
                                                 .color(Color::Rgba(255, 90, 90, 255)),
                                         ),
                                 )
@@ -405,7 +392,8 @@ impl Task for ReportTask {
                                         dmg_pct,
                                         team_share_label
                                     ))
-                                    .size(20)
+                                    .bold()
+                                    .size(24)
                                     .color(Color::White),
                                 )
                                 .child(
@@ -414,7 +402,7 @@ impl Task for ReportTask {
                                         dmg_taken_label,
                                         format_with_spaces(player.total_damage_taken)
                                     ))
-                                    .size(20)
+                                    .size(22)
                                     .color(Color::Gray),
                                 ),
                         )
@@ -422,11 +410,11 @@ impl Task for ReportTask {
                             // Vision & Control Card
                             Container::new()
                                 .direction(ContainerDirection::Column)
-                                .gap(6)
+                                .gap(8)
                                 .child(
                                     Label::new(vision_title)
                                         .bold()
-                                        .size(22)
+                                        .size(26)
                                         .color(Color::Rgba(240, 200, 80, 255)),
                                 )
                                 .child(
@@ -438,7 +426,8 @@ impl Task for ReportTask {
                                         player.wards_placed,
                                         player.wards_killed
                                     ))
-                                    .size(20)
+                                    .bold()
+                                    .size(24)
                                     .color(Color::White),
                                 ),
                         )
@@ -446,17 +435,17 @@ impl Task for ReportTask {
                             // Economy & Farming Card
                             Container::new()
                                 .direction(ContainerDirection::Column)
-                                .gap(6)
+                                .gap(8)
                                 .child(
                                     Container::new()
                                         .direction(ContainerDirection::Row)
-                                        .gap(8)
+                                        .gap(10)
                                         .align_items(AlignItems::Center)
                                         .child(coins_icon)
                                         .child(
                                             Label::new(economy_title)
                                                 .bold()
-                                                .size(22)
+                                                .size(26)
                                                 .color(Color::Rgba(0, 225, 120, 255)),
                                         ),
                                 )
@@ -469,16 +458,17 @@ impl Task for ReportTask {
                                         total_cs,
                                         cs_per_min
                                     ))
-                                    .size(20)
+                                    .bold()
+                                    .size(24)
                                     .color(Color::White),
                                 ),
                         ),
                 )
-                // 6. Items Footer Row
+                // 6. Final Inventory Footer Row
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Row)
-                        .gap(10)
+                        .gap(12)
                         .align_items(AlignItems::Center)
                         .childs(item_sprites.into_iter().flatten()),
                 )
