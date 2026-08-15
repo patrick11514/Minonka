@@ -259,6 +259,52 @@ export default class Report extends AccountCommand<undefined> {
               queue.description)
             : 'Custom';
 
+        const timelineData = await api[region].match.timeline(selectedMatchId);
+        const timelineItems: Array<{
+            itemId: number;
+            timestamp: number;
+            isSold: boolean;
+        }> = [];
+        const timelineWards: Array<{ wardType: string; timestamp: number }> = [];
+
+        if (timelineData.status && timelineData.data.info) {
+            const timelineParticipant = timelineData.data.info.participants.find(
+                (p) => p.puuid === puuid
+            );
+            const participantId = timelineParticipant?.participantId;
+
+            if (participantId !== undefined) {
+                for (const frame of timelineData.data.info.frames) {
+                    for (const event of frame.events) {
+                        if (event.participantId === participantId) {
+                            if (event.type === 'ITEM_PURCHASED' && event.itemId) {
+                                timelineItems.push({
+                                    itemId: event.itemId,
+                                    timestamp: Math.floor(event.timestamp / 1000),
+                                    isSold: false
+                                });
+                            } else if (event.type === 'ITEM_SOLD' && event.itemId) {
+                                timelineItems.push({
+                                    itemId: event.itemId,
+                                    timestamp: Math.floor(event.timestamp / 1000),
+                                    isSold: true
+                                });
+                            }
+                        } else if (
+                            event.creatorId === participantId &&
+                            event.type === 'WARD_PLACED' &&
+                            event.wardType
+                        ) {
+                            timelineWards.push({
+                                wardType: event.wardType,
+                                timestamp: Math.floor(event.timestamp / 1000)
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
         const payload: ReportTaskInput = {
             puuid,
             region,
@@ -324,7 +370,9 @@ export default class Report extends AccountCommand<undefined> {
                 }
             },
             teamTotalDamage,
-            teamTotalKills
+            teamTotalKills,
+            timelineItems,
+            timelineWards
         };
 
         const resultPath = await process.workerServer.addJobWait('report', payload);

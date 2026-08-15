@@ -75,6 +75,13 @@ impl Sprite {
         self.image = imageops::resize(&self.image, width, height, imageops::FilterType::Lanczos3);
     }
 
+    pub fn resize(&mut self, width: u32, height: u32) {
+        if width == 0 || height == 0 {
+            return;
+        }
+        self.image = imageops::resize(&self.image, width, height, imageops::FilterType::Lanczos3);
+    }
+
     pub fn rotate90(&mut self) {
         self.image = imageops::rotate90(&self.image);
     }

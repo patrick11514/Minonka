@@ -7,6 +7,7 @@ import {
     ClashMemberSchema,
     MasterySchema,
     MatchSchema,
+    MatchTimelineSchema,
     SpectatorSchema,
     SummonerSchema
 } from './schemes';
@@ -132,6 +133,11 @@ const RiotAPIStructure = {
             type: 'routing',
             endOfUrl: `/matches/${matchId}`,
             schema: MatchSchema
+        }),
+        timeline: (matchId: string) => ({
+            type: 'routing',
+            endOfUrl: `/matches/${matchId}/timeline`,
+            schema: MatchTimelineSchema
         })
     }),
     clash: new ApiSet('/lol/clash/v1', {

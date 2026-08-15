@@ -5,13 +5,14 @@ use crate::draw::container::{AlignItems, Container, ContainerDirection, JustifyC
 use crate::draw::label::Label;
 use crate::draw::master_canvas::MasterCanvas;
 use crate::draw::sprite::Sprite;
+use crate::draw::stack::Stack;
 use crate::tasks::error::TaskResult;
 use crate::tasks::match_task::MatchParticipantInput;
 use crate::tasks::task::{SaveStrategy, Task, TaskOutcome};
 use crate::tasks::types::{DefaultParametersInput, MatchMetadataInput, ProfileParametersInput, WorkerJob};
 use crate::utils::assets::{
-    Asset, AssetType, Stat, get_background_asset, get_item_asset, get_perk_asset,
-    get_profile_icon, get_stat_asset, get_summoner_asset,
+    Asset, AssetType, Stat, get_background_asset, get_ban_x_asset, get_item_asset,
+    get_perk_asset, get_profile_icon, get_stat_asset, get_summoner_asset,
 };
 use crate::utils::locale::AppLocale;
 use crate::utils::storage::get_persistent_result;
@@ -19,6 +20,23 @@ use crate::utils::{fix_champion_name, format_date, format_duration, format_with_
 use futures::future::try_join_all;
 use serde::{Deserialize, Serialize};
 use ts_rs::TS;
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "export-ts", ts(export))]
+pub struct TimelineItemEventInput {
+    pub item_id: u32,
+    pub timestamp: u32, // in seconds
+    pub is_sold: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "export-ts", ts(export))]
+pub struct TimelineWardEventInput {
+    pub ward_type: String,
+    pub timestamp: u32, // in seconds
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -35,6 +53,10 @@ pub struct ReportTaskInput {
     pub participant: MatchParticipantInput,
     pub team_total_damage: u32,
     pub team_total_kills: u32,
+    #[serde(default)]
+    pub timeline_items: Vec<TimelineItemEventInput>,
+    #[serde(default)]
+    pub timeline_wards: Vec<TimelineWardEventInput>,
 }
 
 pub struct ReportTask;
@@ -118,7 +140,7 @@ impl Task for ReportTask {
             for (idx, sel) in primary_style.selections.iter().enumerate() {
                 let asset = get_perk_asset(sel.perk, &json, &locale).await?;
                 if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                    let width = if idx == 0 { 40 } else { 32 };
+                    let width = if idx == 0 { 48 } else { 38 };
                     sprite.resize_to_width(width);
                     primary_rune_sprites.push(sprite);
                 }
@@ -130,7 +152,7 @@ impl Task for ReportTask {
             for sel in &secondary_style.selections {
                 let asset = get_perk_asset(sel.perk, &json, &locale).await?;
                 if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                    sprite.resize_to_width(30);
+                    sprite.resize_to_width(36);
                     secondary_and_shards.push(sprite);
                 }
             }
@@ -141,7 +163,7 @@ impl Task for ReportTask {
                 if perk_id > 0 {
                     let asset = get_perk_asset(perk_id, &json, &locale).await?;
                     if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                        sprite.resize_to_width(24);
+                        sprite.resize_to_width(28);
                         secondary_and_shards.push(sprite);
                     }
                 }
@@ -171,10 +193,89 @@ impl Task for ReportTask {
             async move {
                 let asset = get_item_asset(item_id);
                 if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
-                    sprite.resize_to_width(64);
+                    sprite.resize_to_width(56);
                     Ok::<Option<Sprite>, crate::tasks::error::TaskError>(Some(sprite))
                 } else {
                     Ok::<Option<Sprite>, crate::tasks::error::TaskError>(None)
+                }
+            }
+        }))
+        .await?;
+
+        // Timeline Items History (Purchased / Sold with cross overlay)
+        let ban_x_asset = get_ban_x_asset();
+        let timeline_sprites: Vec<Option<Container>> = try_join_all(input.timeline_items.iter().map(|item| {
+            let ban_x_asset = ban_x_asset.clone();
+            async move {
+                let asset = get_item_asset(item.item_id);
+                if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
+                    sprite.resize_to_width(36);
+                    let (w, h) = sprite.dimensions();
+
+                    let stack = if item.is_sold {
+                        let mut cross = Sprite::from_asset(&ban_x_asset, 0, 0).await?;
+                        cross.resize(w, h);
+                        Stack::new().child(sprite).child(cross)
+                    } else {
+                        Stack::new().child(sprite)
+                    };
+
+                    let mins = item.timestamp / 60;
+                    let secs = item.timestamp % 60;
+                    let time_label = Label::new(format!("{:02}:{:02}", mins, secs))
+                        .bold()
+                        .size(12)
+                        .color(if item.is_sold { Color::Rgba(255, 100, 100, 255) } else { Color::Rgba(200, 200, 200, 255) });
+
+                    let col = Container::new()
+                        .direction(ContainerDirection::Column)
+                        .align_items(AlignItems::Center)
+                        .gap(2)
+                        .child(stack)
+                        .child(time_label);
+
+                    Ok::<Option<Container>, crate::tasks::error::TaskError>(Some(col))
+                } else {
+                    Ok::<Option<Container>, crate::tasks::error::TaskError>(None)
+                }
+            }
+        }))
+        .await?;
+
+        // Timeline Wards History (Ward item icon + placement timestamp)
+        let timeline_ward_sprites: Vec<Option<Container>> = try_join_all(input.timeline_wards.iter().map(|ward| {
+            async move {
+                let item_id = match ward.ward_type.as_str() {
+                    "CONTROL_WARD" => 2055,
+                    "BLUE_TRINKET" => 3363,
+                    "SIGHT_WARD" => 3340,
+                    _ => 3340, // YELLOW_TRINKET & others
+                };
+                let asset = get_item_asset(item_id);
+                if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
+                    sprite.resize_to_width(32);
+
+                    let mins = ward.timestamp / 60;
+                    let secs = ward.timestamp % 60;
+                    let time_label = Label::new(format!("{:02}:{:02}", mins, secs))
+                        .bold()
+                        .size(11)
+                        .color(if ward.ward_type == "CONTROL_WARD" {
+                            Color::Rgba(255, 100, 100, 255)
+                        } else {
+                            Color::Rgba(240, 200, 80, 255)
+                        });
+
+                    let col = Container::new()
+                        .direction(ContainerDirection::Column)
+                        .align_items(AlignItems::Center)
+                        .gap(2)
+                        .child(sprite)
+                        .child(time_label);
+
+                    Ok::<Option<Container>, crate::tasks::error::TaskError>(Some(col))
+                } else {
+                    Ok::<Option<Container>, crate::tasks::error::TaskError>(None)
                 }
             }
         }))
@@ -232,6 +333,7 @@ impl Task for ReportTask {
         let minion_label = if is_cz { "Farma:" } else { "Minions Killed:" };
         let p_kill_label = if is_cz { "P/Zabití" } else { "P/Kill" };
         let team_share_label = if is_cz { "z týmu" } else { "of team" };
+        let item_timeline_title = if is_cz { "HISTORIE PŘEDMĚTŮ" } else { "ITEM BUILD TIMELINE" };
 
         let multikill_str = match player.largest_multi_kill {
             5 => Some(if is_cz { "PENTAKILL" } else { "PENTAKILL" }),
@@ -352,27 +454,29 @@ impl Task for ReportTask {
                                 ),
                         ),
                 )
-                // 5. Detailed Performance Stat Cards (Full Width, Larger Fonts)
+                // 4. Detailed Performance Stat Cards (Centered Alignment)
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Column)
-                        .gap(20)
+                        .gap(14)
+                        .align_items(AlignItems::Center)
                         .width(820)
                         .child(
-                            // Combat & Damage Card
+                            // Combat & Damage Card (Centered)
                             Container::new()
                                 .direction(ContainerDirection::Column)
-                                .gap(8)
+                                .gap(4)
+                                .align_items(AlignItems::Center)
                                 .child(
                                     Container::new()
                                         .direction(ContainerDirection::Row)
-                                        .gap(10)
+                                        .gap(8)
                                         .align_items(AlignItems::Center)
                                         .child(damage_icon)
                                         .child(
                                             Label::new(dmg_label)
                                                 .bold()
-                                                .size(26)
+                                                .size(24)
                                                 .color(Color::Rgba(255, 90, 90, 255)),
                                         ),
                                 )
@@ -385,7 +489,7 @@ impl Task for ReportTask {
                                         team_share_label
                                     ))
                                     .bold()
-                                    .size(24)
+                                    .size(22)
                                     .color(Color::White),
                                 )
                                 .child(
@@ -394,19 +498,20 @@ impl Task for ReportTask {
                                         dmg_taken_label,
                                         format_with_spaces(player.total_damage_taken)
                                     ))
-                                    .size(22)
+                                    .size(20)
                                     .color(Color::Gray),
                                 ),
                         )
                         .child(
-                            // Vision & Control Card
+                            // Vision & Control Card (Centered with Ward Placement History)
                             Container::new()
                                 .direction(ContainerDirection::Column)
-                                .gap(8)
+                                .gap(4)
+                                .align_items(AlignItems::Center)
                                 .child(
                                     Label::new(vision_title)
                                         .bold()
-                                        .size(26)
+                                        .size(24)
                                         .color(Color::Rgba(240, 200, 80, 255)),
                                 )
                                 .child(
@@ -419,25 +524,39 @@ impl Task for ReportTask {
                                         player.wards_killed
                                     ))
                                     .bold()
-                                    .size(24)
+                                    .size(22)
                                     .color(Color::White),
-                                ),
+                                )
+                                .child_if(if !timeline_ward_sprites.is_empty() {
+                                    Some(
+                                        Container::new()
+                                            .direction(ContainerDirection::Row)
+                                            .gap(8)
+                                            .align_items(AlignItems::Center)
+                                            .wrap(true)
+                                            .max_items_per_line(12)
+                                            .childs(timeline_ward_sprites.into_iter().flatten()),
+                                    )
+                                } else {
+                                    None
+                                }),
                         )
                         .child(
-                            // Economy & Farming Card
+                            // Economy & Farming Card (Centered)
                             Container::new()
                                 .direction(ContainerDirection::Column)
-                                .gap(8)
+                                .gap(4)
+                                .align_items(AlignItems::Center)
                                 .child(
                                     Container::new()
                                         .direction(ContainerDirection::Row)
-                                        .gap(10)
+                                        .gap(8)
                                         .align_items(AlignItems::Center)
                                         .child(coins_icon)
                                         .child(
                                             Label::new(economy_title)
                                                 .bold()
-                                                .size(26)
+                                                .size(24)
                                                 .color(Color::Rgba(0, 225, 120, 255)),
                                         ),
                                 )
@@ -451,19 +570,46 @@ impl Task for ReportTask {
                                         cs_per_min
                                     ))
                                     .bold()
-                                    .size(24)
+                                    .size(22)
                                     .color(Color::White),
                                 ),
                         ),
                 )
-                // 6. Final Inventory Footer Row
+                // 5. Final Inventory Items Row
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Row)
-                        .gap(12)
+                        .gap(10)
                         .align_items(AlignItems::Center)
                         .childs(item_sprites.into_iter().flatten()),
                 )
+                // 6. Item Build Timeline (Purchased & Sold with cross)
+                .child_if(if !timeline_sprites.is_empty() {
+                    Some(
+                        Container::new()
+                            .direction(ContainerDirection::Column)
+                            .gap(4)
+                            .align_items(AlignItems::Center)
+                            .width(820)
+                            .child(
+                                Label::new(item_timeline_title)
+                                    .bold()
+                                    .size(20)
+                                    .color(Color::Gray),
+                            )
+                            .child(
+                                Container::new()
+                                    .direction(ContainerDirection::Row)
+                                    .gap(6)
+                                    .align_items(AlignItems::Center)
+                                    .wrap(true)
+                                    .max_items_per_line(14)
+                                    .childs(timeline_sprites.into_iter().flatten()),
+                            ),
+                    )
+                } else {
+                    None
+                })
         });
 
         Ok(TaskOutcome::Render(
