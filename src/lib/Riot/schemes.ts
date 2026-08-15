@@ -349,3 +349,40 @@ export const SpectatorSchema = z.object({
         })
     )
 });
+
+export const MatchTimelineSchema = z.object({
+    metadata: z.object({
+        dataVersion: z.string(),
+        matchId: z.string(),
+        participants: z.array(z.string())
+    }),
+    info: z.object({
+        frameInterval: z.number(),
+        gameId: z.number().optional(),
+        participants: z.array(
+            z.object({
+                participantId: z.number(),
+                puuid: z.string()
+            })
+        ),
+        frames: z.array(
+            z.object({
+                timestamp: z.number(),
+                events: z.array(
+                    z
+                        .object({
+                            type: z.string(),
+                            timestamp: z.number(),
+                            participantId: z.number().optional(),
+                            itemId: z.number().optional(),
+                            afterId: z.number().optional(),
+                            beforeId: z.number().optional(),
+                            creatorId: z.number().optional(),
+                            wardType: z.string().optional()
+                        })
+                        .passthrough()
+                )
+            })
+        )
+    })
+});

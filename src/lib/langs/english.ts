@@ -91,6 +91,11 @@ export default template.parse({
         team: 'Team',
         sentToChannel: 'Sent to channel'
     },
+    report: {
+        selectPlaceholder: 'Select a match to generate report',
+        generatingImage: 'Generating match report card...',
+        sentToChannel: 'Sent to channel'
+    },
     clash: {
         title: 'Upcoming Clash Tournaments',
         day: 'Day',

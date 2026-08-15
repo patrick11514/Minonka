@@ -1,0 +1,75 @@
+{
+    "metadata": {
+        "matchId": "EUN1_3953845149"
+    },
+    "queueName": "Solo/Tandem",
+    "gameCreation": 1779218890662,
+    "gameDuration": 2161,
+    "puuid": "iAgw8JT8-3Zt_U1OSwEvztymbsIrCcizRzULxqhaWNcW6cMTM49w0ltAgIN0BMoilTMkQntDV6FAdg",
+    "region": "EUN1",
+    "locale": "cs",
+    "level": 450,
+    "gameName": "Patrik",
+    "tagLine": "EUNE",
+    "profileIconId": 588,
+    "teamTotalDamage": 85000,
+    "teamTotalKills": 35,
+    "participant": {
+        "assists": 8,
+        "champLevel": 18,
+        "championName": "Yasuo",
+        "deaths": 7,
+        "gameEndedInEarlySurrender": false,
+        "goldEarned": 16500,
+        "kills": 12,
+        "item0": 3031,
+        "item1": 3072,
+        "item2": 3006,
+        "item3": 3046,
+        "item4": 3053,
+        "item5": 3026,
+        "item6": 3340,
+        "puuid": "iAgw8JT8-3Zt_U1OSwEvztymbsIrCcizRzULxqhaWNcW6cMTM49w0ltAgIN0BMoilTMkQntDV6FAdg",
+        "riotIdGameName": "Patrik",
+        "riotIdTagline": "EUNE",
+        "roleBoundItem": null,
+        "summoner1Id": 4,
+        "summoner2Id": 12,
+        "teamId": 100,
+        "totalDamageDealtToChampions": 28500,
+        "totalDamageTaken": 19400,
+        "totalMinionsKilled": 240,
+        "visionScore": 32,
+        "wardsPlaced": 14,
+        "wardsKilled": 5,
+        "largestMultiKill": 2,
+        "win": true,
+        "perks": {
+            "statPerks": {
+                "defense": 5002,
+                "flex": 5008,
+                "offense": 5005
+            },
+            "styles": [
+                {
+                    "description": "primaryStyle",
+                    "style": 8000,
+                    "selections": [
+                        { "perk": 8005, "var1": 0, "var2": 0, "var3": 0 },
+                        { "perk": 9111, "var1": 0, "var2": 0, "var3": 0 },
+                        { "perk": 9104, "var1": 0, "var2": 0, "var3": 0 },
+                        { "perk": 8014, "var1": 0, "var2": 0, "var3": 0 }
+                    ]
+                },
+                {
+                    "description": "subStyle",
+                    "style": 8400,
+                    "selections": [
+                        { "perk": 8444, "var1": 0, "var2": 0, "var3": 0 },
+                        { "perk": 8453, "var1": 0, "var2": 0, "var3": 0 }
+                    ]
+                }
+            ]
+        }
+    }
+}

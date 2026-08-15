@@ -3,6 +3,7 @@ pub mod error;
 pub mod graph;
 pub mod match_task;
 pub mod rank;
+pub mod report;
 pub mod spectator;
 pub mod summoner;
 pub mod task;
@@ -17,6 +18,7 @@ use self::cherry_match::CherryMatchTask;
 use self::graph::GraphTask;
 use self::match_task::MatchTask;
 use self::rank::RankTask;
+use self::report::ReportTask;
 use self::spectator::SpectatorTask;
 use self::summoner::SummonerTask;
 use self::task::Task;
@@ -37,6 +39,7 @@ pub async fn dispatch(
         SummonerTask::NAME => SummonerTask::run_from_json(payload, context).await,
         TeamTask::NAME => TeamTask::run_from_json(payload, context).await,
         GraphTask::NAME => GraphTask::run_from_json(payload, context).await,
+        ReportTask::NAME => ReportTask::run_from_json(payload, context).await,
         _ => Err(error::TaskError::UnknownJob(job_name.to_string())),
     };
 

@@ -71,17 +71,22 @@ export default template.parse({
         losses: 'Prohry'
     },
     match: {
-        empty: 'Nebyl nalezený žádný zápas. Zkus upravit filtrování nebo zkusit později.',
-        loading: 'Načítám zápasy... %1/%2',
-        uploading: 'Nahrávám...',
+        empty: 'Nebyla nalezena žádná hra. Zkuste upravit filtry, nebo to zkuste znovu později',
+        loading: 'Načítání her... %1/%2',
+        uploading: 'Nahrávání...',
         results: {
             [MatchStatus.Win]: 'Výhra',
             [MatchStatus.Loss]: 'Prohra',
             [MatchStatus.Remake]: 'Remake'
         },
-        buttonInfoText: 'Zobrazuji %1-%2 posledních zápasů',
+        buttonInfoText: 'Zobrazeno %1-%2 posledních her',
         place: 'Místo',
         team: 'Tým',
+        sentToChannel: 'Odesláno do kanálu'
+    },
+    report: {
+        selectPlaceholder: 'Vyberte hru pro vygenerování reportu',
+        generatingImage: 'Generování zápasového reportu...',
         sentToChannel: 'Odesláno do kanálu'
     },
     clash: {
