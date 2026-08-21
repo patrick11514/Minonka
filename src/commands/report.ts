@@ -5,6 +5,7 @@ import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { recordMatchDataAndDuoPairs } from '$/lib/Riot/duo';
 import { ParticipantSchema } from '$/lib/Riot/schemes';
+import { evaluatePlayerTags } from '$/lib/Riot/tags';
 import { queues, Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
 import { ReportTaskInput } from '$/types/worker/ReportTaskInput';
@@ -197,7 +198,7 @@ export default class Report extends AccountCommand<undefined> {
             return;
         }
 
-        await interaction.deferReply();
+        await interaction.deferUpdate();
 
         const selectedMatchId = interaction.values[0];
         const { puuid, region } = data;
@@ -205,8 +206,9 @@ export default class Report extends AccountCommand<undefined> {
         const matchData = await api[region].match.match(selectedMatchId);
         if (!matchData.status) {
             const lang = getLocale(interaction.locale);
-            await interaction.editReply({
-                content: formatErrorResponse(lang, matchData)
+            await interaction.followUp({
+                content: formatErrorResponse(lang, matchData),
+                flags: MessageFlags.Ephemeral
             });
             return;
         }
@@ -214,8 +216,9 @@ export default class Report extends AccountCommand<undefined> {
         const summoner = await api[region].summoner.byPuuid(puuid);
         if (!summoner.status) {
             const lang = getLocale(interaction.locale);
-            await interaction.editReply({
-                content: formatErrorResponse(lang, summoner)
+            await interaction.followUp({
+                content: formatErrorResponse(lang, summoner),
+                flags: MessageFlags.Ephemeral
             });
             return;
         }
@@ -223,8 +226,9 @@ export default class Report extends AccountCommand<undefined> {
         const account = await api[region].account.byPuuid(puuid);
         if (!account.status) {
             const lang = getLocale(interaction.locale);
-            await interaction.editReply({
-                content: formatErrorResponse(lang, account)
+            await interaction.followUp({
+                content: formatErrorResponse(lang, account),
+                flags: MessageFlags.Ephemeral
             });
             return;
         }
@@ -234,8 +238,9 @@ export default class Report extends AccountCommand<undefined> {
 
         if (!participant) {
             const lang = getLocale(interaction.locale);
-            await interaction.editReply({
-                content: lang.match.empty
+            await interaction.followUp({
+                content: lang.match.empty,
+                flags: MessageFlags.Ephemeral
             });
             return;
         }
@@ -305,6 +310,14 @@ export default class Report extends AccountCommand<undefined> {
             }
         }
 
+        // Tag Evaluation
+        const tags = evaluatePlayerTags(
+            participant,
+            matchData.data,
+            timelineData.status ? timelineData.data : null,
+            interaction.locale
+        );
+
         const payload: ReportTaskInput = {
             puuid,
             region,
@@ -372,7 +385,8 @@ export default class Report extends AccountCommand<undefined> {
             teamTotalDamage,
             teamTotalKills,
             timelineItems,
-            timelineWards
+            timelineWards,
+            tags
         };
 
         const resultPath = await process.workerServer.addJobWait('report', payload);
@@ -380,14 +394,19 @@ export default class Report extends AccountCommand<undefined> {
         const buffer = await fs.readFile(resultPath);
 
         await interaction.editReply({
+            content: '',
             files: [
                 {
                     attachment: buffer,
                     name: 'report.png'
                 }
-            ]
+            ],
+            components: interaction.message.components
         });
 
-        await fs.unlink(resultPath);
+        // Delete temporary file only if it was in the temp directory (not cached persistent)
+        if (resultPath.includes('/tmp') || resultPath.includes('output_')) {
+            await fs.unlink(resultPath).catch(() => {});
+        }
     }
 }

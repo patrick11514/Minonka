@@ -1,5 +1,6 @@
 use crate::cache::json::JsonCache;
 use crate::context::AppContext;
+use crate::draw::badge::Badge;
 use crate::draw::color::Color;
 use crate::draw::container::{AlignItems, Container, ContainerDirection, JustifyContent};
 use crate::draw::label::Label;
@@ -41,6 +42,15 @@ pub struct TimelineWardEventInput {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(feature = "export-ts", ts(export))]
+pub struct PlayerTagInput {
+    pub id: String,
+    pub name: String,
+    pub color: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[cfg_attr(feature = "export-ts", ts(export))]
 pub struct ReportTaskInput {
     #[serde(flatten)]
     pub default: DefaultParametersInput,
@@ -57,6 +67,8 @@ pub struct ReportTaskInput {
     pub timeline_items: Vec<TimelineItemEventInput>,
     #[serde(default)]
     pub timeline_wards: Vec<TimelineWardEventInput>,
+    #[serde(default)]
+    pub tags: Vec<PlayerTagInput>,
 }
 
 pub struct ReportTask;
@@ -374,7 +386,7 @@ impl Task for ReportTask {
                                 ),
                         ),
                 )
-                // 2. Outcome Banner & Multikill Badge
+                // 2. Outcome Banner & Multikill Badge & Player Tags
                 .child(
                     Container::new()
                         .direction(ContainerDirection::Column)
@@ -392,7 +404,27 @@ impl Task for ReportTask {
                                 .bold()
                                 .size(24)
                                 .color(Color::Rgba(255, 215, 0, 255))
-                        })),
+                        }))
+                        .child_if(if !input.tags.is_empty() {
+                            Some(
+                                Container::new()
+                                    .direction(ContainerDirection::Row)
+                                    .gap(8)
+                                    .align_items(AlignItems::Center)
+                                    .justify(JustifyContent::Center)
+                                    .wrap(true)
+                                    .childs(input.tags.iter().map(|tag| {
+                                        let border_color = Color::from_hex(&tag.color);
+                                        Badge::new(&tag.name)
+                                            .color(border_color)
+                                            .size(18)
+                                            .padding(10, 4)
+                                            .border_radius(4.0)
+                                    })),
+                            )
+                        } else {
+                            None
+                        }),
                 )
                 // 3. Main Champion & KDA Spotlight Card with 2 Vertical Rune Columns next to it
                 .child(

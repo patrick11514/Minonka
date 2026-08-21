@@ -267,5 +267,52 @@ export default template.parse({
             updated: 'Updated defaults for %1. %2',
             reset: 'Defaults for %1 decided to take a vacation. Reset complete.'
         }
+    },
+    reportTags: {
+        earlyKiller: 'Early Killer',
+        firstBlood: 'First Blood',
+        damageMonster: 'Damage Monster',
+        killLeader: 'Dominator',
+        bountyHunter: 'Bounty Hunter',
+        assassin: 'Silent Assassin',
+        unkillable: 'Unkillable',
+        ironWall: 'Iron Wall',
+        teamAnchor: 'Team Anchor',
+        masterAssistant: 'Guardian Angel',
+        clutchPerformer: 'Clutch Performer',
+        visionMaster: 'Visionmaster',
+        wardSweeper: 'Blackout',
+        controlWarden: 'Control Warden',
+        csMachine: 'CS Machine',
+        goldTycoon: 'Gold Tycoon',
+        dragonSlayer: 'Dragon Slayer'
+    },
+    reportTagDescriptions: {
+        earlyKiller: 'Secured a kill before 5:00 in-game time',
+        firstBlood: 'Secured the first champion kill of the match **(unique)**',
+        damageMonster:
+            'Highest damage dealt to champions & at least 30% of team total damage **(unique)**',
+        killLeader: 'Highest kills in the match (at least 8 kills) **(unique)**',
+        bountyHunter: 'Achieved a multikill of 3 or more (Triple, Quadra, or Pentakill)',
+        assassin: 'At least 10 kills with 2 or fewer deaths',
+        unkillable: '0 deaths in a match lasting at least 15 minutes',
+        ironWall:
+            'Highest damage taken (at least 20,000) with 4 or fewer deaths **(unique)**',
+        teamAnchor:
+            'Kill participation (KP) of at least 70% with at least 5 team kills **(team unique)**',
+        masterAssistant:
+            'Highest assists in the match (at least 15 assists) **(unique)**',
+        clutchPerformer: 'KDA ratio of at least 8.0 in a winning match',
+        visionMaster: 'Highest vision score in the match (at least 60) **(unique)**',
+        wardSweeper: 'Destroyed at least 8 enemy wards',
+        controlWarden: 'Placed at least 5 Control Wards',
+        csMachine: 'Averaged at least 8.5 CS per minute',
+        goldTycoon: 'Most gold earned in the match (at least 15,000 gold) **(unique)**',
+        dragonSlayer: 'Secured at least 3 dragon kills'
+    },
+    tagsCommand: {
+        title: 'Performance Badges (Tags)',
+        description:
+            'List of all available match performance badges and their requirements:'
     }
 } satisfies z.infer<typeof template>);

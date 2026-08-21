@@ -1,3 +1,4 @@
+pub mod badge;
 pub mod color;
 pub mod container;
 pub mod label;

@@ -71,5 +71,22 @@
                 }
             ]
         }
-    }
+    },
+    "tags": [
+        {
+            "id": "damageMonster",
+            "name": "Ničitel",
+            "color": "#FF5722"
+        },
+        {
+            "id": "earlyKiller",
+            "name": "Brzký zabiják",
+            "color": "#FF4655"
+        },
+        {
+            "id": "csMachine",
+            "name": "Farmář",
+            "color": "#00E676"
+        }
+    ]
 }

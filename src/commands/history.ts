@@ -6,6 +6,7 @@ import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { getMatchTeamIndicators, recordMatchDataAndDuoPairs } from '$/lib/Riot/duo';
 import { getLpDetails } from '$/lib/Riot/lp';
 import { CherryMatchSchema, MatchSchema } from '$/lib/Riot/schemes';
+import { evaluatePlayerTags } from '$/lib/Riot/tags';
 import { queues, Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
 import { DePromise, OmitUnion } from '$/types/types';
@@ -225,8 +226,28 @@ export default class History extends AccountCommand<CustomData> {
                         getMatchTeamIndicators(regularMatchData)
                     ]);
 
+                    const participantsWithTags = regularMatchData.info.participants.map(
+                        (participant) => {
+                            const tags = evaluatePlayerTags(
+                                participant,
+                                regularMatchData,
+                                null,
+                                locale
+                            );
+
+                            return {
+                                ...participant,
+                                tags
+                            };
+                        }
+                    );
+
                     const payload: MatchTaskInput = {
                         ...regularMatchData,
+                        info: {
+                            ...regularMatchData.info,
+                            participants: participantsWithTags
+                        },
                         locale,
                         region,
                         puuid,

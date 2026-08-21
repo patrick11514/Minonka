@@ -268,5 +268,50 @@ export default template.parse({
             updated: 'Přednastavení pro %1 aktualizováno. %2',
             reset: 'Přednastavení pro %1 bylo resetováno.'
         }
+    },
+    reportTags: {
+        earlyKiller: 'Brzký zabiják',
+        firstBlood: 'První zářez',
+        damageMonster: 'Ničitel',
+        killLeader: 'Dominátor',
+        bountyHunter: 'Lovec odměn',
+        assassin: 'Tichý vrah',
+        unkillable: 'Nezabitelný',
+        ironWall: 'Železná zeď',
+        teamAnchor: 'Opora týmu',
+        masterAssistant: 'Anděl strážný',
+        clutchPerformer: 'Hrdina okamžiku',
+        visionMaster: 'Vševidoucí',
+        wardSweeper: 'Čistič mapy',
+        controlWarden: 'Strážce vize',
+        csMachine: 'Farmář',
+        goldTycoon: 'Zlatý magnát',
+        dragonSlayer: 'Drakobijce'
+    },
+    reportTagDescriptions: {
+        earlyKiller: 'Získal zářez před 5. minutou hry',
+        firstBlood: 'Získal první zářez v zápase **(unikátní)**',
+        damageMonster:
+            'Nejvyšší poškození do šampionů a alespoň 30 % z celkového poškození týmu **(unikátní)**',
+        killLeader: 'Nejvíce zářezů v zápase (alespoň 8) **(unikátní)**',
+        bountyHunter: 'Získal multikill 3 a více (Triple, Quadra nebo Pentakill)',
+        assassin: 'Alespoň 10 zářezů a maximálně 2 úmrtí',
+        unkillable: '0 úmrtí v zápase trvajícím alespoň 15 minut',
+        ironWall:
+            'Nejvíce obdrženého poškození (alespoň 20 000) a maximálně 4 úmrtí **(unikátní)**',
+        teamAnchor:
+            'Účast na zářezech týmu (KP) alespoň 70 % při alespoň 5 zářezech týmu **(unikátní v týmu)**',
+        masterAssistant: 'Nejvíce asistencí v zápase (alespoň 15) **(unikátní)**',
+        clutchPerformer: 'KDA alespoň 8.0 ve vítězném zápase',
+        visionMaster: 'Nejvyšší vision score v zápase (alespoň 60) **(unikátní)**',
+        wardSweeper: 'Zničil alespoň 8 nepřátelských wardů',
+        controlWarden: 'Položil alespoň 5 control wardů',
+        csMachine: 'Alespoň 8.5 CS za minutu',
+        goldTycoon: 'Nejvíce získaného zlata v zápase (alespoň 15 000) **(unikátní)**',
+        dragonSlayer: 'Zabil alespoň 3 draky'
+    },
+    tagsCommand: {
+        title: 'Herní odznaky (Tagy)',
+        description: 'Seznam všech dostupných odznaků a podmínek pro jejich získání:'
     }
 } satisfies z.infer<typeof template>);
