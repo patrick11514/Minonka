@@ -324,7 +324,7 @@ export const SpectatorSchema = z.object({
     gameLength: z.number(),
     participants: z.array(
         z.object({
-            puuid: z.string(),
+            puuid: z.string().nullable(),
             teamId: z.number(),
             spell1Id: z.number(),
             spell2Id: z.number(),

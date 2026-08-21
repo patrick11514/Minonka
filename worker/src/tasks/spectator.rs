@@ -40,7 +40,7 @@ pub struct SpectatorParticipantInput {
     pub team_id: u32,
     pub champion_id: u32,
     pub riot_id: String,
-    pub puuid: String,
+    pub puuid: Option<String>,
     pub spell1_id: u32,
     pub spell2_id: u32,
     pub perks: SpectatorPerksInput,
@@ -252,7 +252,7 @@ impl Task for SpectatorTask {
 
         for player in &input.participants {
             let reversed = player.team_id != 100;
-            let me = player.puuid == input.default.puuid;
+            let me = player.puuid.as_deref() == Some(&input.default.puuid);
             let comp = render_context
                 .player_component(player, me, reversed)
                 .await?;
@@ -343,5 +343,10 @@ mod test {
     #[tokio::test]
     async fn test_spectator_cs() {
         crate::assert_task!(super::SpectatorTask, "test_files/spectator_cs.json");
+    }
+
+    #[tokio::test]
+    async fn test_spectator_streamer() {
+        crate::assert_task!(super::SpectatorTask, "test_files/spectator_streamer.json");
     }
 }
