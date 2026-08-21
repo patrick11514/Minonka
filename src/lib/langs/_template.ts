@@ -234,5 +234,47 @@ export default o({
             updated: _,
             reset: _
         })
+    }),
+    reportTags: o({
+        earlyKiller: _,
+        firstBlood: _,
+        damageMonster: _,
+        killLeader: _,
+        bountyHunter: _,
+        assassin: _,
+        unkillable: _,
+        ironWall: _,
+        teamAnchor: _,
+        masterAssistant: _,
+        clutchPerformer: _,
+        visionMaster: _,
+        wardSweeper: _,
+        controlWarden: _,
+        csMachine: _,
+        goldTycoon: _,
+        dragonSlayer: _
+    }),
+    reportTagDescriptions: o({
+        earlyKiller: _,
+        firstBlood: _,
+        damageMonster: _,
+        killLeader: _,
+        bountyHunter: _,
+        assassin: _,
+        unkillable: _,
+        ironWall: _,
+        teamAnchor: _,
+        masterAssistant: _,
+        clutchPerformer: _,
+        visionMaster: _,
+        wardSweeper: _,
+        controlWarden: _,
+        csMachine: _,
+        goldTycoon: _,
+        dragonSlayer: _
+    }),
+    tagsCommand: o({
+        title: _,
+        description: _
     })
 });

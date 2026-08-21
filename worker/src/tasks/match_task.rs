@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::cache::json::JsonCache;
+use crate::draw::badge::Badge;
 use crate::draw::color::Color;
 use crate::draw::container::{AlignItems, Container, ContainerDirection, JustifyContent};
 use crate::draw::label::Label;
@@ -122,6 +123,9 @@ pub struct MatchParticipantInput {
     pub largest_multi_kill: u32,
     pub win: bool,
     pub perks: MatchPerksInput,
+    #[serde(default)]
+    #[cfg_attr(feature = "export-ts", ts(optional))]
+    pub tags: Option<Vec<crate::tasks::report::PlayerTagInput>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -426,14 +430,60 @@ impl RenderContext {
                                     .color(text_color),
                             ),
                     )
-                    .child(
-                        Label::new(format!(
-                            "{}/{}/{}",
-                            player.kills, player.deaths, player.assists
-                        ))
-                        .bold()
-                        .size(32),
-                    ),
+                    .child_if(if !player.tags.as_deref().unwrap_or_default().is_empty() {
+                        Some(
+                            Container::new()
+                                .direction(ContainerDirection::Column)
+                                .align_items(if reversed {
+                                    AlignItems::End
+                                } else {
+                                    AlignItems::Start
+                                })
+                                .child(
+                                    Label::new(format!(
+                                        "{}/{}/{}",
+                                        player.kills, player.deaths, player.assists
+                                    ))
+                                    .bold()
+                                    .size(32),
+                                )
+                                .child(
+                                    Container::new()
+                                        .direction(ContainerDirection::Row)
+                                        .gap(4)
+                                        .width(260)
+                                        .wrap(true)
+                                        .align_items(if reversed {
+                                            AlignItems::End
+                                        } else {
+                                            AlignItems::Start
+                                        })
+                                        .childs(player.tags.as_deref().unwrap_or_default().iter().map(|tag| {
+                                            let tag_color = Color::from_hex(&tag.color);
+                                            Badge::new(&tag.name)
+                                                .color(tag_color)
+                                                .size(13)
+                                                .padding(6, 2)
+                                                .border_radius(3.0)
+                                        }))
+                                        .reverse_if(reversed),
+                                ),
+                        )
+                    } else {
+                        None
+                    })
+                    .child_if(if player.tags.as_deref().unwrap_or_default().is_empty() {
+                        Some(
+                            Label::new(format!(
+                                "{}/{}/{}",
+                                player.kills, player.deaths, player.assists
+                            ))
+                            .bold()
+                            .size(32),
+                        )
+                    } else {
+                        None
+                    }),
             )
             .child(
                 Container::new()
