@@ -441,6 +441,7 @@ impl RenderContext {
                 Container::new()
                     .direction(ContainerDirection::Row)
                     .gap(2)
+                    .y(94)
                     .width(player_info_width)
                     .wrap(true)
                     .align_items(if reversed {
@@ -462,15 +463,9 @@ impl RenderContext {
             None
         };
 
-        let player_info = Container::new()
+        let player_info = Stack::new()
             .width(player_info_width)
-            .direction(ContainerDirection::Column)
-            .gap(2)
-            .align_items(if reversed {
-                AlignItems::End
-            } else {
-                AlignItems::Start
-            })
+            .height(total_height)
             .child(
                 Container::new()
                     .direction(ContainerDirection::Row)
