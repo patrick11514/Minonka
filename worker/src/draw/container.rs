@@ -1,8 +1,11 @@
 use crate::{
     context::font_registry::FontRegistry,
-    draw::renderable::{AsRenderable, Renderable},
+    draw::{
+        color::Color,
+        renderable::{AsRenderable, Renderable},
+    },
 };
-use image::RgbaImage;
+use image::{Pixel, RgbaImage};
 
 #[derive(Default, Clone, Copy, Debug)]
 pub struct Padding {
@@ -62,6 +65,7 @@ pub struct Container {
     padding: Padding,
     wrap: bool,
     max_items_per_line: Option<usize>,
+    background: Option<Color>,
 }
 
 struct Line<'a> {
@@ -86,7 +90,13 @@ impl Container {
             padding: Padding::zero(),
             wrap: false,
             max_items_per_line: None,
+            background: None,
         }
+    }
+
+    pub fn background(mut self, color: Color) -> Self {
+        self.background = Some(color);
+        self
     }
 
     pub fn x(mut self, x: i32) -> Self {
@@ -339,6 +349,24 @@ impl Container {
 
 impl Renderable for Container {
     fn render(&self, canvas: &mut RgbaImage, fonts: &FontRegistry, offset_x: i32, offset_y: i32) {
+        if let Some(bg) = self.background {
+            let (total_w, total_h) = self.size(fonts);
+            let start_x = (offset_x + self.x).max(0) as u32;
+            let start_y = (offset_y + self.y).max(0) as u32;
+            let end_x = ((offset_x + self.x) + total_w as i32)
+                .min(canvas.width() as i32)
+                .max(0) as u32;
+            let end_y = ((offset_y + self.y) + total_h as i32)
+                .min(canvas.height() as i32)
+                .max(0) as u32;
+            let rgba = bg.to_rgba();
+            for y in start_y..end_y {
+                for x in start_x..end_x {
+                    canvas.get_pixel_mut(x, y).blend(&rgba);
+                }
+            }
+        }
+
         if matches!(
             self.direction,
             ContainerDirection::Column | ContainerDirection::ColumnReverse

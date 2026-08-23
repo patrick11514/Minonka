@@ -441,7 +441,7 @@ impl RenderContext {
                 Container::new()
                     .direction(ContainerDirection::Row)
                     .gap(2)
-                    .y(94)
+                    .y(104)
                     .width(player_info_width)
                     .wrap(true)
                     .align_items(if reversed {
@@ -540,7 +540,7 @@ impl RenderContext {
             .map(|team| {
                 Container::new()
                     .direction(ContainerDirection::Column)
-                    .gap(15)
+                    .gap(32)
                     .childs(team.into_iter())
             })
             .collect_tuple()
