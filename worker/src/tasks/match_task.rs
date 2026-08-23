@@ -379,112 +379,112 @@ impl RenderContext {
         ])
         .await?;
 
-        Ok(Container::new()
-            .direction(ContainerDirection::Row)
-            .gap(spacing)
-            .child(
-                Stack::new().child(champion).child(
-                    Container::new()
-                        .width(champion_dimensions.0)
-                        .height(total_height)
-                        .align_items(AlignItems::End)
-                        .justify(JustifyContent::Center)
-                        .child(
-                            Label::new(player.champ_level.to_string())
-                                .size(level_text_size)
-                                .bold()
-                                .stroke(Color::Black, 4),
-                        ),
+        let player_info_width = champion_dimensions.0 + spacing + 260;
+
+        let champion_stack = Stack::new().child(champion).child(
+            Container::new()
+                .width(champion_dimensions.0)
+                .height(total_height)
+                .align_items(AlignItems::End)
+                .justify(JustifyContent::Center)
+                .child(
+                    Label::new(player.champ_level.to_string())
+                        .size(level_text_size)
+                        .bold()
+                        .stroke(Color::Black, 4),
                 ),
-            )
+        );
+
+        let name_container = Container::new()
+            .height(champion_dimensions.1)
+            .width(260)
+            .direction(ContainerDirection::Column)
+            .justify(JustifyContent::SpaceBetween)
+            .align_items(if reversed {
+                AlignItems::End
+            } else {
+                AlignItems::Start
+            })
             .child(
                 Container::new()
-                    .height(champion_dimensions.1)
-                    .width(260)
                     .direction(ContainerDirection::Column)
-                    .justify(JustifyContent::SpaceBetween)
                     .align_items(if reversed {
                         AlignItems::End
                     } else {
                         AlignItems::Start
                     })
                     .child(
-                        Container::new()
-                            .direction(ContainerDirection::Column)
-                            .align_items(if reversed {
-                                AlignItems::End
-                            } else {
-                                AlignItems::Start
-                            })
-                            .child(
-                                Label::new(player.riot_id_game_name.clone())
-                                    .bold()
-                                    .size(36)
-                                    .color(text_color),
-                            )
-                            .child(
-                                Label::new(format!("#{}", player.riot_id_tagline))
-                                    .y(-10)
-                                    .bold()
-                                    .size(26)
-                                    .color(text_color),
-                            ),
-                    )
-                    .child_if(if !player.tags.as_deref().unwrap_or_default().is_empty() {
-                        Some(
-                            Container::new()
-                                .direction(ContainerDirection::Column)
-                                .align_items(if reversed {
-                                    AlignItems::End
-                                } else {
-                                    AlignItems::Start
-                                })
-                                .child(
-                                    Label::new(format!(
-                                        "{}/{}/{}",
-                                        player.kills, player.deaths, player.assists
-                                    ))
-                                    .bold()
-                                    .size(32),
-                                )
-                                .child(
-                                    Container::new()
-                                        .direction(ContainerDirection::Row)
-                                        .gap(4)
-                                        .width(260)
-                                        .wrap(true)
-                                        .align_items(if reversed {
-                                            AlignItems::End
-                                        } else {
-                                            AlignItems::Start
-                                        })
-                                        .childs(player.tags.as_deref().unwrap_or_default().iter().map(|tag| {
-                                            let tag_color = Color::from_hex(&tag.color);
-                                            Badge::new(&tag.name)
-                                                .color(tag_color)
-                                                .size(13)
-                                                .padding(6, 2)
-                                                .border_radius(3.0)
-                                        }))
-                                        .reverse_if(reversed),
-                                ),
-                        )
-                    } else {
-                        None
-                    })
-                    .child_if(if player.tags.as_deref().unwrap_or_default().is_empty() {
-                        Some(
-                            Label::new(format!(
-                                "{}/{}/{}",
-                                player.kills, player.deaths, player.assists
-                            ))
+                        Label::new(player.riot_id_game_name.clone())
                             .bold()
-                            .size(32),
-                        )
-                    } else {
-                        None
-                    }),
+                            .size(36)
+                            .color(text_color),
+                    )
+                    .child(
+                        Label::new(format!("#{}", player.riot_id_tagline))
+                            .y(-10)
+                            .bold()
+                            .size(26)
+                            .color(text_color),
+                    ),
             )
+            .child(
+                Label::new(format!(
+                    "{}/{}/{}",
+                    player.kills, player.deaths, player.assists
+                ))
+                .bold()
+                .size(32),
+            );
+
+        let tags_container = if !player.tags.as_deref().unwrap_or_default().is_empty() {
+            Some(
+                Container::new()
+                    .direction(ContainerDirection::Row)
+                    .gap(2)
+                    .width(player_info_width)
+                    .wrap(true)
+                    .align_items(if reversed {
+                        AlignItems::End
+                    } else {
+                        AlignItems::Start
+                    })
+                    .childs(player.tags.as_deref().unwrap_or_default().iter().map(|tag| {
+                        let tag_color = Color::from_hex(&tag.color);
+                        Badge::new(&tag.name)
+                            .color(tag_color)
+                            .size(13)
+                            .padding(5, 2)
+                            .border_radius(3.0)
+                    }))
+                    .reverse_if(reversed),
+            )
+        } else {
+            None
+        };
+
+        let player_info = Container::new()
+            .width(player_info_width)
+            .direction(ContainerDirection::Column)
+            .gap(2)
+            .align_items(if reversed {
+                AlignItems::End
+            } else {
+                AlignItems::Start
+            })
+            .child(
+                Container::new()
+                    .direction(ContainerDirection::Row)
+                    .gap(spacing)
+                    .child(champion_stack)
+                    .child(name_container)
+                    .reverse_if(reversed),
+            )
+            .child_if(tags_container);
+
+        Ok(Container::new()
+            .direction(ContainerDirection::Row)
+            .gap(spacing)
+            .child(player_info)
             .child(
                 Container::new()
                     .direction(ContainerDirection::Column)
@@ -806,5 +806,10 @@ mod test {
             super::MatchTask,
             "test_files/match_dem_challenger_gm.json"
         );
+    }
+
+    #[tokio::test]
+    async fn test_match_tags() {
+        crate::assert_task!(super::MatchTask, "test_files/match_tags.json");
     }
 }
