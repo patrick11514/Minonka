@@ -577,7 +577,44 @@
                 "totalMinionsKilled": 83,
                 "visionScore": 84,
                 "win": false,
-                "puuid": "8__AxqDeAxMahk1OSwHN10AZnVqi67LoHm7Nf0kNsTmrzAtA7Yszh3eFWoyEypxA5pPe5OJh9Q4Lsw"
+                "puuid": "8__AxqDeAxMahk1OSwHN10AZnVqi67LoHm7Nf0kNsTmrzAtA7Yszh3eFWoyEypxA5pPe5OJh9Q4Lsw",
+                "tags": [
+                    {
+                        "id": "earlyKiller",
+                        "name": "Early Killer",
+                        "color": "#FF4655"
+                    },
+                    {
+                        "id": "firstBlood",
+                        "name": "First Blood",
+                        "color": "#E60000"
+                    },
+                    {
+                        "id": "damageMonster",
+                        "name": "Damage Monster",
+                        "color": "#FF5722"
+                    },
+                    {
+                        "id": "bountyHunter",
+                        "name": "Bounty Hunter",
+                        "color": "#FFD700"
+                    },
+                    {
+                        "id": "assassin",
+                        "name": "Silent Assassin",
+                        "color": "#B388FF"
+                    },
+                    {
+                        "id": "unkillable",
+                        "name": "Unkillable",
+                        "color": "#00E5FF"
+                    },
+                    {
+                        "id": "ironWall",
+                        "name": "Iron Wall",
+                        "color": "#78909C"
+                    }
+                ]
             },
             {
                 "champExperience": 22201,
@@ -1141,7 +1178,44 @@
                 "totalMinionsKilled": 74,
                 "visionScore": 91,
                 "win": true,
-                "puuid": "iAgw8JT8-3Zt_U1OSwEvztymbsIrCcizRzULxqhaWNcW6cMTM49w0ltAgIN0BMoilTMkQntDV6FAdg"
+                "puuid": "iAgw8JT8-3Zt_U1OSwEvztymbsIrCcizRzULxqhaWNcW6cMTM49w0ltAgIN0BMoilTMkQntDV6FAdg",
+                "tags": [
+                    {
+                        "id": "earlyKiller",
+                        "name": "Early Killer",
+                        "color": "#FF4655"
+                    },
+                    {
+                        "id": "firstBlood",
+                        "name": "First Blood",
+                        "color": "#E60000"
+                    },
+                    {
+                        "id": "damageMonster",
+                        "name": "Damage Monster",
+                        "color": "#FF5722"
+                    },
+                    {
+                        "id": "bountyHunter",
+                        "name": "Bounty Hunter",
+                        "color": "#FFD700"
+                    },
+                    {
+                        "id": "assassin",
+                        "name": "Silent Assassin",
+                        "color": "#B388FF"
+                    },
+                    {
+                        "id": "unkillable",
+                        "name": "Unkillable",
+                        "color": "#00E5FF"
+                    },
+                    {
+                        "id": "ironWall",
+                        "name": "Iron Wall",
+                        "color": "#78909C"
+                    }
+                ]
             }
         ],
         "queueId": 420,
