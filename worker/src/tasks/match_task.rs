@@ -379,7 +379,18 @@ impl RenderContext {
         ])
         .await?;
 
-        let player_info_width = champion_dimensions.0 + spacing + 260;
+        let rune_width = total_height / 2 - spacing;
+        let summoner_width = rune_width;
+        let items_width = item_size * 7 + item_spacing * 6;
+        let total_player_width = champion_dimensions.0
+            + spacing
+            + 260
+            + spacing
+            + rune_width
+            + spacing
+            + summoner_width
+            + spacing
+            + items_width;
 
         let champion_stack = Stack::new().child(champion).child(
             Container::new()
@@ -436,36 +447,9 @@ impl RenderContext {
                 .size(32),
             );
 
-        let tags_container = if !player.tags.as_deref().unwrap_or_default().is_empty() {
-            Some(
-                Container::new()
-                    .direction(ContainerDirection::Row)
-                    .gap(2)
-                    .y(104)
-                    .width(player_info_width)
-                    .wrap(true)
-                    .align_items(if reversed {
-                        AlignItems::End
-                    } else {
-                        AlignItems::Start
-                    })
-                    .childs(player.tags.as_deref().unwrap_or_default().iter().map(|tag| {
-                        let tag_color = Color::from_hex(&tag.color);
-                        Badge::new(&tag.name)
-                            .color(tag_color)
-                            .size(13)
-                            .padding(5, 2)
-                            .border_radius(3.0)
-                    }))
-                    .reverse_if(reversed),
-            )
-        } else {
-            None
-        };
-
-        let player_info = Stack::new()
-            .width(player_info_width)
-            .height(total_height)
+        let player_row = Container::new()
+            .direction(ContainerDirection::Row)
+            .gap(spacing)
             .child(
                 Container::new()
                     .direction(ContainerDirection::Row)
@@ -474,12 +458,6 @@ impl RenderContext {
                     .child(name_container)
                     .reverse_if(reversed),
             )
-            .child_if(tags_container);
-
-        Ok(Container::new()
-            .direction(ContainerDirection::Row)
-            .gap(spacing)
-            .child(player_info)
             .child(
                 Container::new()
                     .direction(ContainerDirection::Column)
@@ -513,12 +491,47 @@ impl RenderContext {
                     )
                     .child(
                         Container::new()
-                            .width(item_size * 7 + item_spacing * 6)
+                            .width(items_width)
                             .justify(JustifyContent::SpaceBetween)
                             .childs(stats.into_iter()),
                     ),
             )
-            .reverse_if(reversed))
+            .reverse_if(reversed);
+
+        let tags_container = if !player.tags.as_deref().unwrap_or_default().is_empty() {
+            Some(
+                Container::new()
+                    .direction(ContainerDirection::Row)
+                    .gap(4)
+                    .y(109)
+                    .width(total_player_width)
+                    .wrap(true)
+                    .align_items(if reversed {
+                        AlignItems::End
+                    } else {
+                        AlignItems::Start
+                    })
+                    .childs(player.tags.as_deref().unwrap_or_default().iter().map(|tag| {
+                        let tag_color = Color::from_hex(&tag.color);
+                        Badge::new(&tag.name)
+                            .color(tag_color)
+                            .size(13)
+                            .padding(5, 2)
+                            .border_radius(3.0)
+                    }))
+                    .reverse_if(reversed),
+            )
+        } else {
+            None
+        };
+
+        Ok(Container::new().child(
+            Stack::new()
+                .width(total_player_width)
+                .height(total_height)
+                .child(player_row)
+                .child_if(tags_container),
+        ))
     }
 
     pub async fn make_teams(
@@ -540,7 +553,7 @@ impl RenderContext {
             .map(|team| {
                 Container::new()
                     .direction(ContainerDirection::Column)
-                    .gap(32)
+                    .gap(24)
                     .childs(team.into_iter())
             })
             .collect_tuple()
@@ -670,6 +683,7 @@ impl Task for MatchTask {
                     .direction(ContainerDirection::Column)
                     .child(
                         Container::new()
+                            .y(-10)
                             .align_items(AlignItems::Center)
                             .child(left_bans)
                             .child(
@@ -687,6 +701,7 @@ impl Task for MatchTask {
                     )
                     .child(
                         Container::new()
+                            .y(-20)
                             .align_items(AlignItems::Start)
                             .child(left_players)
                             .child(
