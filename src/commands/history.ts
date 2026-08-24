@@ -185,14 +185,24 @@ export default class History extends AccountCommand<CustomData> {
             return lang.match.empty;
         }
 
-        const matches = matchIds.data.map((matchId) => api[region].match.match(matchId));
-        const matchesData = await Promise.all(matches);
+        const matchPromises = matchIds.data.map((matchId) =>
+            api[region].match.match(matchId)
+        );
+        const timelinePromises = matchIds.data.map((matchId) =>
+            api[region].match.timeline(matchId)
+        );
+
+        const [matchesData, timelinesData] = await Promise.all([
+            Promise.all(matchPromises),
+            Promise.all(timelinePromises)
+        ]);
+
         if (matchesData.some((match) => !match.status)) {
             return formatErrorResponse(lang, matchesData.find((match) => !match.status)!);
         }
 
         return await Promise.all(
-            matchesData.map(async (matchResponse) => {
+            matchesData.map(async (matchResponse, index) => {
                 if (!matchResponse.status) {
                     throw new Error('Unexpected match response status');
                 }
@@ -226,12 +236,18 @@ export default class History extends AccountCommand<CustomData> {
                         getMatchTeamIndicators(regularMatchData)
                     ]);
 
+                    const timelineResponse = timelinesData[index];
+                    const timelineData =
+                        timelineResponse && timelineResponse.status
+                            ? timelineResponse.data
+                            : null;
+
                     const participantsWithTags = regularMatchData.info.participants.map(
                         (participant) => {
                             const tags = evaluatePlayerTags(
                                 participant,
                                 regularMatchData,
-                                null,
+                                timelineData,
                                 locale
                             );
 
