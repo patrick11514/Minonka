@@ -23,6 +23,13 @@
                 "perkIds": [8230],
                 "perkStyle": 8200,
                 "perkSubStyle": 8000
+            },
+            "rank": {
+                "tierIndex": 3,
+                "tier": "GOLD",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 75
             }
         },
         {
@@ -39,6 +46,13 @@
                 "perkIds": [8214],
                 "perkStyle": 8200,
                 "perkSubStyle": 8300
+            },
+            "rank": {
+                "tierIndex": 4,
+                "tier": "PLATINUM",
+                "rankIndex": 2,
+                "rank": "II",
+                "lp": 50
             }
         },
         {
@@ -55,6 +69,13 @@
                 "perkIds": [8010],
                 "perkStyle": 8000,
                 "perkSubStyle": 8400
+            },
+            "rank": {
+                "tierIndex": 5,
+                "tier": "EMERALD",
+                "rankIndex": 0,
+                "rank": "IV",
+                "lp": 10
             }
         },
         {
@@ -71,7 +92,8 @@
                 "perkIds": [8005],
                 "perkStyle": 8000,
                 "perkSubStyle": 8300
-            }
+            },
+            "rank": null
         },
         {
             "puuid": "vs6WLDTL7IY3n01OSwEh3dbhxIu0oImmnBHNIps1BnaDP3lAOUmVXDVrDl-7O36lZUK5n3pAWs4T8g",
@@ -87,6 +109,13 @@
                 "perkIds": [8112],
                 "perkStyle": 8100,
                 "perkSubStyle": 8300
+            },
+            "rank": {
+                "tierIndex": 7,
+                "tier": "MASTER",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 120
             }
         },
         {
@@ -103,6 +132,13 @@
                 "perkIds": [8229],
                 "perkStyle": 8200,
                 "perkSubStyle": 8100
+            },
+            "rank": {
+                "tierIndex": 6,
+                "tier": "DIAMOND",
+                "rankIndex": 1,
+                "rank": "III",
+                "lp": 30
             }
         },
         {
@@ -119,6 +155,13 @@
                 "perkIds": [8992],
                 "perkStyle": 8200,
                 "perkSubStyle": 8300
+            },
+            "rank": {
+                "tierIndex": 8,
+                "tier": "GRANDMASTER",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 540
             }
         },
         {
@@ -135,6 +178,13 @@
                 "perkIds": [9923],
                 "perkStyle": 8100,
                 "perkSubStyle": 8000
+            },
+            "rank": {
+                "tierIndex": 2,
+                "tier": "SILVER",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 80
             }
         },
         {
@@ -151,6 +201,13 @@
                 "perkIds": [8112],
                 "perkStyle": 8100,
                 "perkSubStyle": 8400
+            },
+            "rank": {
+                "tierIndex": 9,
+                "tier": "CHALLENGER",
+                "rankIndex": 3,
+                "rank": "I",
+                "lp": 950
             }
         },
         {
@@ -167,6 +224,13 @@
                 "perkIds": [8010],
                 "perkStyle": 8000,
                 "perkSubStyle": 8300
+            },
+            "rank": {
+                "tierIndex": 1,
+                "tier": "BRONZE",
+                "rankIndex": 2,
+                "rank": "II",
+                "lp": 25
             }
         }
     ],

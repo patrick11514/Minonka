@@ -151,5 +151,12 @@ impl AppLocale {
             (AppLocale::En, false) => "Rank Down to",
         }
     }
+
+    pub fn unranked(&self) -> &'static str {
+        match self {
+            AppLocale::Cz => "Nehodnocený",
+            AppLocale::En => "Unranked",
+        }
+    }
 }
 

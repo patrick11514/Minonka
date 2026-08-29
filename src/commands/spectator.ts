@@ -4,8 +4,10 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { getLpGain } from '$/lib/Riot/lp';
-import { Region } from '$/lib/Riot/types';
+import { Rank, Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
+import { RankTier } from '$/types/worker/RankTier';
+import { SpectatorParticipantInput } from '$/types/worker/SpectatorParticipantInput';
 import { SpectatorTaskInput } from '$/types/worker/SpectatorTaskInput';
 import {
     ActionRowBuilder,
@@ -66,13 +68,57 @@ export async function fetchSpectatorTaskInput(
     const maps = await getMaps(riotLocale);
     const mapName = maps?.data[spectator.data.mapId.toString()]?.MapName ?? 'Unknown';
 
+    const queueId = spectator.data.gameQueueConfigId;
+    const participants: SpectatorParticipantInput[] = await Promise.all(
+        spectator.data.participants.map(async (participant) => {
+            let rank: RankTier | undefined = undefined;
+            if (participant.puuid && !participant.bot) {
+                try {
+                    const league = await api[region].league.byPuuid(participant.puuid);
+                    if (league.status && league.data.length > 0) {
+                        if (queueId === 420) {
+                            const soloEntry = league.data.find(
+                                (e) => e.queueType === 'RANKED_SOLO_5x5'
+                            );
+                            if (soloEntry) {
+                                rank = new Rank(soloEntry).toRust();
+                            }
+                        } else if (queueId === 440) {
+                            const flexEntry = league.data.find(
+                                (e) => e.queueType === 'RANKED_FLEX_SR'
+                            );
+                            if (flexEntry) {
+                                rank = new Rank(flexEntry).toRust();
+                            }
+                        } else {
+                            const sorted = [...league.data].sort(
+                                (a, b) =>
+                                    new Rank(b).getTotalLp() - new Rank(a).getTotalLp()
+                            );
+                            if (sorted.length > 0) {
+                                rank = new Rank(sorted[0]).toRust();
+                            }
+                        }
+                    }
+                } catch {
+                    // Ignore error and leave rank as undefined
+                }
+            }
+
+            return {
+                ...participant,
+                rank
+            };
+        })
+    );
+
     const data: SpectatorTaskInput = {
         puuid: puuid,
         region: region,
         locale: locale,
         queueName,
         gameLength: spectator.data.gameLength,
-        participants: spectator.data.participants,
+        participants,
         bannedChampions: spectator.data.bannedChampions,
         mapName
     };
