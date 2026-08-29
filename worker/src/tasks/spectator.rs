@@ -23,6 +23,7 @@ use crate::utils::assets::{
 };
 use crate::utils::format_duration;
 use crate::utils::locale::AppLocale;
+use crate::utils::rank::RankTier;
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -44,6 +45,9 @@ pub struct SpectatorParticipantInput {
     pub spell1_id: u32,
     pub spell2_id: u32,
     pub perks: SpectatorPerksInput,
+    #[serde(default)]
+    #[cfg_attr(feature = "export-ts", ts(optional))]
+    pub rank: Option<RankTier>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -127,7 +131,18 @@ impl RenderContext {
                     .bold()
                     .size(25)
                     .color(text_color),
-            );
+            )
+            .child(if let Some(rank) = &player.rank {
+                Label::new(rank.as_str(&self.locale))
+                    .bold()
+                    .size(25)
+                    .color(rank.tier().color())
+            } else {
+                Label::new(self.locale.unranked())
+                    .bold()
+                    .size(25)
+                    .color(Color::Gray)
+            });
 
         let player_info = Container::new()
             .direction(ContainerDirection::Row)
