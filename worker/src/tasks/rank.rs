@@ -186,7 +186,11 @@ impl Task for RankTask {
                         Label::new(format!("WR: {:.2}%", win_rate))
                             .size(60)
                             .bold()
-                            .color(Color::Green),
+                            .color(if win_rate < 50.0 {
+                                Color::Red
+                            } else {
+                                Color::Green
+                            }),
                     )
                     .child(
                         Label::new(format!("Wins - {}", rank_entry.wins))

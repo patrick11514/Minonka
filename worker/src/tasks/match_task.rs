@@ -251,10 +251,28 @@ impl RenderContext {
         let mut rune = Sprite::from_asset(&rune, 0, 0).await?;
         rune.resize_to_width(total_height / 2 - spacing);
 
-        let quest = if let Some(quest_item) = player.role_bound_item {
-            get_item_asset(quest_item)
+        let (mut quest_or_secondary_rune, is_role_bound) = if let Some(quest_item) = player.role_bound_item {
+            let quest_asset = get_item_asset(quest_item);
+            if let Ok(sprite) = Sprite::from_asset(&quest_asset, 0, 0).await {
+                (sprite, true)
+            } else {
+                let secondary_rune = get_rune_asset(
+                    player
+                        .perks
+                        .styles
+                        .iter()
+                        .nth(1)
+                        .and_then(|perk| Some(perk.style))
+                        .expect("Second perk not found"),
+                    None,
+                    &self.json,
+                    &self.locale,
+                )
+                .await?;
+                (Sprite::from_asset(&secondary_rune, 0, 0).await?, false)
+            }
         } else {
-            get_rune_asset(
+            let secondary_rune = get_rune_asset(
                 player
                     .perks
                     .styles
@@ -266,14 +284,14 @@ impl RenderContext {
                 &self.json,
                 &self.locale,
             )
-            .await?
+            .await?;
+            (Sprite::from_asset(&secondary_rune, 0, 0).await?, false)
         };
 
         //Quest on normal Summoners rift and secondary rune on ARAM
-        let mut quest_or_secondary_rune = Sprite::from_asset(&quest, 0, 0).await?;
         quest_or_secondary_rune.resize_to_width(
             total_height / 2
-                - if let Some(_) = player.role_bound_item {
+                - if is_role_bound {
                     spacing
                 } else {
                     spacing * 4
@@ -313,13 +331,15 @@ impl RenderContext {
                     .child(item_background.clone())
                     .child_if(if item_id != 0 {
                         let asset = get_item_asset(item_id);
-                        let mut sprite = Sprite::from_asset(&asset, 0, 0)
-                            .await
-                            .expect("Failed to read item asset")
-                            .x(item_spacing as i32)
-                            .y(item_spacing as i32);
-                        sprite.resize_to_width(item_background.dimensions().0 - item_spacing * 2);
-                        Some(sprite)
+                        if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
+                            sprite = sprite
+                                .x(item_spacing as i32)
+                                .y(item_spacing as i32);
+                            sprite.resize_to_width(item_background.dimensions().0 - item_spacing * 2);
+                            Some(sprite)
+                        } else {
+                            None
+                        }
                     } else {
                         None
                     });
@@ -821,5 +841,33 @@ mod test {
     #[tokio::test]
     async fn test_match_tags() {
         crate::assert_task!(super::MatchTask, "test_files/match_tags.json");
+    }
+
+    #[tokio::test]
+    async fn test_match_missing_item_asset() {
+        const NON_EXISTENT_ITEM_ID: u32 = 999_999;
+
+        let payload = std::fs::read_to_string("test_files/match_draft.json")
+            .expect("Failed to read match_draft.json");
+        let mut input: super::MatchTaskInput =
+            serde_json::from_str(&payload).expect("Failed to parse input JSON");
+
+        // Set an item that does not exist in ddragon
+        input.info.participants[0].item0 = NON_EXISTENT_ITEM_ID;
+        input.info.participants[0].role_bound_item = Some(NON_EXISTENT_ITEM_ID);
+
+        let context = crate::context::AppContext::new()
+            .await
+            .expect("Failed to initialize worker context");
+
+        let outcome = <super::MatchTask as crate::tasks::task::Task>::run(input, context)
+            .await
+            .expect("Match task should not fail when an item asset is missing");
+
+        if let crate::tasks::task::TaskOutcome::Render(mut canvas, _) = outcome {
+            canvas.render();
+        } else {
+            panic!("Expected Render outcome");
+        }
     }
 }
