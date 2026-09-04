@@ -288,13 +288,15 @@ impl RenderContext {
                     .child(item_background.clone())
                     .child_if(if item_id != 0 {
                         let asset = get_item_asset(item_id);
-                        let mut sprite = Sprite::from_asset(&asset, 0, 0)
-                            .await
-                            .expect("Failed to read item asset")
-                            .x(item_spacing as i32)
-                            .y(item_spacing as i32);
-                        sprite.resize_to_width(item_background.dimensions().0 - item_spacing * 2);
-                        Some(sprite)
+                        if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
+                            sprite = sprite
+                                .x(item_spacing as i32)
+                                .y(item_spacing as i32);
+                            sprite.resize_to_width(item_background.dimensions().0 - item_spacing * 2);
+                            Some(sprite)
+                        } else {
+                            None
+                        }
                     } else {
                         None
                     })
