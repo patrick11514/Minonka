@@ -845,14 +845,16 @@ mod test {
 
     #[tokio::test]
     async fn test_match_missing_item_asset() {
+        const NON_EXISTENT_ITEM_ID: u32 = 999_999;
+
         let payload = std::fs::read_to_string("test_files/match_draft.json")
             .expect("Failed to read match_draft.json");
         let mut input: super::MatchTaskInput =
             serde_json::from_str(&payload).expect("Failed to parse input JSON");
 
-        // Set an item that does not exist in ddragon (e.g. 3097)
-        input.info.participants[0].item0 = 3097;
-        input.info.participants[0].role_bound_item = Some(3097);
+        // Set an item that does not exist in ddragon
+        input.info.participants[0].item0 = NON_EXISTENT_ITEM_ID;
+        input.info.participants[0].role_bound_item = Some(NON_EXISTENT_ITEM_ID);
 
         let context = crate::context::AppContext::new()
             .await
