@@ -298,7 +298,8 @@ export default class Report extends AccountCommand<undefined> {
                         } else if (
                             event.creatorId === participantId &&
                             event.type === 'WARD_PLACED' &&
-                            event.wardType
+                            event.wardType &&
+                            event.wardType !== 'UNDEFINED'
                         ) {
                             timelineWards.push({
                                 wardType: event.wardType,
