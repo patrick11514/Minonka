@@ -260,8 +260,8 @@ impl Task for ReportTask {
                 let item_id = match ward.ward_type.as_str() {
                     "CONTROL_WARD" => 2055,
                     "BLUE_TRINKET" => 3363,
-                    "SIGHT_WARD" => 3340,
-                    _ => 3340, // YELLOW_TRINKET & others
+                    "SIGHT_WARD" | "YELLOW_TRINKET" => 3340,
+                    _ => return Ok::<Option<Container>, crate::tasks::error::TaskError>(None),
                 };
                 let asset = get_item_asset(item_id);
                 if let Ok(mut sprite) = Sprite::from_asset(&asset, 0, 0).await {
