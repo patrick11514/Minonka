@@ -462,3 +462,36 @@ export const getMaps = async (lang: RiotLanguage) => {
         return null;
     }
 };
+
+export type Position = 'TOP' | 'JUNGLE' | 'MIDDLE' | 'BOTTOM' | 'SUPPORT';
+
+export type ChampionPositionInfo = {
+    id: number;
+    name: string;
+    key: string;
+    positions: Position[];
+};
+
+export type ChampionPositions = Record<string, ChampionPositionInfo>;
+
+export const getChampionPositions = async (): Promise<ChampionPositions | null> => {
+    try {
+        const path = Path.join(ROOT, 'champion-positions.json');
+        if (!(await asyncExists(path))) {
+            l.error('Asset champion-positions.json not found on disk.');
+            return null;
+        }
+
+        const asset = await assetCache.get(path);
+        if (!asset) {
+            return null;
+        }
+
+        const data = JSON.parse(asset.toString()) as ChampionPositions;
+        return data;
+    } catch (e) {
+        l.error(e);
+        process.discordBot?.handleError?.(e, 'GetChampionPositions Asset parsing');
+        return null;
+    }
+};

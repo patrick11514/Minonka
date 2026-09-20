@@ -70,3 +70,11 @@ if [ ! -d "lanes" ]; then
 fi
 
 echo "Lane-rank-specific icons are up to date"
+
+# champion positions
+if [ ! -f "champion-positions.json" ]; then
+    echo "Downloading champion positions"
+    curl -s -A "Mozilla/5.0" https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/champions.json | jq '[.[] | {(.id|tostring): {id: .id, name: .name, key: .key, positions: .positions}}] | add' > champion-positions.json
+fi
+
+echo "Champion positions are up to date"
