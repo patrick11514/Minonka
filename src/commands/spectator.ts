@@ -4,6 +4,7 @@ import { getLocale, replacePlaceholders } from '$/lib/langs';
 import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { getLpGain } from '$/lib/Riot/lp';
+import { orderSpectatorParticipants } from '$/lib/Riot/spectatorOrder';
 import { Rank, Region } from '$/lib/Riot/types';
 import { Account } from '$/types/database';
 import { RankTier } from '$/types/worker/RankTier';
@@ -112,13 +113,18 @@ export async function fetchSpectatorTaskInput(
         })
     );
 
+    const orderedParticipants = await orderSpectatorParticipants(
+        participants,
+        spectator.data.mapId
+    );
+
     const data: SpectatorTaskInput = {
         puuid: puuid,
         region: region,
         locale: locale,
         queueName,
         gameLength: spectator.data.gameLength,
-        participants,
+        participants: orderedParticipants,
         bannedChampions: spectator.data.bannedChampions,
         mapName
     };
