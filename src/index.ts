@@ -11,6 +11,7 @@ import { EmojiManager } from './lib/EmojiManager';
 import { InMemory } from './lib/InMemory';
 import Logger from './lib/logger';
 import './lib/pollyfill';
+import { WebServer } from './lib/WebServer';
 import { WorkerServer } from './lib/WorkerServer';
 
 //Initialize global process variables
@@ -37,6 +38,10 @@ if (process.argv.includes('--register')) {
     const workerServer = new WorkerServer();
     process.workerServer = workerServer;
     process.inMemory = new InMemory();
+
+    const webServer = new WebServer();
+    process.webServer = webServer;
+    await webServer.start();
 
     const emoji = new EmojiManager();
     process.emoji = emoji;

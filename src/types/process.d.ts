@@ -1,6 +1,7 @@
 import { DiscordBot } from '$/lib/DiscordBot';
 import { EmojiManager } from '$/lib/EmojiManager';
 import { InMemory } from '$/lib/InMemory';
+import { WebServer } from '$/lib/WebServer';
 import { WorkerServer } from '$/lib/WorkerServer';
 import { Client } from 'discord.js';
 
@@ -10,6 +11,7 @@ declare global {
     namespace NodeJS {
         interface Process {
             workerServer: WorkerServer;
+            webServer: WebServer;
             client: Client;
             discordBot: DiscordBot;
             lolPatch: string;
