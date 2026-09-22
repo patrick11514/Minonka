@@ -20,7 +20,9 @@ const schema = z.object({
     EMOJI_GUILD_CHAMPIONS: z.string(),
     EMOJI_GUILD_ITEMS: z.string(),
     EMOJI_GUILD_MISC: z.string(),
-    ERRORS_LOG_CHANNEL: z.string()
+    ERRORS_LOG_CHANNEL: z.string(),
+    WEBSERVER_PORT: z.coerce.number().default(5182),
+    WEBSERVER_BASE_URL: z.string().default('https://minonka.patrick115.eu')
 });
 
 export const env = schema.parse(process.env);
