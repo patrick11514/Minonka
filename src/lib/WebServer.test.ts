@@ -103,11 +103,11 @@ test('WebServer routes and page rendering', async (t) => {
         });
     });
 
-    await t.test('WebServer.start binds to configured host (127.0.0.1)', async () => {
+    await t.test('WebServer.start binds to configured host (0.0.0.0)', async () => {
         const standaloneServer = new WebServer();
         const s = await standaloneServer.start();
         const address = s.address() as AddressInfo;
-        assert.strictEqual(address.address, '127.0.0.1');
+        assert.strictEqual(address.address, '0.0.0.0');
         await standaloneServer.stop();
     });
 });
