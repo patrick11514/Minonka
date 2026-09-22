@@ -6,6 +6,7 @@ import api from '$/lib/Riot/api';
 import { getLpGain } from '$/lib/Riot/lp';
 import { orderSpectatorParticipants } from '$/lib/Riot/spectatorOrder';
 import { Rank, Region } from '$/lib/Riot/types';
+import { canSendToChannel } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import { RankTier } from '$/types/worker/RankTier';
 import { SpectatorParticipantInput } from '$/types/worker/SpectatorParticipantInput';
@@ -268,19 +269,20 @@ export default class Spectator extends AccountCommand {
         const header = `<@${interaction.user.id}> ${spectatorResult.gameName}#${spectatorResult.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
-        if (
-            interaction.isStringSelectMenu() &&
-            interaction.channel?.isTextBased() &&
-            interaction.channel.isSendable()
-        ) {
-            publicMessage = await interaction.channel.send({
-                content: header + lang.spectator.generatingImage
-            });
-            await interaction.reply({
-                content: lang.spectator.sentToChannel,
-                flags: MessageFlags.Ephemeral
-            });
-            await interaction.deleteReply();
+        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
+            try {
+                publicMessage = await interaction.channel.send({
+                    content: header + lang.spectator.generatingImage
+                });
+                await interaction.reply({
+                    content: lang.spectator.sentToChannel,
+                    flags: MessageFlags.Ephemeral
+                });
+                await interaction.deleteReply();
+            } catch {
+                publicMessage = undefined;
+                await interaction.deferReply();
+            }
         } else {
             await interaction.deferReply();
         }

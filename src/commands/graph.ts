@@ -4,6 +4,7 @@ import Logger from '$/lib/logger';
 import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { Region } from '$/lib/Riot/types';
+import { canSendToChannel } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import { GraphTaskInput } from '$/types/worker/GraphTaskInput';
 import { conn } from '$/types/connection';
@@ -172,19 +173,20 @@ export default class Graph extends AccountCommand<CustomData> {
         const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
-        if (
-            interaction.isStringSelectMenu() &&
-            interaction.channel?.isTextBased() &&
-            interaction.channel.isSendable()
-        ) {
-            publicMessage = await interaction.channel.send({
-                content: header + lang.graph.generatingImage
-            });
-            await interaction.reply({
-                content: lang.graph.sentToChannel,
-                flags: MessageFlags.Ephemeral
-            });
-            await interaction.deleteReply();
+        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
+            try {
+                publicMessage = await interaction.channel.send({
+                    content: header + lang.graph.generatingImage
+                });
+                await interaction.reply({
+                    content: lang.graph.sentToChannel,
+                    flags: MessageFlags.Ephemeral
+                });
+                await interaction.deleteReply();
+            } catch {
+                publicMessage = undefined;
+                await interaction.deferReply();
+            }
         } else {
             await interaction.deferReply();
         }

@@ -8,6 +8,7 @@ import { getLpDetails } from '$/lib/Riot/lp';
 import { CherryMatchSchema, MatchSchema } from '$/lib/Riot/schemes';
 import { evaluatePlayerTags } from '$/lib/Riot/tags';
 import { queues, Region } from '$/lib/Riot/types';
+import { canSendToChannel } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import { DePromise, OmitUnion } from '$/types/types';
 import type { MatchTaskInput } from '$/types/worker/MatchTaskInput';
@@ -374,25 +375,26 @@ export default class History extends AccountCommand<CustomData> {
         const header = `<@${interaction.user.id}> ${account.gameName}#${account.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
-        if (
-            interaction.isStringSelectMenu() &&
-            interaction.channel?.isTextBased() &&
-            interaction.channel.isSendable()
-        ) {
-            publicMessage = await interaction.channel.send({
-                content:
-                    header +
-                    replacePlaceholders(
-                        lang.match.loading,
-                        '0',
-                        customData.count.toString()
-                    )
-            });
-            await interaction.reply({
-                content: lang.match.sentToChannel,
-                flags: MessageFlags.Ephemeral
-            });
-            await interaction.deleteReply();
+        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
+            try {
+                publicMessage = await interaction.channel.send({
+                    content:
+                        header +
+                        replacePlaceholders(
+                            lang.match.loading,
+                            '0',
+                            customData.count.toString()
+                        )
+                });
+                await interaction.reply({
+                    content: lang.match.sentToChannel,
+                    flags: MessageFlags.Ephemeral
+                });
+                await interaction.deleteReply();
+            } catch {
+                publicMessage = undefined;
+                await interaction.deferReply();
+            }
         } else {
             await interaction.deferReply();
         }

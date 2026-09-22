@@ -335,8 +335,13 @@ export class DiscordBot extends EventEmitter<Events> {
 **Time:** ${new Date().toLocaleString()}
 **Interaction:** ${extendedInfo}`;
         if (interactionOrContext instanceof BaseInteraction) {
+            const serverName = interactionOrContext.guild?.name
+                ? interactionOrContext.guild.name
+                : interactionOrContext.guildId
+                  ? 'External Guild (User App)'
+                  : 'DM / Private Channel';
             header += `
-**Server:** ${interactionOrContext.guild?.name ?? 'DM'} (${interactionOrContext.guildId ?? 'N/A'})
+**Server:** ${serverName} (${interactionOrContext.guildId ?? 'N/A'})
 **Executor:** <@${interactionOrContext.user.id}> (${interactionOrContext.user.id})`;
         }
 

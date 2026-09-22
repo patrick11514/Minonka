@@ -5,7 +5,7 @@ import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { getRecentStreakForQueue } from '$/lib/Riot/streak';
 import { Rank, Region } from '$/lib/Riot/types';
-import { getHighestRank } from '$/lib/utilities';
+import { canSendToChannel, getHighestRank } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import { BannerType } from '$/types/worker/BannerType';
 import { SummonerTaskInput } from '$/types/worker/SummonerTaskInput';
@@ -125,19 +125,20 @@ export default class Summoner extends AccountCommand {
         const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
-        if (
-            interaction.isStringSelectMenu() &&
-            interaction.channel?.isTextBased() &&
-            interaction.channel.isSendable()
-        ) {
-            publicMessage = await interaction.channel.send({
-                content: header + lang.summoner.generatingImage
-            });
-            await interaction.reply({
-                content: lang.summoner.sentToChannel,
-                flags: MessageFlags.Ephemeral
-            });
-            await interaction.deleteReply();
+        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
+            try {
+                publicMessage = await interaction.channel.send({
+                    content: header + lang.summoner.generatingImage
+                });
+                await interaction.reply({
+                    content: lang.summoner.sentToChannel,
+                    flags: MessageFlags.Ephemeral
+                });
+                await interaction.deleteReply();
+            } catch {
+                publicMessage = undefined;
+                await interaction.deferReply();
+            }
         } else {
             await interaction.deferReply();
         }
