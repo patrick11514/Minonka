@@ -11,7 +11,7 @@ test('WebServer routes and page rendering', async (t) => {
 
     await t.test('start server on ephemeral port', async () => {
         server = await new Promise((resolve) => {
-            const s = webServer.app.listen(0, () => resolve(s));
+            const s = webServer.app.listen(0, '127.0.0.1', () => resolve(s));
         });
         const port = (server.address() as AddressInfo).port;
         baseUrl = `http://127.0.0.1:${port}`;
@@ -101,5 +101,13 @@ test('WebServer routes and page rendering', async (t) => {
         await new Promise<void>((resolve, reject) => {
             server.close((err) => (err ? reject(err) : resolve()));
         });
+    });
+
+    await t.test('WebServer.start binds to configured host (127.0.0.1)', async () => {
+        const standaloneServer = new WebServer();
+        const s = await standaloneServer.start();
+        const address = s.address() as AddressInfo;
+        assert.strictEqual(address.address, '127.0.0.1');
+        await standaloneServer.stop();
     });
 });

@@ -65,12 +65,13 @@ export class WebServer {
             return this.server;
         }
 
+        const host = env.WEBSERVER_HOST;
         const port = env.WEBSERVER_PORT;
-        l.start(`Starting WebServer on port ${port}...`);
+        l.start(`Starting WebServer on ${host}:${port}...`);
 
         return new Promise((resolve) => {
-            this.server = this.app.listen(port, () => {
-                l.stop(`WebServer listening on port ${port}`);
+            this.server = this.app.listen(port, host, () => {
+                l.stop(`WebServer listening on ${host}:${port}`);
                 resolve(this.server!);
             });
         });
