@@ -5,6 +5,7 @@ import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { getRecentStreakForQueue } from '$/lib/Riot/streak';
 import { Region } from '$/lib/Riot/types';
+import { canSendToChannel } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import { RankTaskInput } from '$/types/worker/RankTaskInput';
 import {
@@ -134,19 +135,20 @@ export default class Rank extends AccountCommand {
         const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
-        if (
-            interaction.isStringSelectMenu() &&
-            interaction.channel?.isTextBased() &&
-            interaction.channel.isSendable()
-        ) {
-            publicMessage = await interaction.channel.send({
-                content: header + lang.rank.generatingImage
-            });
-            await interaction.reply({
-                content: lang.rank.sentToChannel,
-                flags: MessageFlags.Ephemeral
-            });
-            await interaction.deleteReply();
+        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
+            try {
+                publicMessage = await interaction.channel.send({
+                    content: header + lang.rank.generatingImage
+                });
+                await interaction.reply({
+                    content: lang.rank.sentToChannel,
+                    flags: MessageFlags.Ephemeral
+                });
+                await interaction.deleteReply();
+            } catch {
+                publicMessage = undefined;
+                await interaction.deferReply();
+            }
         } else {
             await interaction.deferReply();
         }

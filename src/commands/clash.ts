@@ -6,7 +6,7 @@ import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { Rank, Region } from '$/lib/Riot/types';
 import { SubCommand } from '$/lib/SubCommand';
-import { addRegionOption, getHighestRank } from '$/lib/utilities';
+import { addRegionOption, canSendToChannel, getHighestRank } from '$/lib/utilities';
 import { Account } from '$/types/database';
 import { TeamTaskInput } from '$/types/worker/TeamTaskInput';
 import {
@@ -290,19 +290,20 @@ export default class Clash extends Command {
         }
 
         let publicMessage: Message<boolean> | undefined = undefined;
-        if (
-            interaction.isStringSelectMenu() &&
-            interaction.channel?.isTextBased() &&
-            interaction.channel.isSendable()
-        ) {
-            publicMessage = await interaction.channel.send({
-                content: headerPrefix + lang.clash.generatingImage
-            });
-            await interaction.reply({
-                content: lang.clash.sentToChannel,
-                flags: MessageFlags.Ephemeral
-            });
-            await interaction.deleteReply();
+        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
+            try {
+                publicMessage = await interaction.channel.send({
+                    content: headerPrefix + lang.clash.generatingImage
+                });
+                await interaction.reply({
+                    content: lang.clash.sentToChannel,
+                    flags: MessageFlags.Ephemeral
+                });
+                await interaction.deleteReply();
+            } catch {
+                publicMessage = undefined;
+                await interaction.deferReply();
+            }
         } else {
             await interaction.deferReply();
         }

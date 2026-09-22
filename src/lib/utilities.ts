@@ -1,4 +1,9 @@
-import { Locale } from 'discord.js';
+import {
+    Locale,
+    PermissionFlagsBits,
+    RepliableInteraction,
+    type SendableChannels
+} from 'discord.js';
 import { Command } from './Command';
 import { SubCommand } from './SubCommand';
 import { getLocale } from './langs';
@@ -165,4 +170,51 @@ export const getChampionsMap = async (lang: RiotLanguage) => {
         map.set(champion.key, champion);
     }
     return map;
+};
+
+export const canSendToChannel = (
+    interaction: RepliableInteraction
+): interaction is RepliableInteraction & { channel: SendableChannels } => {
+    const channel = interaction.channel;
+    if (!channel || !channel.isTextBased() || !channel.isSendable()) {
+        return false;
+    }
+
+    if (interaction.inGuild()) {
+        // If bot is not in the guild (e.g. User App in an external server), interaction.guild is null
+        if (!interaction.guild) {
+            return false;
+        }
+
+        const botMember = interaction.guild.members.me;
+        if (!botMember) {
+            return false;
+        }
+
+        if ('permissionsFor' in channel && typeof channel.permissionsFor === 'function') {
+            const permissions = channel.permissionsFor(botMember);
+            if (
+                !permissions ||
+                !permissions.has(PermissionFlagsBits.ViewChannel) ||
+                !permissions.has(PermissionFlagsBits.SendMessages)
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    if (channel.isDMBased()) {
+        if (
+            'isGroupDM' in channel &&
+            typeof channel.isGroupDM === 'function' &&
+            channel.isGroupDM()
+        ) {
+            return false;
+        }
+        return true;
+    }
+
+    return false;
 };

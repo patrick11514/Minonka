@@ -6,7 +6,11 @@ import api from '$/lib/Riot/api';
 import { formatErrorResponse } from '$/lib/Riot/baseRequest';
 import { MasterySchema } from '$/lib/Riot/schemes';
 import { Region } from '$/lib/Riot/types';
-import { discordLocaleToJSLocale, getChampionsMap } from '$/lib/utilities';
+import {
+    canSendToChannel,
+    discordLocaleToJSLocale,
+    getChampionsMap
+} from '$/lib/utilities';
 import { Account } from '$/types/database';
 import {
     ActionRowBuilder,
@@ -174,20 +178,23 @@ export default class Mastery extends AccountCommand {
             return;
         }
 
-        if (
-            interaction.isStringSelectMenu() &&
-            interaction.channel?.isTextBased() &&
-            interaction.channel.isSendable()
-        ) {
-            await interaction.channel.send({
-                content: header,
-                components: [row]
-            });
-            await interaction.reply({
-                content: lang.mastery.sentToChannel,
-                flags: MessageFlags.Ephemeral
-            });
-            await interaction.deleteReply();
+        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
+            try {
+                await interaction.channel.send({
+                    content: header,
+                    components: [row]
+                });
+                await interaction.reply({
+                    content: lang.mastery.sentToChannel,
+                    flags: MessageFlags.Ephemeral
+                });
+                await interaction.deleteReply();
+            } catch {
+                await interaction.reply({
+                    content: header,
+                    components: [row]
+                });
+            }
         } else {
             await interaction.reply({
                 content: header,

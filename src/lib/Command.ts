@@ -1,5 +1,7 @@
 import {
+    ApplicationIntegrationType,
     ClientEvents,
+    InteractionContextType,
     Locale,
     SlashCommandBuilder,
     type ChatInputCommandInteraction
@@ -31,7 +33,26 @@ export abstract class Command {
     ) {
         this.slashCommand = new SlashCommandBuilder()
             .setName(name)
-            .setDescription(description);
+            .setDescription(description)
+            .setIntegrationTypes(
+                ApplicationIntegrationType.GuildInstall,
+                ApplicationIntegrationType.UserInstall
+            )
+            .setContexts(
+                InteractionContextType.Guild,
+                InteractionContextType.BotDM,
+                InteractionContextType.PrivateChannel
+            );
+    }
+
+    public setIntegrationTypes(...types: ApplicationIntegrationType[]) {
+        this.slashCommand.setIntegrationTypes(...types);
+        return this;
+    }
+
+    public setContexts(...contexts: InteractionContextType[]) {
+        this.slashCommand.setContexts(...contexts);
+        return this;
     }
 
     public addLocalization(lang: Locale, name: string, description: string) {
