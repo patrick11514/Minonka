@@ -18,7 +18,6 @@ import {
     ButtonStyle,
     CacheType,
     ChatInputCommandInteraction,
-    ContainerBuilder,
     Interaction,
     Locale,
     MediaGalleryBuilder,
@@ -26,7 +25,6 @@ import {
     Message,
     MessageFlags,
     RepliableInteraction,
-    SectionBuilder,
     TextDisplayBuilder
 } from 'discord.js';
 import { Selectable } from 'kysely';
@@ -390,11 +388,9 @@ export default class History extends AccountCommand<CustomData> {
         editMessage: Message<boolean> | RepliableInteraction<CacheType>,
         interaction: RepliableInteraction<CacheType>,
         jobIds: string[],
-        matchesInfo: HistoryMatchInfo[],
         row: ActionRowBuilder<ButtonBuilder>,
         lang: ReturnType<typeof getLocale>,
-        contentPrefix: string,
-        key: string
+        contentPrefix: string
     ) {
         if (!interaction.deferred && !interaction.replied) {
             await interaction.deferReply({
@@ -413,7 +409,7 @@ export default class History extends AccountCommand<CustomData> {
             }));
 
             const components: (
-                | ContainerBuilder
+                | MediaGalleryBuilder
                 | ActionRowBuilder<ButtonBuilder>
                 | TextDisplayBuilder
             )[] = [];
@@ -424,58 +420,15 @@ export default class History extends AccountCommand<CustomData> {
                 );
             }
 
-            for (let i = 0; i < matchesInfo.length; i++) {
-                const info = matchesInfo[i];
+            for (let i = 0; i < files.length; i++) {
                 const attachmentName = `match_${i}.png`;
-
-                const accentColor = info.isRemake
-                    ? 0x785a28
-                    : info.win
-                      ? 0x0ac8b9
-                      : 0xe84057;
-
-                const container = new ContainerBuilder()
-                    .setAccentColor(accentColor)
-                    .addMediaGalleryComponents(
-                        new MediaGalleryBuilder().addItems(
-                            new MediaGalleryItemBuilder().setURL(
-                                `attachment://${attachmentName}`
-                            )
+                components.push(
+                    new MediaGalleryBuilder().addItems(
+                        new MediaGalleryItemBuilder().setURL(
+                            `attachment://${attachmentName}`
                         )
-                    );
-
-                const minutes = Math.floor(info.gameDuration / 60);
-                const seconds = info.gameDuration % 60;
-                const durationStr = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
-
-                const resultText = info.isRemake
-                    ? (lang.match.results[MatchStatus.Remake] ?? 'Remake')
-                    : info.win
-                      ? (lang.match.results[MatchStatus.Win] ?? 'Victory')
-                      : (lang.match.results[MatchStatus.Loss] ?? 'Defeat');
-
-                const headerContent = `### ${resultText} • ${info.queueName}\n-# ${durationStr} • <t:${Math.floor(info.gameStartTimestamp / 1000)}:R>`;
-
-                if (!info.isCherry) {
-                    const section = new SectionBuilder()
-                        .addTextDisplayComponents(
-                            new TextDisplayBuilder().setContent(headerContent)
-                        )
-                        .setButtonAccessory(
-                            new ButtonBuilder()
-                                .setCustomId(`history;${key};report;${i}`)
-                                .setLabel(lang.match.report ?? 'Report')
-                                .setEmoji('📊')
-                                .setStyle(ButtonStyle.Secondary)
-                        );
-                    container.addSectionComponents(section);
-                } else {
-                    container.addTextDisplayComponents(
-                        new TextDisplayBuilder().setContent(headerContent)
-                    );
-                }
-
-                components.push(container);
+                    )
+                );
             }
 
             components.push(row);
@@ -604,22 +557,18 @@ export default class History extends AccountCommand<CustomData> {
                 publicMessage,
                 interaction,
                 result.jobIds,
-                result.matchesInfo,
                 row,
                 lang,
-                header,
-                key
+                header
             );
         } else {
             await this.handleMessages(
                 interaction,
                 interaction,
                 result.jobIds,
-                result.matchesInfo,
                 row,
                 lang,
-                header,
-                key
+                header
             );
         }
     }
@@ -774,11 +723,9 @@ export default class History extends AccountCommand<CustomData> {
             interaction.message,
             interaction,
             result.jobIds,
-            result.matchesInfo,
             row,
             lang,
-            header,
-            key
+            header
         );
     }
 }
