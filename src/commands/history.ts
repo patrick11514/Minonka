@@ -8,9 +8,9 @@ import { getLpDetails } from '$/lib/Riot/lp';
 import { CherryMatchSchema, MatchSchema } from '$/lib/Riot/schemes';
 import { evaluatePlayerTags } from '$/lib/Riot/tags';
 import { queues, Region } from '$/lib/Riot/types';
+import { getMatchStatus, MatchStatus } from '$/lib/Riot/utilities';
 import { canSendToChannel } from '$/lib/utilities';
 import { Account } from '$/types/database';
-import { DePromise, OmitUnion } from '$/types/types';
 import type { MatchTaskInput } from '$/types/worker/MatchTaskInput';
 import {
     ActionRowBuilder,
@@ -18,20 +18,36 @@ import {
     ButtonStyle,
     CacheType,
     ChatInputCommandInteraction,
+    ContainerBuilder,
     Interaction,
     Locale,
+    MediaGalleryBuilder,
+    MediaGalleryItemBuilder,
     Message,
     MessageFlags,
-    RepliableInteraction
+    RepliableInteraction,
+    SectionBuilder,
+    TextDisplayBuilder
 } from 'discord.js';
 import { Selectable } from 'kysely';
 import crypto from 'node:crypto';
 import type { z } from 'zod';
+import { generateReport } from './report';
 
 const l = new Logger('History', 'white');
 
 type MatchData = z.infer<typeof MatchSchema>;
 type CherryMatchData = z.infer<typeof CherryMatchSchema>;
+
+export type HistoryMatchInfo = {
+    matchId: string;
+    isCherry: boolean;
+    win: boolean;
+    isRemake: boolean;
+    queueName: string;
+    gameDuration: number;
+    gameStartTimestamp: number;
+};
 
 type ButtonData = {
     discordId: string;
@@ -41,6 +57,7 @@ type ButtonData = {
     count: number;
     offset: number;
     header: string;
+    matchIds: string[];
 };
 
 type CustomData = {
@@ -202,7 +219,9 @@ export default class History extends AccountCommand<CustomData> {
             return formatErrorResponse(lang, matchesData.find((match) => !match.status)!);
         }
 
-        return await Promise.all(
+        const matchesInfo: HistoryMatchInfo[] = [];
+
+        const jobIds = await Promise.all(
             matchesData.map(async (matchResponse, index) => {
                 if (!matchResponse.status) {
                     throw new Error('Unexpected match response status');
@@ -213,6 +232,26 @@ export default class History extends AccountCommand<CustomData> {
                 let jobId: string;
                 if (matchData.isCherry) {
                     const cherryMatchData: CherryMatchData = matchData;
+                    const participant = cherryMatchData.info.participants.find(
+                        (p) => p.puuid === puuid
+                    );
+                    const win = participant
+                        ? participant.subteamPlacement <= 2 || (participant.win ?? false)
+                        : false;
+
+                    matchesInfo[index] = {
+                        matchId: cherryMatchData.metadata.matchId,
+                        isCherry: true,
+                        win,
+                        isRemake: false,
+                        queueName:
+                            getLocale(locale).queues[cherryMatchData.info.queueId] ??
+                            'Arena',
+                        gameDuration: cherryMatchData.info.gameDuration,
+                        gameStartTimestamp: Number(
+                            cherryMatchData.info.gameStartTimestamp
+                        )
+                    };
 
                     jobId = process.workerServer.addJob('cherryMatch', {
                         ...cherryMatchData,
@@ -259,6 +298,34 @@ export default class History extends AccountCommand<CustomData> {
                         }
                     );
 
+                    let win = false;
+                    let isRemake = false;
+                    try {
+                        const status = getMatchStatus(regularMatchData, puuid);
+                        win = status === MatchStatus.Win;
+                        isRemake = status === MatchStatus.Remake;
+                    } catch {
+                        const participant = regularMatchData.info.participants.find(
+                            (p) => p.puuid === puuid
+                        );
+                        win = participant?.win ?? false;
+                        isRemake = participant?.gameEndedInEarlySurrender ?? false;
+                    }
+
+                    matchesInfo[index] = {
+                        matchId: regularMatchData.metadata.matchId,
+                        isCherry: false,
+                        win,
+                        isRemake,
+                        queueName:
+                            getLocale(locale).queues[regularMatchData.info.queueId] ??
+                            'Custom',
+                        gameDuration: regularMatchData.info.gameDuration,
+                        gameStartTimestamp: Number(
+                            regularMatchData.info.gameStartTimestamp
+                        )
+                    };
+
                     const payload: MatchTaskInput = {
                         ...regularMatchData,
                         info: {
@@ -280,6 +347,11 @@ export default class History extends AccountCommand<CustomData> {
                 return jobId;
             })
         );
+
+        return {
+            jobIds,
+            matchesInfo
+        };
     }
 
     generateButtonRow(
@@ -317,10 +389,12 @@ export default class History extends AccountCommand<CustomData> {
     private async handleMessages(
         editMessage: Message<boolean> | RepliableInteraction<CacheType>,
         interaction: RepliableInteraction<CacheType>,
-        jobIds: OmitUnion<DePromise<ReturnType<typeof this.getFiles>>, string>,
+        jobIds: string[],
+        matchesInfo: HistoryMatchInfo[],
         row: ActionRowBuilder<ButtonBuilder>,
         lang: ReturnType<typeof getLocale>,
-        contentPrefix: string
+        contentPrefix: string,
+        key: string
     ) {
         if (!interaction.deferred && !interaction.replied) {
             await interaction.deferReply({
@@ -333,10 +407,79 @@ export default class History extends AccountCommand<CustomData> {
                 jobIds.map((jobId) => process.workerServer.wait(jobId))
             );
 
+            const attachments = files.map((file, i) => ({
+                attachment: file,
+                name: `match_${i}.png`
+            }));
+
+            const components: (
+                | ContainerBuilder
+                | ActionRowBuilder<ButtonBuilder>
+                | TextDisplayBuilder
+            )[] = [];
+
+            if (contentPrefix.trim()) {
+                components.push(
+                    new TextDisplayBuilder().setContent(contentPrefix.trim())
+                );
+            }
+
+            for (let i = 0; i < matchesInfo.length; i++) {
+                const info = matchesInfo[i];
+                const attachmentName = `match_${i}.png`;
+
+                const accentColor = info.isRemake
+                    ? 0x785a28
+                    : info.win
+                      ? 0x0ac8b9
+                      : 0xe84057;
+
+                const container = new ContainerBuilder()
+                    .setAccentColor(accentColor)
+                    .addMediaGalleryComponents(
+                        new MediaGalleryBuilder().addItems(
+                            new MediaGalleryItemBuilder().setURL(
+                                `attachment://${attachmentName}`
+                            )
+                        )
+                    );
+
+                const minutes = Math.floor(info.gameDuration / 60);
+                const seconds = info.gameDuration % 60;
+                const durationStr = `${minutes}m ${seconds.toString().padStart(2, '0')}s`;
+
+                const resultText = info.isRemake
+                    ? (lang.match.results[MatchStatus.Remake] ?? 'Remake')
+                    : info.win
+                      ? (lang.match.results[MatchStatus.Win] ?? 'Victory')
+                      : (lang.match.results[MatchStatus.Loss] ?? 'Defeat');
+
+                const section = new SectionBuilder().addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        `### ${resultText} • ${info.queueName}\n-# ${durationStr} • <t:${Math.floor(info.gameStartTimestamp / 1000)}:R>`
+                    )
+                );
+
+                if (!info.isCherry) {
+                    section.setButtonAccessory(
+                        new ButtonBuilder()
+                            .setCustomId(`history;${key};report;${i}`)
+                            .setLabel(lang.match.report ?? 'Report')
+                            .setEmoji('📊')
+                            .setStyle(ButtonStyle.Secondary)
+                    );
+                }
+
+                container.addSectionComponents(section);
+                components.push(container);
+            }
+
+            components.push(row);
+
             const payload = {
-                content: contentPrefix,
-                files,
-                components: [row]
+                flags: MessageFlags.IsComponentsV2 as const,
+                files: attachments,
+                components
             };
 
             if (editMessage instanceof Message) {
@@ -354,10 +497,15 @@ export default class History extends AccountCommand<CustomData> {
                     ? replacePlaceholders(lang.workerError, e.message)
                     : lang.genericError);
 
+            const payload = {
+                flags: MessageFlags.IsComponentsV2 as const,
+                components: [new TextDisplayBuilder().setContent(content)]
+            };
+
             if (editMessage instanceof Message) {
-                await editMessage.edit({ content });
+                await editMessage.edit(payload);
             } else {
-                await interaction.editReply({ content });
+                await interaction.editReply(payload);
             }
 
             process.discordBot.handleError(e, interaction);
@@ -378,13 +526,17 @@ export default class History extends AccountCommand<CustomData> {
         if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
             try {
                 publicMessage = await interaction.channel.send({
-                    content:
-                        header +
-                        replacePlaceholders(
-                            lang.match.loading,
-                            '0',
-                            customData.count.toString()
+                    flags: MessageFlags.IsComponentsV2,
+                    components: [
+                        new TextDisplayBuilder().setContent(
+                            header +
+                                replacePlaceholders(
+                                    lang.match.loading,
+                                    '0',
+                                    customData.count.toString()
+                                )
                         )
+                    ]
                 });
                 await interaction.reply({
                     content: lang.match.sentToChannel,
@@ -410,7 +562,8 @@ export default class History extends AccountCommand<CustomData> {
 
         if (typeof result === 'string') {
             const payload = {
-                content: header + result
+                flags: MessageFlags.IsComponentsV2 as const,
+                components: [new TextDisplayBuilder().setContent(header + result)]
             };
             if (publicMessage) {
                 await publicMessage.edit(payload);
@@ -423,35 +576,46 @@ export default class History extends AccountCommand<CustomData> {
         const key = crypto.randomBytes(16).toString('hex');
 
         const inMemory = process.inMemory.getInstance<ButtonData>();
-        inMemory.set(key, {
+        await inMemory.set(key, {
             discordId: interaction.user.id,
             puuid: account.puuid,
             region,
             queue: queue || '',
             count,
             offset,
-            header
+            header,
+            matchIds: result.matchesInfo.map((m) => m.matchId)
         });
 
-        const row = this.generateButtonRow(lang, key, count, offset, result.length);
+        const row = this.generateButtonRow(
+            lang,
+            key,
+            count,
+            offset,
+            result.jobIds.length
+        );
 
         if (publicMessage) {
             await this.handleMessages(
                 publicMessage,
                 interaction,
-                result,
+                result.jobIds,
+                result.matchesInfo,
                 row,
                 lang,
-                header
+                header,
+                key
             );
         } else {
             await this.handleMessages(
                 interaction,
                 interaction,
-                result,
+                result.jobIds,
+                result.matchesInfo,
                 row,
                 lang,
-                header
+                header,
+                key
             );
         }
     }
@@ -508,6 +672,22 @@ export default class History extends AccountCommand<CustomData> {
             return;
         }
 
+        const command = id[2];
+
+        if (command === 'report') {
+            const index = parseInt(id[3], 10);
+            const matchId = data.matchIds?.[index];
+            if (!matchId) {
+                await interaction.reply({
+                    flags: MessageFlags.Ephemeral,
+                    content: lang.match.empty
+                });
+                return;
+            }
+            await generateReport(interaction, data.puuid, data.region, matchId);
+            return;
+        }
+
         if (interaction.user.id !== data.discordId) {
             await interaction.reply({
                 flags: MessageFlags.Ephemeral,
@@ -519,7 +699,6 @@ export default class History extends AccountCommand<CustomData> {
         let { offset } = data;
         const { count, puuid, region, queue, header } = data;
 
-        const command = id[2];
         const originalOffset = offset;
 
         switch (command) {
@@ -529,6 +708,8 @@ export default class History extends AccountCommand<CustomData> {
             case 'next':
                 offset += count;
                 break;
+            case 'reload':
+                break;
         }
 
         //clamp offset to 0
@@ -536,17 +717,6 @@ export default class History extends AccountCommand<CustomData> {
 
         const account = await api[region].summoner.byPuuid(puuid);
         if (!account.status) return;
-
-        //update in memory
-        await inMemory.set(key, {
-            discordId: interaction.user.id,
-            puuid: account.data.puuid,
-            region,
-            queue: queue || '',
-            count,
-            offset,
-            header
-        });
 
         const result = await this.getFiles(
             interaction.locale,
@@ -561,8 +731,11 @@ export default class History extends AccountCommand<CustomData> {
                 //update buttons, so the next button is disabled
                 const row = this.generateButtonRow(lang, key, count, originalOffset, 0);
 
+                const existingComponents = interaction.message.components
+                    .slice(0, -1)
+                    .map((c) => c.toJSON());
                 await interaction.message.edit({
-                    components: [row]
+                    components: [...existingComponents, row]
                 });
             }
 
@@ -573,15 +746,35 @@ export default class History extends AccountCommand<CustomData> {
             return;
         }
 
-        const row = this.generateButtonRow(lang, key, count, offset, result.length);
+        //update in memory
+        await inMemory.set(key, {
+            discordId: interaction.user.id,
+            puuid: account.data.puuid,
+            region,
+            queue: queue || '',
+            count,
+            offset,
+            header,
+            matchIds: result.matchesInfo.map((m) => m.matchId)
+        });
+
+        const row = this.generateButtonRow(
+            lang,
+            key,
+            count,
+            offset,
+            result.jobIds.length
+        );
 
         await this.handleMessages(
             interaction.message,
             interaction,
-            result,
+            result.jobIds,
+            result.matchesInfo,
             row,
             lang,
-            header
+            header,
+            key
         );
     }
 }

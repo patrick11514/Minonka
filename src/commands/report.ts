@@ -11,6 +11,7 @@ import { Account } from '$/types/database';
 import { ReportTaskInput } from '$/types/worker/ReportTaskInput';
 import {
     ActionRowBuilder,
+    type BaseMessageOptions,
     CacheType,
     ChatInputCommandInteraction,
     Interaction,
@@ -203,211 +204,233 @@ export default class Report extends AccountCommand<undefined> {
         const selectedMatchId = interaction.values[0];
         const { puuid, region } = data;
 
-        const matchData = await api[region].match.match(selectedMatchId);
-        if (!matchData.status) {
-            const lang = getLocale(interaction.locale);
-            await interaction.followUp({
-                content: formatErrorResponse(lang, matchData),
-                flags: MessageFlags.Ephemeral
-            });
-            return;
-        }
-
-        const summoner = await api[region].summoner.byPuuid(puuid);
-        if (!summoner.status) {
-            const lang = getLocale(interaction.locale);
-            await interaction.followUp({
-                content: formatErrorResponse(lang, summoner),
-                flags: MessageFlags.Ephemeral
-            });
-            return;
-        }
-
-        const account = await api[region].account.byPuuid(puuid);
-        if (!account.status) {
-            const lang = getLocale(interaction.locale);
-            await interaction.followUp({
-                content: formatErrorResponse(lang, account),
-                flags: MessageFlags.Ephemeral
-            });
-            return;
-        }
-
-        const info = matchData.data.info;
-        const participant = info.participants.find((p: Participant) => p.puuid === puuid);
-
-        if (!participant) {
-            const lang = getLocale(interaction.locale);
-            await interaction.followUp({
-                content: lang.match.empty,
-                flags: MessageFlags.Ephemeral
-            });
-            return;
-        }
-
-        const teamParticipants = info.participants.filter(
-            (p: Participant) => p.teamId === participant.teamId
+        await generateReport(
+            interaction,
+            puuid,
+            region,
+            selectedMatchId,
+            interaction.message.components
         );
-        const teamTotalDamage = teamParticipants.reduce(
-            (sum: number, p: Participant) => sum + p.totalDamageDealtToChampions,
-            0
+    }
+}
+
+export async function generateReport(
+    interaction: RepliableInteraction<CacheType>,
+    puuid: string,
+    region: Region,
+    matchId: string,
+    components?: BaseMessageOptions['components']
+) {
+    const lang = getLocale(interaction.locale);
+
+    if (!interaction.deferred && !interaction.replied) {
+        await interaction.deferReply();
+    }
+
+    const handleError = async (errorContent: string) => {
+        if (!interaction.deferred && !interaction.replied) {
+            await interaction.reply({
+                content: errorContent,
+                flags: MessageFlags.Ephemeral
+            });
+        } else if (components !== undefined) {
+            await interaction.followUp({
+                content: errorContent,
+                flags: MessageFlags.Ephemeral
+            });
+        } else {
+            await interaction.editReply({
+                content: errorContent
+            });
+        }
+    };
+
+    const matchData = await api[region].match.match(matchId);
+    if (!matchData.status) {
+        await handleError(formatErrorResponse(lang, matchData));
+        return;
+    }
+
+    const summoner = await api[region].summoner.byPuuid(puuid);
+    if (!summoner.status) {
+        await handleError(formatErrorResponse(lang, summoner));
+        return;
+    }
+
+    const account = await api[region].account.byPuuid(puuid);
+    if (!account.status) {
+        await handleError(formatErrorResponse(lang, account));
+        return;
+    }
+
+    const info = matchData.data.info;
+    const participant = info.participants.find((p: Participant) => p.puuid === puuid);
+
+    if (!participant) {
+        await handleError(lang.match.empty);
+        return;
+    }
+
+    const teamParticipants = info.participants.filter(
+        (p: Participant) => p.teamId === participant.teamId
+    );
+    const teamTotalDamage = teamParticipants.reduce(
+        (sum: number, p: Participant) => sum + p.totalDamageDealtToChampions,
+        0
+    );
+    const teamTotalKills = teamParticipants.reduce(
+        (sum: number, p: Participant) => sum + p.kills,
+        0
+    );
+
+    const queue = queues.find((q) => q.queueId === info.queueId);
+    const queueName = queue
+        ? (lang.queues[queue.queueId as keyof typeof lang.queues] ?? queue.description)
+        : 'Custom';
+
+    const timelineData = await api[region].match.timeline(matchId);
+    const timelineItems: Array<{
+        itemId: number;
+        timestamp: number;
+        isSold: boolean;
+    }> = [];
+    const timelineWards: Array<{ wardType: string; timestamp: number }> = [];
+
+    if (timelineData.status && timelineData.data.info) {
+        const timelineParticipant = timelineData.data.info.participants.find(
+            (p) => p.puuid === puuid
         );
-        const teamTotalKills = teamParticipants.reduce(
-            (sum: number, p: Participant) => sum + p.kills,
-            0
-        );
+        const participantId = timelineParticipant?.participantId;
 
-        const lang = getLocale(interaction.locale);
-        const queue = queues.find((q) => q.queueId === info.queueId);
-        const queueName = queue
-            ? (lang.queues[queue.queueId as keyof typeof lang.queues] ??
-              queue.description)
-            : 'Custom';
-
-        const timelineData = await api[region].match.timeline(selectedMatchId);
-        const timelineItems: Array<{
-            itemId: number;
-            timestamp: number;
-            isSold: boolean;
-        }> = [];
-        const timelineWards: Array<{ wardType: string; timestamp: number }> = [];
-
-        if (timelineData.status && timelineData.data.info) {
-            const timelineParticipant = timelineData.data.info.participants.find(
-                (p) => p.puuid === puuid
-            );
-            const participantId = timelineParticipant?.participantId;
-
-            if (participantId !== undefined) {
-                for (const frame of timelineData.data.info.frames) {
-                    for (const event of frame.events) {
-                        if (event.participantId === participantId) {
-                            if (event.type === 'ITEM_PURCHASED' && event.itemId) {
-                                timelineItems.push({
-                                    itemId: event.itemId,
-                                    timestamp: Math.floor(event.timestamp / 1000),
-                                    isSold: false
-                                });
-                            } else if (event.type === 'ITEM_SOLD' && event.itemId) {
-                                timelineItems.push({
-                                    itemId: event.itemId,
-                                    timestamp: Math.floor(event.timestamp / 1000),
-                                    isSold: true
-                                });
-                            }
-                        } else if (
-                            event.creatorId === participantId &&
-                            event.type === 'WARD_PLACED' &&
-                            event.wardType &&
-                            event.wardType !== 'UNDEFINED'
-                        ) {
-                            timelineWards.push({
-                                wardType: event.wardType,
-                                timestamp: Math.floor(event.timestamp / 1000)
+        if (participantId !== undefined) {
+            for (const frame of timelineData.data.info.frames) {
+                for (const event of frame.events) {
+                    if (event.participantId === participantId) {
+                        if (event.type === 'ITEM_PURCHASED' && event.itemId) {
+                            timelineItems.push({
+                                itemId: event.itemId,
+                                timestamp: Math.floor(event.timestamp / 1000),
+                                isSold: false
+                            });
+                        } else if (event.type === 'ITEM_SOLD' && event.itemId) {
+                            timelineItems.push({
+                                itemId: event.itemId,
+                                timestamp: Math.floor(event.timestamp / 1000),
+                                isSold: true
                             });
                         }
+                    } else if (
+                        event.creatorId === participantId &&
+                        event.type === 'WARD_PLACED' &&
+                        event.wardType &&
+                        event.wardType !== 'UNDEFINED'
+                    ) {
+                        timelineWards.push({
+                            wardType: event.wardType,
+                            timestamp: Math.floor(event.timestamp / 1000)
+                        });
                     }
                 }
             }
         }
+    }
 
-        // Tag Evaluation
-        const tags = evaluatePlayerTags(
-            participant,
-            matchData.data,
-            timelineData.status ? timelineData.data : null,
-            interaction.locale
-        );
+    // Tag Evaluation
+    const tags = evaluatePlayerTags(
+        participant,
+        matchData.data,
+        timelineData.status ? timelineData.data : null,
+        interaction.locale
+    );
 
-        const payload: ReportTaskInput = {
-            puuid,
-            region,
-            locale: interaction.locale,
-            level: summoner.data.summonerLevel,
-            gameName: account.data.gameName,
-            tagLine: account.data.tagLine,
-            profileIconId: summoner.data.profileIconId,
-            metadata: {
-                matchId: selectedMatchId
-            },
-            queueName,
-            gameCreation: BigInt(info.gameCreation),
-            gameDuration: info.gameDuration,
-            participant: {
-                assists: participant.assists,
-                champLevel: participant.champLevel,
-                championName: participant.championName,
-                deaths: participant.deaths,
-                gameEndedInEarlySurrender: participant.gameEndedInEarlySurrender,
-                goldEarned: participant.goldEarned,
-                kills: participant.kills,
-                item0: participant.item0,
-                item1: participant.item1,
-                item2: participant.item2,
-                item3: participant.item3,
-                item4: participant.item4,
-                item5: participant.item5,
-                item6: participant.item6,
-                puuid: participant.puuid,
-                riotIdGameName: participant.riotIdGameName,
-                riotIdTagline: participant.riotIdTagline,
-                roleBoundItem: participant.roleBoundItem ?? null,
-                summoner1Id: participant.summoner1Id,
-                summoner2Id: participant.summoner2Id,
-                teamId: participant.teamId,
-                totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
-                totalDamageTaken: participant.totalDamageTaken ?? 0,
-                totalMinionsKilled: participant.totalMinionsKilled,
-                visionScore: participant.visionScore,
-                wardsPlaced: participant.wardsPlaced ?? 0,
-                wardsKilled: participant.wardsKilled ?? 0,
-                largestMultiKill: participant.largestMultiKill ?? 0,
-                win: participant.win,
-                perks: {
-                    statPerks: participant.perks.statPerks
-                        ? {
-                              defense: participant.perks.statPerks.defense,
-                              flex: participant.perks.statPerks.flex,
-                              offense: participant.perks.statPerks.offense
-                          }
-                        : undefined,
-                    styles: participant.perks.styles.map((style) => ({
-                        description: style.description,
-                        style: style.style,
-                        selections: style.selections.map((sel) => ({
-                            perk: sel.perk,
-                            var1: sel.var1,
-                            var2: sel.var2,
-                            var3: sel.var3
-                        }))
+    const payload: ReportTaskInput = {
+        puuid,
+        region,
+        locale: interaction.locale,
+        level: summoner.data.summonerLevel,
+        gameName: account.data.gameName,
+        tagLine: account.data.tagLine,
+        profileIconId: summoner.data.profileIconId,
+        metadata: {
+            matchId
+        },
+        queueName,
+        gameCreation: BigInt(info.gameCreation),
+        gameDuration: info.gameDuration,
+        participant: {
+            assists: participant.assists,
+            champLevel: participant.champLevel,
+            championName: participant.championName,
+            deaths: participant.deaths,
+            gameEndedInEarlySurrender: participant.gameEndedInEarlySurrender,
+            goldEarned: participant.goldEarned,
+            kills: participant.kills,
+            item0: participant.item0,
+            item1: participant.item1,
+            item2: participant.item2,
+            item3: participant.item3,
+            item4: participant.item4,
+            item5: participant.item5,
+            item6: participant.item6,
+            puuid: participant.puuid,
+            riotIdGameName: participant.riotIdGameName,
+            riotIdTagline: participant.riotIdTagline,
+            roleBoundItem: participant.roleBoundItem ?? null,
+            summoner1Id: participant.summoner1Id,
+            summoner2Id: participant.summoner2Id,
+            teamId: participant.teamId,
+            totalDamageDealtToChampions: participant.totalDamageDealtToChampions,
+            totalDamageTaken: participant.totalDamageTaken ?? 0,
+            totalMinionsKilled: participant.totalMinionsKilled,
+            visionScore: participant.visionScore,
+            wardsPlaced: participant.wardsPlaced ?? 0,
+            wardsKilled: participant.wardsKilled ?? 0,
+            largestMultiKill: participant.largestMultiKill ?? 0,
+            win: participant.win,
+            perks: {
+                statPerks: participant.perks.statPerks
+                    ? {
+                          defense: participant.perks.statPerks.defense,
+                          flex: participant.perks.statPerks.flex,
+                          offense: participant.perks.statPerks.offense
+                      }
+                    : undefined,
+                styles: participant.perks.styles.map((style) => ({
+                    description: style.description,
+                    style: style.style,
+                    selections: style.selections.map((sel) => ({
+                        perk: sel.perk,
+                        var1: sel.var1,
+                        var2: sel.var2,
+                        var3: sel.var3
                     }))
-                }
-            },
-            teamTotalDamage,
-            teamTotalKills,
-            timelineItems,
-            timelineWards,
-            tags
-        };
+                }))
+            }
+        },
+        teamTotalDamage,
+        teamTotalKills,
+        timelineItems,
+        timelineWards,
+        tags
+    };
 
-        const resultPath = await process.workerServer.addJobWait('report', payload);
+    const resultPath = await process.workerServer.addJobWait('report', payload);
 
-        const buffer = await fs.readFile(resultPath);
+    const buffer = await fs.readFile(resultPath);
 
-        await interaction.editReply({
-            content: '',
-            files: [
-                {
-                    attachment: buffer,
-                    name: 'report.png'
-                }
-            ],
-            components: interaction.message.components
-        });
+    await interaction.editReply({
+        content: '',
+        files: [
+            {
+                attachment: buffer,
+                name: 'report.png'
+            }
+        ],
+        components: components ?? []
+    });
 
-        // Delete temporary file only if it was in the temp directory (not cached persistent)
-        if (resultPath.includes('/tmp') || resultPath.includes('output_')) {
-            await fs.unlink(resultPath).catch(() => {});
-        }
+    // Delete temporary file only if it was in the temp directory (not cached persistent)
+    if (resultPath.includes('/tmp') || resultPath.includes('output_')) {
+        await fs.unlink(resultPath).catch(() => {});
     }
 }
