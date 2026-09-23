@@ -454,23 +454,27 @@ export default class History extends AccountCommand<CustomData> {
                       ? (lang.match.results[MatchStatus.Win] ?? 'Victory')
                       : (lang.match.results[MatchStatus.Loss] ?? 'Defeat');
 
-                const section = new SectionBuilder().addTextDisplayComponents(
-                    new TextDisplayBuilder().setContent(
-                        `### ${resultText} • ${info.queueName}\n-# ${durationStr} • <t:${Math.floor(info.gameStartTimestamp / 1000)}:R>`
-                    )
-                );
+                const headerContent = `### ${resultText} • ${info.queueName}\n-# ${durationStr} • <t:${Math.floor(info.gameStartTimestamp / 1000)}:R>`;
 
                 if (!info.isCherry) {
-                    section.setButtonAccessory(
-                        new ButtonBuilder()
-                            .setCustomId(`history;${key};report;${i}`)
-                            .setLabel(lang.match.report ?? 'Report')
-                            .setEmoji('📊')
-                            .setStyle(ButtonStyle.Secondary)
+                    const section = new SectionBuilder()
+                        .addTextDisplayComponents(
+                            new TextDisplayBuilder().setContent(headerContent)
+                        )
+                        .setButtonAccessory(
+                            new ButtonBuilder()
+                                .setCustomId(`history;${key};report;${i}`)
+                                .setLabel(lang.match.report ?? 'Report')
+                                .setEmoji('📊')
+                                .setStyle(ButtonStyle.Secondary)
+                        );
+                    container.addSectionComponents(section);
+                } else {
+                    container.addTextDisplayComponents(
+                        new TextDisplayBuilder().setContent(headerContent)
                     );
                 }
 
-                container.addSectionComponents(section);
                 components.push(container);
             }
 
