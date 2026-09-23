@@ -216,7 +216,8 @@ const MatchTeamSchema = z.object({
             z.literal('horde'),
             z.literal('inhibitor'),
             z.literal('riftHerald'),
-            z.literal('tower')
+            z.literal('tower'),
+            z.literal('voidGator')
         ]),
         z.object({
             first: z.boolean(),
