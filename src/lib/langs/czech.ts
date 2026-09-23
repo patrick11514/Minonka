@@ -82,7 +82,8 @@ export default template.parse({
         buttonInfoText: 'Zobrazeno %1-%2 posledních her',
         place: 'Místo',
         team: 'Tým',
-        sentToChannel: 'Odesláno do kanálu'
+        sentToChannel: 'Odesláno do kanálu',
+        report: 'Report'
     },
     report: {
         selectPlaceholder: 'Vyberte hru pro vygenerování reportu',
@@ -244,7 +245,8 @@ export default template.parse({
         not_in_game: 'Účet %1#%2 není v žádné hře',
         reload: 'Obnovit',
         generatingImage: 'Generuji spectator obrázek...',
-        sentToChannel: 'Odesláno do kanálu'
+        sentToChannel: 'Odesláno do kanálu',
+        noMatchSummary: 'Tento herní mód nepodporuje sumarizaci zápasu.'
     },
     summoner: {
         generatingImage: 'Generuji summoner obrázek...',

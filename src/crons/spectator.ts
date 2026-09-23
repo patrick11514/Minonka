@@ -69,7 +69,8 @@ export const autoRefreshSpectator = async () => {
                             data.puuid,
                             data.region,
                             data.locale,
-                            data.discordId
+                            data.discordId,
+                            data.gameId
                         );
                         await process.inMemory.getInstance().delete(row.key);
                     } else {
@@ -105,9 +106,10 @@ export const autoRefreshSpectator = async () => {
                     components: [buttonRow]
                 });
 
-                // Update lastUpdate
+                // Update lastUpdate and gameId
                 await process.inMemory.getInstance<ButtonData>().set(row.key, {
                     ...data,
+                    gameId: spectatorResult.gameId,
                     lastUpdate: Date.now()
                 });
 

@@ -89,7 +89,8 @@ export default template.parse({
         buttonInfoText: 'Showing %1-%2 last matches',
         place: 'Place',
         team: 'Team',
-        sentToChannel: 'Sent to channel'
+        sentToChannel: 'Sent to channel',
+        report: 'Report'
     },
     report: {
         selectPlaceholder: 'Select a match to generate report',
@@ -243,7 +244,8 @@ export default template.parse({
         not_in_game: 'Account %1#%2 is not in any game',
         reload: 'Reload',
         generatingImage: 'Generating spectator image...',
-        sentToChannel: 'Sent to channel'
+        sentToChannel: 'Sent to channel',
+        noMatchSummary: 'This game mode does not support match summary.'
     },
     summoner: {
         generatingImage: 'Generating summoner image...',

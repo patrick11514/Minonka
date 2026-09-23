@@ -134,7 +134,8 @@ export default o({
         team: _,
         loading: _,
         uploading: _,
-        sentToChannel: _
+        sentToChannel: _,
+        report: _
     }),
     report: o({
         selectPlaceholder: _,
@@ -210,7 +211,8 @@ export default o({
         not_in_game: _,
         reload: _,
         generatingImage: _,
-        sentToChannel: _
+        sentToChannel: _,
+        noMatchSummary: _
     }),
     summoner: o({
         generatingImage: _,

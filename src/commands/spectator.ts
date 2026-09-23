@@ -37,6 +37,7 @@ export type ButtonData = {
     messageId: string;
     lastUpdate: number;
     locale: Locale;
+    gameId: number;
 };
 
 export async function fetchSpectatorTaskInput(
@@ -45,7 +46,13 @@ export async function fetchSpectatorTaskInput(
     locale: Locale
 ): Promise<
     | { status: false; code: number; message: string }
-    | { status: true; data: SpectatorTaskInput; gameName: string; tagLine: string }
+    | {
+          status: true;
+          data: SpectatorTaskInput;
+          gameName: string;
+          tagLine: string;
+          gameId: number;
+      }
 > {
     const spectator = await api[region].spectator.byPuuid(puuid);
     if (!spectator.status) {
@@ -134,7 +141,8 @@ export async function fetchSpectatorTaskInput(
         status: true,
         data,
         gameName: account.data.gameName,
-        tagLine: account.data.tagLine
+        tagLine: account.data.tagLine,
+        gameId: spectator.data.gameId
     };
 }
 
@@ -143,25 +151,45 @@ export async function handleMatchFinished(
     puuid: string,
     region: Region,
     locale: Locale,
-    discordId: string
+    discordId: string,
+    gameId?: number
 ) {
     const lang = getLocale(locale);
+    const account = await api[region].account.byPuuid(puuid);
+    const gameName = account.status ? account.data.gameName : 'Unknown';
+    const tagLine = account.status ? account.data.tagLine : 'Unknown';
+    const header = `<@${discordId}> ${gameName}#${tagLine} (${lang.regions[region] ?? region}):\n`;
+
     const matchIds = await api[region].match.ids(puuid, { count: 1, start: 0 });
     if (!matchIds.status || matchIds.data.length === 0) {
-        throw new Error('No match found for this player.');
+        await message.edit({
+            content: header + lang.spectator.noMatchSummary,
+            files: [],
+            components: []
+        });
+        return;
     }
 
     const matchId = matchIds.data[0];
     const matchResponse = await api[region].match.match(matchId);
     if (!matchResponse.status) {
-        throw new Error('Failed to load match details.');
+        await message.edit({
+            content: header + lang.spectator.noMatchSummary,
+            files: [],
+            components: []
+        });
+        return;
     }
 
     const matchData = matchResponse.data;
-    const account = await api[region].account.byPuuid(puuid);
-    const gameName = account.status ? account.data.gameName : 'Unknown';
-    const tagLine = account.status ? account.data.tagLine : 'Unknown';
-    const header = `<@${discordId}> ${gameName}#${tagLine} (${lang.regions[region] ?? region}):\n`;
+    if (gameId && matchData.info.gameId !== gameId) {
+        await message.edit({
+            content: header + lang.spectator.noMatchSummary,
+            files: [],
+            components: []
+        });
+        return;
+    }
 
     let result: string;
     if (matchData.isCherry) {
@@ -304,7 +332,8 @@ export default class Spectator extends AccountCommand {
                 channelId: msg.channelId,
                 messageId: msg.id,
                 lastUpdate: Date.now(),
-                locale: interaction.locale
+                locale: interaction.locale,
+                gameId: spectatorResult.gameId
             });
 
             const row = this.generateButtonRow(lang, key);
@@ -393,7 +422,8 @@ export default class Spectator extends AccountCommand {
                         data.puuid,
                         data.region,
                         interaction.locale,
-                        data.discordId
+                        data.discordId,
+                        data.gameId
                     );
                     await inMemory.delete('spectator:' + key);
                     await interaction.deleteReply();
@@ -431,6 +461,7 @@ export default class Spectator extends AccountCommand {
 
             await inMemory.set('spectator:' + key, {
                 ...data,
+                gameId: spectatorResult.gameId,
                 lastUpdate: Date.now()
             });
 

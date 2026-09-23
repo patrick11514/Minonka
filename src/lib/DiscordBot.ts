@@ -7,6 +7,7 @@ import {
     Client,
     CommandInteractionOption,
     CommandInteractionOptionResolver,
+    Events as DiscordEvents,
     GatewayIntentBits,
     REST,
     Routes
@@ -39,7 +40,7 @@ export class DiscordBot extends EventEmitter<Events> {
 
         this.loadCommands();
 
-        this.client.on('ready', (client) => {
+        this.client.on(DiscordEvents.ClientReady, (client) => {
             super.emit('login', client);
             setStatus();
 
