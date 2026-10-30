@@ -268,39 +268,18 @@ export default class Spectator extends AccountCommand {
         region: Region
     ) {
         const lang = getLocale(interaction.locale);
-        const spectatorResult = await fetchSpectatorTaskInput(
-            user.puuid,
-            region,
-            interaction.locale
-        );
 
-        if (!spectatorResult.status) {
-            if (spectatorResult.code === 404) {
-                await interaction.reply({
-                    content: replacePlaceholders(
-                        lang.spectator.not_in_game,
-                        user.gameName,
-                        user.tagLine
-                    ),
-                    flags: MessageFlags.Ephemeral
-                });
-                return;
-            }
-
-            await interaction.reply({
-                content: replacePlaceholders(lang.genericError, spectatorResult.message),
-                flags: MessageFlags.Ephemeral
-            });
-            return;
-        }
-
-        const header = `<@${interaction.user.id}> ${spectatorResult.gameName}#${spectatorResult.tagLine} (${lang.regions[region] ?? region}):\n`;
+        const accountName =
+            user.gameName && user.tagLine ? `${user.gameName}#${user.tagLine}` : '';
+        const initialHeader = accountName
+            ? `<@${interaction.user.id}> ${accountName} (${lang.regions[region] ?? region}):\n`
+            : `<@${interaction.user.id}> (${lang.regions[region] ?? region}):\n`;
 
         let publicMessage: Message<boolean> | undefined = undefined;
         if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
             try {
                 publicMessage = await interaction.channel.send({
-                    content: header + lang.spectator.generatingImage
+                    content: initialHeader + lang.spectator.generatingImage
                 });
                 await interaction.reply({
                     content: lang.spectator.sentToChannel,
@@ -314,6 +293,40 @@ export default class Spectator extends AccountCommand {
         } else {
             await interaction.deferReply();
         }
+
+        const sendError = async (content: string) => {
+            if (publicMessage) {
+                await publicMessage.edit({ content });
+            } else {
+                await interaction.editReply({ content });
+            }
+        };
+
+        const spectatorResult = await fetchSpectatorTaskInput(
+            user.puuid,
+            region,
+            interaction.locale
+        );
+
+        if (!spectatorResult.status) {
+            if (spectatorResult.code === 404) {
+                await sendError(
+                    replacePlaceholders(
+                        lang.spectator.not_in_game,
+                        user.gameName,
+                        user.tagLine
+                    )
+                );
+                return;
+            }
+
+            await sendError(
+                replacePlaceholders(lang.genericError, spectatorResult.message)
+            );
+            return;
+        }
+
+        const header = `<@${interaction.user.id}> ${spectatorResult.gameName}#${spectatorResult.tagLine} (${lang.regions[region] ?? region}):\n`;
 
         try {
             const result = await process.workerServer.addJobWait(

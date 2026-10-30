@@ -76,30 +76,56 @@ export default class Rank extends AccountCommand {
     ) {
         const lang = getLocale(interaction.locale);
 
+        const accountName =
+            DBaccount.gameName && DBaccount.tagLine
+                ? `${DBaccount.gameName}#${DBaccount.tagLine}`
+                : '';
+        const initialHeader = accountName
+            ? `<@${interaction.user.id}> ${accountName} (${lang.regions[region] ?? region}):\n`
+            : `<@${interaction.user.id}> (${lang.regions[region] ?? region}):\n`;
+
+        let publicMessage: Message<boolean> | undefined = undefined;
+        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
+            try {
+                publicMessage = await interaction.channel.send({
+                    content: initialHeader + lang.rank.generatingImage
+                });
+                await interaction.reply({
+                    content: lang.rank.sentToChannel,
+                    flags: MessageFlags.Ephemeral
+                });
+                await interaction.deleteReply();
+            } catch {
+                publicMessage = undefined;
+                await interaction.deferReply();
+            }
+        } else {
+            await interaction.deferReply();
+        }
+
+        const sendError = async (content: string) => {
+            if (publicMessage) {
+                await publicMessage.edit({ content });
+            } else {
+                await interaction.editReply({ content });
+            }
+        };
+
         const league = await api[region].league.byPuuid(DBaccount.puuid);
         if (!league.status) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(lang, league)
-            });
+            await sendError(initialHeader + formatErrorResponse(lang, league));
             return;
         }
 
         const summoner = await api[region].summoner.byPuuid(DBaccount.puuid);
         if (!summoner.status) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(lang, summoner)
-            });
+            await sendError(initialHeader + formatErrorResponse(lang, summoner));
             return;
         }
 
         const account = await api[region].account.byPuuid(summoner.data.puuid);
         if (!account.status) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(lang, account)
-            });
+            await sendError(initialHeader + formatErrorResponse(lang, account));
             return;
         }
 
@@ -133,25 +159,6 @@ export default class Rank extends AccountCommand {
         } satisfies RankTaskInput;
 
         const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
-
-        let publicMessage: Message<boolean> | undefined = undefined;
-        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
-            try {
-                publicMessage = await interaction.channel.send({
-                    content: header + lang.rank.generatingImage
-                });
-                await interaction.reply({
-                    content: lang.rank.sentToChannel,
-                    flags: MessageFlags.Ephemeral
-                });
-                await interaction.deleteReply();
-            } catch {
-                publicMessage = undefined;
-                await interaction.deferReply();
-            }
-        } else {
-            await interaction.deferReply();
-        }
 
         try {
             const result = await process.workerServer.addJobWait('rank', data);

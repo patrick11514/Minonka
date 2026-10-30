@@ -102,6 +102,41 @@ export default class Graph extends AccountCommand<CustomData> {
         const lang = getLocale(interaction.locale);
         const { queue } = customData;
 
+        const accountName =
+            DBaccount.gameName && DBaccount.tagLine
+                ? `${DBaccount.gameName}#${DBaccount.tagLine}`
+                : '';
+        const initialHeader = accountName
+            ? `<@${interaction.user.id}> ${accountName} (${lang.regions[region] ?? region}):\n`
+            : `<@${interaction.user.id}> (${lang.regions[region] ?? region}):\n`;
+
+        let publicMessage: Message<boolean> | undefined = undefined;
+        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
+            try {
+                publicMessage = await interaction.channel.send({
+                    content: initialHeader + lang.graph.generatingImage
+                });
+                await interaction.reply({
+                    content: lang.graph.sentToChannel,
+                    flags: MessageFlags.Ephemeral
+                });
+                await interaction.deleteReply();
+            } catch {
+                publicMessage = undefined;
+                await interaction.deferReply();
+            }
+        } else {
+            await interaction.deferReply();
+        }
+
+        const sendError = async (content: string) => {
+            if (publicMessage) {
+                await publicMessage.edit({ content });
+            } else {
+                await interaction.editReply({ content });
+            }
+        };
+
         // Fetch history first
         const history = await conn
             .selectFrom('lp')
@@ -113,28 +148,19 @@ export default class Graph extends AccountCommand<CustomData> {
             .execute();
 
         if (history.length === 0) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: lang.graph.noRank
-            });
+            await sendError(initialHeader + lang.graph.noRank);
             return;
         }
 
         const summoner = await api[region].summoner.byPuuid(DBaccount.puuid);
         if (!summoner.status) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(lang, summoner)
-            });
+            await sendError(initialHeader + formatErrorResponse(lang, summoner));
             return;
         }
 
         const account = await api[region].account.byPuuid(summoner.data.puuid);
         if (!account.status) {
-            await interaction.reply({
-                flags: MessageFlags.Ephemeral,
-                content: formatErrorResponse(lang, account)
-            });
+            await sendError(initialHeader + formatErrorResponse(lang, account));
             return;
         }
 
@@ -171,25 +197,6 @@ export default class Graph extends AccountCommand<CustomData> {
         } satisfies GraphTaskInput;
 
         const header = `<@${interaction.user.id}> ${account.data.gameName}#${account.data.tagLine} (${lang.regions[region] ?? region}):\n`;
-
-        let publicMessage: Message<boolean> | undefined = undefined;
-        if (interaction.isStringSelectMenu() && canSendToChannel(interaction)) {
-            try {
-                publicMessage = await interaction.channel.send({
-                    content: header + lang.graph.generatingImage
-                });
-                await interaction.reply({
-                    content: lang.graph.sentToChannel,
-                    flags: MessageFlags.Ephemeral
-                });
-                await interaction.deleteReply();
-            } catch {
-                publicMessage = undefined;
-                await interaction.deferReply();
-            }
-        } else {
-            await interaction.deferReply();
-        }
 
         try {
             const result = await process.workerServer.addJobWait('graph', data);
