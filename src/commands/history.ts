@@ -68,12 +68,12 @@ export default class History extends AccountCommand<CustomData> {
     constructor() {
         super(
             'history',
-            'Show you match history of last 6 games',
+            'Show you match history of last 3 games',
             {
                 me: {
-                    description: 'Show your match history of last 6 games',
+                    description: 'Show your match history of last 3 games',
                     localizedDescription: {
-                        [Locale.Czech]: 'Zobrazí tvou historii posledních 6 her'
+                        [Locale.Czech]: 'Zobrazí tvou historii posledních 3 her'
                     }
                 },
                 name: {
@@ -94,7 +94,7 @@ export default class History extends AccountCommand<CustomData> {
                     default: '/history me - show your match history',
                     locales: {
                         [Locale.Czech]:
-                            '/historie já - zobrazí tvou historii posledních 6 her'
+                            '/historie já - zobrazí tvou historii posledních 3 her'
                     }
                 }
             }
@@ -102,7 +102,7 @@ export default class History extends AccountCommand<CustomData> {
         super.addLocalization(
             Locale.Czech,
             'historie',
-            'Zobrazí tvou historii posledních 6 her'
+            'Zobrazí tvou historii posledních 3 her'
         );
         for (const subCommand of [
             this.meSubCommand,
@@ -171,7 +171,7 @@ export default class History extends AccountCommand<CustomData> {
                 queue: queues
                     .find((q) => q.description === "Summoner's Rift Clash games")!
                     .queueId.toString(),
-                count: 6,
+                count: 3,
                 offset: 0
             }
         );
@@ -575,7 +575,7 @@ export default class History extends AccountCommand<CustomData> {
 
     async handler(interaction: ChatInputCommandInteraction) {
         const queue = interaction.options.getString('queue');
-        const count = interaction.options.getInteger('count') || 6;
+        const count = interaction.options.getInteger('count') || 3;
         const offset = interaction.options.getInteger('offset') || 0;
 
         await this.handleAccountCommand(interaction, l, {
