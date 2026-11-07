@@ -171,7 +171,7 @@ Minonka provides a set of user commands. Stats commands support three subcommand
 
 ### Match History
 
-- `/history [me/other/mention] [count] [offset] [queue]` - Fetch and display game summaries (default shows last 6 matches). The response features navigation buttons to scroll through past matches or reload.
+- `/history [me/other/mention] [count] [offset] [queue]` - Fetch and display game summaries (default shows last 3 matches). The response features navigation buttons to scroll through past matches or reload.
   ![history](worker/test_files/match_solo_gain.png)
 
 ### Live Game Spectator
