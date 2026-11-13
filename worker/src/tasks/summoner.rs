@@ -19,11 +19,12 @@ use crate::tasks::{
     types::{DefaultParametersInput, WorkerJob},
 };
 use crate::utils::assets::{
-    Asset, AssetType, OnlineAsset, get_lossstreak_asset, get_profile_icon, get_winstreak_asset,
+    Asset, AssetType, OnlineAsset, get_lossstreak_asset, get_online_asset_path, get_profile_icon,
+    get_winstreak_asset,
 };
 use crate::utils::locale::AppLocale;
 use crate::utils::rank::{RankTier, Tier};
-use tracing::debug;
+use tracing::{debug, warn};
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
@@ -74,6 +75,96 @@ struct Banner {
 }
 
 const DEFAULT_BANNER: &str = "00_unranked_banner.png";
+const BANNERS_DIR: &str = "game/assets/loadouts/regalia/banners";
+
+fn banner_asset(banner: &str) -> Asset {
+    Asset::new(
+        AssetType::Online(OnlineAsset::CommunityDragon),
+        format!("/{}/{}", BANNERS_DIR, banner),
+    )
+}
+
+async fn load_cached_banners_from_dir(dir: &std::path::Path) -> Vec<Banner> {
+    let mut entries = match tokio::fs::read_dir(dir).await {
+        Ok(entries) => entries,
+        Err(_) => return Vec::new(),
+    };
+
+    let mut banners = Vec::new();
+    while let Ok(Some(entry)) = entries.next_entry().await {
+        let Ok(metadata) = entry.metadata().await else {
+            continue;
+        };
+        if !metadata.is_file() || metadata.len() == 0 {
+            continue;
+        }
+        let name = entry.file_name().to_string_lossy().to_string();
+        if name.ends_with(".png") {
+            banners.push(Banner { name });
+        }
+    }
+
+    banners.sort_by(|a, b| a.name.cmp(&b.name));
+    banners
+}
+
+async fn resolve_banner_name(
+    ddragon_cache: &DdragonCache,
+    banner: BannerType,
+    highest_rank: Option<RankTier>,
+    game_name: &str,
+) -> TaskResult<String> {
+    match ddragon_cache
+        .get::<Vec<Banner>>("/json/latest/game/assets/loadouts/regalia/banners/")
+        .await
+    {
+        Ok(Some(banners)) => find_banner_name(&banners, banner, highest_rank)
+            .context("resolve summoner banner", game_name.to_string()),
+        Ok(None) => Ok(DEFAULT_BANNER.to_string()),
+        Err(err) => {
+            warn!(
+                error = %err,
+                "Failed to fetch summoner banners from CommunityDragon, falling back to cached banners"
+            );
+            let cached_dir = get_online_asset_path(BANNERS_DIR, &OnlineAsset::CommunityDragon);
+            let cached_banners = load_cached_banners_from_dir(&cached_dir).await;
+            find_banner_name(&cached_banners, banner, highest_rank)
+                .context("resolve cached summoner banner", game_name.to_string())
+        }
+    }
+}
+
+async fn load_summoner_background(banner: &str, context: &AppContext) -> MasterCanvas {
+    match MasterCanvas::from_asset(banner_asset(banner), context.clone().into()).await {
+        Ok(canvas) => canvas,
+        Err(err) => {
+            warn!(
+                banner = %banner,
+                error = %err,
+                "Failed to load summoner banner, falling back to default banner"
+            );
+            if banner != DEFAULT_BANNER {
+                match MasterCanvas::from_asset(banner_asset(DEFAULT_BANNER), context.clone().into())
+                    .await
+                {
+                    Ok(canvas) => return canvas,
+                    Err(default_err) => {
+                        warn!(
+                            banner = DEFAULT_BANNER,
+                            error = %default_err,
+                            "Failed to load default summoner banner, using solid fallback canvas"
+                        );
+                    }
+                }
+            }
+
+            MasterCanvas::new(
+                image::RgbaImage::from_pixel(512, 512, image::Rgba([20, 24, 34, 255])),
+                context.clone().into(),
+            )
+        }
+    }
+}
 
 fn find_banner_name(
     banners: &[Banner],
@@ -151,22 +242,15 @@ impl Task for SummonerTask {
         let ddragon_cache: DdragonCache = context.clone().into();
         let json: JsonCache = context.clone().into();
 
-        let banners = ddragon_cache
-            .get::<Vec<Banner>>("/json/latest/game/assets/loadouts/regalia/banners/")
-            .await?;
-
-        let banner = match banners {
-            Some(banners) => find_banner_name(&banners, input.banner, input.highest_rank.clone())
-                .context("resolve summoner banner", input.profile.game_name.clone())?,
-            None => DEFAULT_BANNER.to_string(),
-        };
+        let banner = resolve_banner_name(
+            &ddragon_cache,
+            input.banner,
+            input.highest_rank.clone(),
+            &input.profile.game_name,
+        )
+        .await?;
 
         debug!(banner = %banner, "selected summoner banner");
-
-        let background = Asset::new(
-            AssetType::Online(OnlineAsset::CommunityDragon),
-            format!("/game/assets/loadouts/regalia/banners/{}", banner),
-        );
 
         let level_background = Asset::new(AssetType::Other, "level.png");
         let mut level_background = Sprite::from_asset(&level_background, 0, 0).await?;
@@ -315,12 +399,8 @@ impl Task for SummonerTask {
             None
         };
 
-        let canvas = MasterCanvas::from_asset(background, context.into())
+        let canvas = load_summoner_background(&banner, &context)
             .await
-            .context(
-                "load summoner background canvas",
-                locale.region(&input.default.region),
-            )?
             .with_layout(|root| {
                 root.direction(ContainerDirection::Column)
                     .align_items(AlignItems::Center)
@@ -459,5 +539,54 @@ mod test {
     #[tokio::test]
     async fn test_summoner_end() {
         crate::assert_task!(super::SummonerTask, "test_files/summoner_end.json");
+    }
+
+    #[tokio::test]
+    async fn test_load_cached_banners_from_dir_filters_and_sorts() {
+        let dir = std::env::temp_dir().join(format!(
+            "minonka-banners-test-{}",
+            crate::utils::unique_id()
+        ));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("13_welcome_to_noxus_banner.png"), b"png").unwrap();
+        std::fs::write(dir.join("00_unranked_banner.png"), b"png").unwrap();
+        std::fs::write(dir.join("empty.png"), b"").unwrap();
+        std::fs::write(dir.join("00_unranked_banner.tmp-123"), b"tmp").unwrap();
+
+        let banners = super::load_cached_banners_from_dir(&dir).await;
+        let names: Vec<String> = banners.into_iter().map(|b| b.name).collect();
+        assert_eq!(
+            names,
+            vec![
+                "00_unranked_banner.png".to_string(),
+                "13_welcome_to_noxus_banner.png".to_string(),
+            ]
+        );
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[tokio::test]
+    async fn test_resolve_banner_name_falls_back_on_upstream_error() {
+        let cache_dir = std::env::temp_dir().join(format!(
+            "minonka-banner-fallback-{}",
+            crate::utils::unique_id()
+        ));
+        // Port 1 refuses connections immediately; no disk cache exists in cache_dir.
+        let ddragon_cache =
+            crate::cache::ddragon::DdragonCache::with_config("http://127.0.0.1:1", Some(cache_dir.clone()));
+
+        let banner = super::resolve_banner_name(
+            &ddragon_cache,
+            super::BannerType::Default(99999),
+            None,
+            "TestPlayer",
+        )
+        .await
+        .unwrap();
+
+        assert_eq!(banner, super::DEFAULT_BANNER);
+
+        let _ = std::fs::remove_dir_all(&cache_dir);
     }
 }
