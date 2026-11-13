@@ -8,7 +8,9 @@ use serde::de::DeserializeOwned;
 
 use crate::{
     tasks::error::{TaskError, TaskResult, TaskResultExt},
-    utils::{get_current_dir, get_persistent_cache_folder, http_client, write_file_atomic},
+    utils::{
+        build_http_client, get_current_dir, get_persistent_cache_folder, write_file_atomic,
+    },
 };
 
 const CACHE_TTL: Duration = Duration::from_secs(24 * 60 * 60);
@@ -19,6 +21,7 @@ const DEFAULT_BASE_URL: &str = "https://raw.communitydragon.org";
 pub struct DdragonCache {
     cache: Arc<moka::future::Cache<String, serde_json::Value>>,
     stale_cache: Arc<moka::future::Cache<String, serde_json::Value>>,
+    client: reqwest::Client,
     base_url: String,
     cache_dir: Option<PathBuf>,
 }
@@ -42,6 +45,7 @@ impl DdragonCache {
                     .time_to_live(STALE_CACHE_TTL)
                     .build(),
             ),
+            client: build_http_client(),
             base_url: base_url.into(),
             cache_dir,
         }
@@ -77,7 +81,8 @@ impl DdragonCache {
     }
 
     async fn fetch_json(&self, source_url: &str) -> TaskResult<serde_json::Value> {
-        let response = http_client()
+        let response = self
+            .client
             .get(source_url)
             .send()
             .await

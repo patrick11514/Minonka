@@ -4,8 +4,8 @@ use crate::{
     cache::json::JsonCache,
     tasks::error::{TaskError, TaskResult, TaskResultExt},
     utils::{
-        get_current_dir, get_persistent_cache_folder, http_client, locale::AppLocale, rank::Tier,
-        write_file_atomic,
+        build_http_client, get_current_dir, get_persistent_cache_folder, locale::AppLocale,
+        rank::Tier, write_file_atomic,
     },
 };
 
@@ -68,7 +68,7 @@ pub fn get_online_asset_path(name: &str, asset: &OnlineAsset) -> PathBuf {
 #[tracing::instrument(skip(asset), fields(asset = %name, asset_type = ?asset), err)]
 async fn fetch_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<Vec<u8>> {
     let url = get_online_asset_url(name, asset);
-    let response = http_client()
+    let response = build_http_client()
         .get(&url)
         .send()
         .await
