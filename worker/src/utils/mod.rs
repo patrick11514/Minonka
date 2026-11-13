@@ -1,6 +1,5 @@
 use std::{
     path::{Path, PathBuf},
-    sync::OnceLock,
     time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
@@ -51,15 +50,12 @@ pub fn unique_id() -> String {
     format!("{:x}-{:x}", nanos, std::process::id())
 }
 
-pub fn http_client() -> &'static reqwest::Client {
-    static CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
-    CLIENT.get_or_init(|| {
-        reqwest::Client::builder()
-            .connect_timeout(Duration::from_secs(4))
-            .timeout(Duration::from_secs(8))
-            .build()
-            .expect("Failed to build reqwest client")
-    })
+pub fn build_http_client() -> reqwest::Client {
+    reqwest::Client::builder()
+        .connect_timeout(Duration::from_secs(4))
+        .timeout(Duration::from_secs(8))
+        .build()
+        .expect("Failed to build reqwest client")
 }
 
 pub async fn write_file_atomic(path: &Path, data: &[u8]) -> TaskResult<()> {
