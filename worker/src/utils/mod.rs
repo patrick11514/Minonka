@@ -1,6 +1,7 @@
 use std::{
     path::{Path, PathBuf},
-    time::{SystemTime, UNIX_EPOCH},
+    sync::OnceLock,
+    time::{Duration, SystemTime, UNIX_EPOCH},
 };
 
 use chrono::{TimeZone, Utc};
@@ -9,7 +10,7 @@ use tracing_subscriber::{EnvFilter, fmt::format::FmtSpan};
 
 use crate::{
     draw::{color::Color, label::Label},
-    tasks::error::TaskResult,
+    tasks::error::{TaskError, TaskResult, TaskResultExt},
     utils::locale::AppLocale,
 };
 
@@ -48,6 +49,44 @@ pub fn unique_id() -> String {
         .duration_since(UNIX_EPOCH)
         .map_or(0, |duration| duration.as_nanos());
     format!("{:x}-{:x}", nanos, std::process::id())
+}
+
+pub fn http_client() -> &'static reqwest::Client {
+    static CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
+    CLIENT.get_or_init(|| {
+        reqwest::Client::builder()
+            .connect_timeout(Duration::from_secs(4))
+            .timeout(Duration::from_secs(8))
+            .build()
+            .expect("Failed to build reqwest client")
+    })
+}
+
+pub async fn write_file_atomic(path: &Path, data: &[u8]) -> TaskResult<()> {
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent).await.map_err(TaskError::Io).context(
+            "create cache dir",
+            parent.to_string_lossy().to_string(),
+        )?;
+    }
+
+    let tmp_path = path.with_extension(format!("tmp-{}", unique_id()));
+    if let Err(err) = fs::write(&tmp_path, data).await {
+        let _ = fs::remove_file(&tmp_path).await;
+        return Err(TaskError::Io(err).context(
+            "write tmp file",
+            tmp_path.to_string_lossy().to_string(),
+        ));
+    }
+
+    if let Err(err) = fs::rename(&tmp_path, path).await {
+        let _ = fs::remove_file(&tmp_path).await;
+        return Err(
+            TaskError::Io(err).context("rename tmp file", path.to_string_lossy().to_string())
+        );
+    }
+
+    Ok(())
 }
 
 pub fn first_upper(value: &str) -> String {
