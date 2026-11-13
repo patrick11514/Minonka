@@ -3,7 +3,10 @@ use std::{fmt::Display, path::PathBuf};
 use crate::{
     cache::json::JsonCache,
     tasks::error::{TaskError, TaskResult, TaskResultExt},
-    utils::{get_current_dir, get_persistent_cache_folder, locale::AppLocale, rank::Tier},
+    utils::{
+        build_http_client, get_current_dir, get_persistent_cache_folder, locale::AppLocale,
+        rank::Tier, write_file_atomic,
+    },
 };
 
 #[derive(Debug, Clone)]
@@ -42,7 +45,7 @@ impl Display for AssetType {
 
 #[tracing::instrument(skip(asset), fields(asset = %name, asset_type = ?asset))]
 fn get_online_asset_url(name: &str, asset: &OnlineAsset) -> String {
-    let clean_name = name.strip_prefix('/').unwrap_or(name);
+    let clean_name = name.trim_start_matches('/');
     match asset {
         OnlineAsset::CommunityDragon => {
             format!("https://raw.communitydragon.org/latest/{}", clean_name)
@@ -51,11 +54,11 @@ fn get_online_asset_url(name: &str, asset: &OnlineAsset) -> String {
 }
 
 #[tracing::instrument(skip(asset), fields(asset = %name, asset_type = ?asset))]
-fn get_online_asset_path(name: &str, asset: &OnlineAsset) -> PathBuf {
+pub fn get_online_asset_path(name: &str, asset: &OnlineAsset) -> PathBuf {
     let prefix = match asset {
         OnlineAsset::CommunityDragon => "cddragon",
     };
-    let clean_name = name.strip_prefix('/').unwrap_or(name);
+    let clean_name = name.trim_start_matches('/');
 
     get_current_dir()
         .join(get_persistent_cache_folder())
@@ -65,7 +68,9 @@ fn get_online_asset_path(name: &str, asset: &OnlineAsset) -> PathBuf {
 #[tracing::instrument(skip(asset), fields(asset = %name, asset_type = ?asset), err)]
 async fn fetch_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<Vec<u8>> {
     let url = get_online_asset_url(name, asset);
-    let response = reqwest::get(&url)
+    let response = build_http_client()
+        .get(&url)
+        .send()
         .await
         .map_err(TaskError::Reqwest)
         .context("fetch online asset", url.clone())?;
@@ -93,31 +98,7 @@ async fn get_online_asset(name: &str, asset: &OnlineAsset) -> TaskResult<PathBuf
     }
 
     let data = fetch_online_asset(name, asset).await?;
-    if let Some(parent) = path.parent() {
-        tokio::fs::create_dir_all(parent)
-            .await
-            .map_err(TaskError::Io)
-            .context(
-                "create online asset cache dir",
-                parent.to_string_lossy().to_string(),
-            )?;
-    }
-
-    let tmp_path = path.with_extension(format!("tmp-{}", crate::utils::unique_id()));
-    if let Err(err) = tokio::fs::write(&tmp_path, data).await {
-        let _ = tokio::fs::remove_file(&tmp_path).await;
-        return Err(TaskError::Io(err).context(
-            "write online asset tmp",
-            tmp_path.to_string_lossy().to_string(),
-        ));
-    }
-
-    if let Err(err) = tokio::fs::rename(&tmp_path, &path).await {
-        let _ = tokio::fs::remove_file(&tmp_path).await;
-        return Err(
-            TaskError::Io(err).context("rename online asset", path.to_string_lossy().to_string())
-        );
-    }
+    write_file_atomic(&path, &data).await?;
 
     Ok(path)
 }
