@@ -52,8 +52,8 @@ pub fn unique_id() -> String {
 
 pub fn build_http_client() -> reqwest::Client {
     reqwest::Client::builder()
-        .connect_timeout(Duration::from_secs(4))
-        .timeout(Duration::from_secs(8))
+        .connect_timeout(Duration::from_secs(15))
+        .timeout(Duration::from_secs(30))
         .build()
         .expect("Failed to build reqwest client")
 }
