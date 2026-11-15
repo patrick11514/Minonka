@@ -134,7 +134,8 @@ export async function fetchSpectatorTaskInput(
         gameLength: spectator.data.gameLength,
         participants: orderedParticipants,
         bannedChampions: spectator.data.bannedChampions,
-        mapName
+        mapName,
+        isCherry: spectator.data.gameMode === 'CHERRY'
     };
 
     return {

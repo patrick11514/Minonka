@@ -2,4 +2,4 @@
 import type { SpectatorBannedChampionInput } from "./SpectatorBannedChampionInput";
 import type { SpectatorParticipantInput } from "./SpectatorParticipantInput";
 
-export type SpectatorTaskInput = { queueName: string, gameLength: number, mapName: string, participants: Array<SpectatorParticipantInput>, bannedChampions: Array<SpectatorBannedChampionInput>, puuid: string, region: string, locale: string, };
+export type SpectatorTaskInput = { queueName: string, gameLength: number, mapName: string, participants: Array<SpectatorParticipantInput>, bannedChampions: Array<SpectatorBannedChampionInput>, isCherry?: boolean, puuid: string, region: string, locale: string, };
