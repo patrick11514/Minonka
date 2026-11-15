@@ -1,0 +1,337 @@
+{
+    "puuid": "qVMjop4aosgqXgK2B9hwCa5wRBeB1nnmWxvSN4qaHVrYWSZMWyEyxghWmieNny83HJrOUroXQowTug",
+    "region": "EUN1",
+    "locale": "en_US",
+    "queueName": "Arena (3v3v3v3v3v3)",
+    "gameLength": 1080,
+    "mapName": "Rings of Wrath",
+    "isCherry": true,
+    "participants": [
+        {
+            "teamId": 100,
+            "championId": 58,
+            "riotId": "Lungi Choke#Goru",
+            "puuid": "T9MS_6oUzgGliab3rM1nwsAQ_BcBp47ufsT9-IYWXXEtvri4_wvZ5tOqKlOMPELfZxlTALcicEbrmQ",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8005],
+                "perkStyle": 8000,
+                "perkSubStyle": 8400
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 86,
+            "riotId": "JustDan#TTV",
+            "puuid": "xEr5fz0JcxakvipwnqFexLwqXfeGP07XPogE8pg6wODoQIhRZGcK7LgpNuJJs_QW2IkO_dWzgpx67w",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8010],
+                "perkStyle": 8000,
+                "perkSubStyle": 8400
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 875,
+            "riotId": "Someone#KFCNG",
+            "puuid": "CLjITz0dPP34mC7DHaRU7jLa9k7PN0tNALaNFqF3IG5i8FL0tgFK9PI_P_inJcQVv4hfSHCZRG3kYA",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8229],
+                "perkStyle": 8200,
+                "perkSubStyle": 8100
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 223,
+            "riotId": "tomppagaming#EUNE",
+            "puuid": "4jgydRR7_gy6rgRzcYfAMnbWBQoyDTEIigbBdjdAVvBKQUttD8ruQclq8qEzRLO174P-UZNy-XiJoA",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8437],
+                "perkStyle": 8400,
+                "perkSubStyle": 8000
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 86,
+            "riotId": "Salami4#EUNE",
+            "puuid": "LWpemc0l40mFPovqGGtlJVYgN47dk7gMMqWpxpIUOsp-PwK8a_oL9te3Z3bhb6w0f-OLw5sYPVrltw",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8010],
+                "perkStyle": 8000,
+                "perkSubStyle": 8200
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 223,
+            "riotId": "TahmKench",
+            "puuid": null,
+            "spell1Id": 2202,
+            "spell2Id": 2201,
+            "perks": {
+                "perkIds": [8437],
+                "perkStyle": 8400,
+                "perkSubStyle": 8300
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 102,
+            "riotId": "Nyla#Gwen",
+            "puuid": "qy9sVrIDgjAmhQm-b5jpF2KIcmRMs_8iZ3PXDK-v9A2DRWGeKb5IzBCZoHvNFUETpZF_HlxP9szpmg",
+            "spell1Id": 2202,
+            "spell2Id": 2201,
+            "perks": {
+                "perkIds": [8010],
+                "perkStyle": 8000,
+                "perkSubStyle": 8300
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 804,
+            "riotId": "LightUpMyHole#Czech",
+            "puuid": "qVMjop4aosgqXgK2B9hwCa5wRBeB1nnmWxvSN4qaHVrYWSZMWyEyxghWmieNny83HJrOUroXQowTug",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8128],
+                "perkStyle": 8100,
+                "perkSubStyle": 8200
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 526,
+            "riotId": "Haruspex#dry",
+            "puuid": "sop6iR19nlDMVhw1cZrYwdwI4ipZPlkxwJNACGRfjKgyv1ytwyhlvIrSyK67_famebuHiYb_ztbWzA",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8128],
+                "perkStyle": 8100,
+                "perkSubStyle": 8200
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 44,
+            "riotId": "SuperMeatBoy1223#JGDIF",
+            "puuid": "SNZuxdcS0nJdK7JoobFpsrjXjB_x1slMij_Ss_CO1UNEFtadccm2lRZe5VcpuERUM_wBEvoR9c7pyg",
+            "spell1Id": 2202,
+            "spell2Id": 2201,
+            "perks": {
+                "perkIds": [8437],
+                "perkStyle": 8400,
+                "perkSubStyle": 8000
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 20,
+            "riotId": "KetchupChips123#2602",
+            "puuid": "d5DAGMGbLjoHRqrCsVT_jgibSWuA11a1wOsgzJlvpe8fa86ywWV2WnjPeaj0v8SbjB8XrOt272ma-g",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8128],
+                "perkStyle": 8100,
+                "perkSubStyle": 8000
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 127,
+            "riotId": "Barbacuechips123#Orang",
+            "puuid": "QhXGrQmMFfK4lcErNV6o-4N4jUQAl9QMAsUjcWyung1wDAHCunSsJHjFM3oQfWeQf9mN4TMmlaOfrw",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8112],
+                "perkStyle": 8100,
+                "perkSubStyle": 8200
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 9,
+            "riotId": "FISKEN SIMON#9840",
+            "puuid": "LtAQ3bcbvy2tpmku4DxyOKmDY8MDtzdHAkW-0IOH9El7RWGiz8VIgAZhV-YNsvrrtP4Ck4HA1IsnqA",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [9923],
+                "perkStyle": 8100,
+                "perkSubStyle": 8000
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 902,
+            "riotId": "LowcaTransow#7777",
+            "puuid": "Mis39KXebj4VG9qcRYdIXQDBrVKcWEu1UXToRYIU1zJYJS1vZFXVim0SqeR6DmYiIXkijU2kDv6zeg",
+            "spell1Id": 2202,
+            "spell2Id": 2201,
+            "perks": {
+                "perkIds": [8229],
+                "perkStyle": 8200,
+                "perkSubStyle": 8400
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 68,
+            "riotId": "Laska z ptakiem#CWL",
+            "puuid": "0PAM-f1P5GXD6X0zytNsTOlrzd-ypv4DerkO2HtEq8JdQUDd2EPLu3UxcM5Q5paVLLG4dp0fZrbPeg",
+            "spell1Id": 2202,
+            "spell2Id": 2201,
+            "perks": {
+                "perkIds": [8229],
+                "perkStyle": 8200,
+                "perkSubStyle": 8300
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 202,
+            "riotId": "YoneAlone#EUNE",
+            "puuid": "nUuqE2RzCUkxtOQe8UZFdwS9vuW_C-sZNn10bEwcubR5VF_rQvoQ_ixLkyKP9Bm90ALY0s4sHg7Mug",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8128],
+                "perkStyle": 8100,
+                "perkSubStyle": 8000
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 555,
+            "riotId": "Filter 160#EUNE",
+            "puuid": "P5FKpYLA4XViCtZK1kEXsAIxFpjQaBcXq_auos-JWhqrV-i2u0dQYPRgtvXDjJ_5hMfEk1Z27TQEfg",
+            "spell1Id": 2202,
+            "spell2Id": 2201,
+            "perks": {
+                "perkIds": [8465],
+                "perkStyle": 8400,
+                "perkSubStyle": 8100
+            }
+        },
+        {
+            "teamId": 100,
+            "championId": 145,
+            "riotId": "podia tu vasilia#EUNE",
+            "puuid": "RO4TUshjCFI7OMykP3myut5ex0EhmNcnY3S_BX0xxknUElqn8HfTVrsAhYw3pZ6mZ7Pjos3IzIu-eQ",
+            "spell1Id": 2201,
+            "spell2Id": 2202,
+            "perks": {
+                "perkIds": [8005],
+                "perkStyle": 8000,
+                "perkSubStyle": 8100
+            }
+        }
+    ],
+    "bannedChampions": [
+        {
+            "championId": 122,
+            "teamId": 100,
+            "pickTurn": 1
+        },
+        {
+            "championId": 887,
+            "teamId": 100,
+            "pickTurn": 2
+        },
+        {
+            "championId": 420,
+            "teamId": 100,
+            "pickTurn": 3
+        },
+        {
+            "championId": 267,
+            "teamId": 100,
+            "pickTurn": 4
+        },
+        {
+            "championId": 26,
+            "teamId": 100,
+            "pickTurn": 5
+        },
+        {
+            "championId": 420,
+            "teamId": 100,
+            "pickTurn": 6
+        },
+        {
+            "championId": 17,
+            "teamId": 100,
+            "pickTurn": 7
+        },
+        {
+            "championId": -1,
+            "teamId": 100,
+            "pickTurn": 8
+        },
+        {
+            "championId": 63,
+            "teamId": 100,
+            "pickTurn": 9
+        },
+        {
+            "championId": 53,
+            "teamId": 100,
+            "pickTurn": 10
+        },
+        {
+            "championId": 77,
+            "teamId": 100,
+            "pickTurn": 11
+        },
+        {
+            "championId": 29,
+            "teamId": 100,
+            "pickTurn": 12
+        },
+        {
+            "championId": 67,
+            "teamId": 100,
+            "pickTurn": 13
+        },
+        {
+            "championId": 13,
+            "teamId": 100,
+            "pickTurn": 14
+        },
+        {
+            "championId": 29,
+            "teamId": 100,
+            "pickTurn": 15
+        },
+        {
+            "championId": 81,
+            "teamId": 100,
+            "pickTurn": 16
+        },
+        {
+            "championId": 14,
+            "teamId": 100,
+            "pickTurn": 17
+        },
+        {
+            "championId": 17,
+            "teamId": 100,
+            "pickTurn": 18
+        }
+    ]
+}

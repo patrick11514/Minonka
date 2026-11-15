@@ -70,6 +70,9 @@ pub struct SpectatorTaskInput {
     pub map_name: String,
     pub participants: Vec<SpectatorParticipantInput>,
     pub banned_champions: Vec<SpectatorBannedChampionInput>,
+    #[serde(default)]
+    #[cfg_attr(feature = "export-ts", ts(optional))]
+    pub is_cherry: Option<bool>,
 }
 
 #[derive(Clone)]
@@ -103,11 +106,12 @@ impl RenderContext {
         player: &SpectatorParticipantInput,
         me: bool,
         reversed: bool,
+        champion_size: u32,
     ) -> TaskResult<Container> {
         let champion =
             get_champion_asset(Some(player.champion_id), &self.json, &self.locale).await?;
         let mut champion = Sprite::from_asset(&champion, 0, 0).await?;
-        champion.resize_to_width(88);
+        champion.resize_to_width(champion_size);
         champion.roundify_circle();
 
         let text_color = if me { Color::Yellow } else { Color::White };
@@ -152,33 +156,9 @@ impl RenderContext {
             .child(name_tag_container)
             .reverse_if(reversed);
 
-        let rune_summoner_width = 50;
-
-        let style = player.perks.perk_style;
-        let selection = player.perks.perk_ids.first().copied();
-        let primary_rune_asset = get_rune_asset(style, selection, &self.json, &self.locale).await?;
-        let mut primary_rune = Sprite::from_asset(&primary_rune_asset, 0, 0).await?;
-        primary_rune.resize_to_width(rune_summoner_width);
-
-        let secondary_style = player.perks.perk_sub_style;
-        let secondary_rune_asset =
-            get_rune_asset(secondary_style, None, &self.json, &self.locale).await?;
-        let mut secondary_rune = Sprite::from_asset(&secondary_rune_asset, 0, 0).await?;
-        secondary_rune.resize_to_width(30);
-
-        let runes_column = Container::new()
-            .direction(ContainerDirection::Column)
-            .align_items(AlignItems::Center)
-            .gap(10)
-            .child(primary_rune)
-            .child(
-                Container::new()
-                    .width(rune_summoner_width)
-                    .height(rune_summoner_width)
-                    .justify(JustifyContent::Center)
-                    .align_items(AlignItems::Center)
-                    .child(secondary_rune),
-            );
+        let rune_summoner_width = (champion_size * 50) / 88;
+        let secondary_rune_width = (rune_summoner_width * 3) / 5;
+        let icon_gap = if champion_size >= 88 { 10 } else { 6 };
 
         let summoner_1_asset =
             get_summoner_asset(player.spell1_id, &self.json, &self.locale).await?;
@@ -192,14 +172,46 @@ impl RenderContext {
 
         let summoners_column = Container::new()
             .direction(ContainerDirection::Column)
-            .gap(10)
+            .gap(icon_gap)
             .child(summoner_1)
             .child(summoner_2);
 
-        let runes_and_summoners = Container::new()
+        let mut runes_and_summoners = Container::new()
             .direction(ContainerDirection::Row)
-            .gap(10)
-            .child(runes_column)
+            .gap(10);
+
+        if player.perks.perk_style > 0 {
+            let style = player.perks.perk_style;
+            let selection = player.perks.perk_ids.first().copied();
+            let primary_rune_asset =
+                get_rune_asset(style, selection, &self.json, &self.locale).await?;
+            let mut primary_rune = Sprite::from_asset(&primary_rune_asset, 0, 0).await?;
+            primary_rune.resize_to_width(rune_summoner_width);
+
+            let secondary_style = player.perks.perk_sub_style;
+            let secondary_rune_asset =
+                get_rune_asset(secondary_style, None, &self.json, &self.locale).await?;
+            let mut secondary_rune = Sprite::from_asset(&secondary_rune_asset, 0, 0).await?;
+            secondary_rune.resize_to_width(secondary_rune_width);
+
+            let runes_column = Container::new()
+                .direction(ContainerDirection::Column)
+                .align_items(AlignItems::Center)
+                .gap(icon_gap)
+                .child(primary_rune)
+                .child(
+                    Container::new()
+                        .width(rune_summoner_width)
+                        .height(rune_summoner_width)
+                        .justify(JustifyContent::Center)
+                        .align_items(AlignItems::Center)
+                        .child(secondary_rune),
+                );
+
+            runes_and_summoners = runes_and_summoners.child(runes_column);
+        }
+
+        runes_and_summoners = runes_and_summoners
             .child(summoners_column)
             .reverse_if(reversed);
 
@@ -210,6 +222,115 @@ impl RenderContext {
             .child(player_info)
             .child(runes_and_summoners)
             .reverse_if(reversed))
+    }
+
+    async fn render_cherry(
+        &self,
+        input: &SpectatorTaskInput,
+        canvas: MasterCanvas,
+        cross: Sprite,
+    ) -> TaskResult<TaskOutcome> {
+        let size = canvas.dimensions();
+        let players_per_side = (input.participants.len() as u32).div_ceil(2).max(1);
+        let champion_size = ((size.1.saturating_sub(120)) / players_per_side)
+            .saturating_sub(14)
+            .clamp(68, 92);
+
+        let split_at = input.participants.len().div_ceil(2);
+        let mut left_players = Vec::with_capacity(split_at);
+        let mut right_players = Vec::with_capacity(input.participants.len() - split_at);
+
+        for (idx, player) in input.participants.iter().enumerate() {
+            let reversed = idx >= split_at;
+            let me = player.puuid.as_deref() == Some(&input.default.puuid);
+            let comp = self
+                .player_component(player, me, reversed, champion_size)
+                .await?;
+            if reversed {
+                right_players.push(comp);
+            } else {
+                left_players.push(comp);
+            }
+        }
+
+        let side_width = 640;
+        let center_spacing = 440;
+
+        let left_container = Container::new()
+            .width(side_width)
+            .gap(12)
+            .direction(ContainerDirection::Column)
+            .childs(left_players.into_iter());
+
+        let right_container = Container::new()
+            .width(side_width)
+            .gap(12)
+            .direction(ContainerDirection::Column)
+            .childs(right_players.into_iter());
+
+        let mut ban_cross = cross;
+        ban_cross.resize_to_width(45);
+
+        let ban_ids: Vec<Option<u32>> = input
+            .banned_champions
+            .iter()
+            .map(|ban| {
+                if ban.champion_id > 0 {
+                    Some(ban.champion_id as u32)
+                } else {
+                    None
+                }
+            })
+            .collect();
+
+        let mut ban_rows = Vec::new();
+        for chunk in ban_ids.chunks(5) {
+            ban_rows.push(self.bans(chunk, ban_cross.clone()).await?);
+        }
+
+        let bans_grid = Container::new()
+            .direction(ContainerDirection::Column)
+            .align_items(AlignItems::Center)
+            .gap(8)
+            .childs(ban_rows.into_iter());
+
+        let timer_label = if input.game_length <= -145 {
+            Label::new(self.locale.loading_game()).size(72).bold()
+        } else {
+            let adjusted_length = (input.game_length + 145) as u32;
+            Label::new(format_duration(adjusted_length))
+                .size(72)
+                .bold()
+        };
+
+        let center_container = Container::new()
+            .width(center_spacing)
+            .direction(ContainerDirection::Column)
+            .align_items(AlignItems::Center)
+            .gap(20)
+            .child(Label::new(&input.queue_name).size(52).bold())
+            .child(timer_label)
+            .child(Label::new(&input.map_name).size(48).bold())
+            .child_if(if !ban_ids.is_empty() {
+                Some(bans_grid)
+            } else {
+                None
+            });
+
+        Ok(TaskOutcome::Render(
+            canvas.with_layout(|root| {
+                root.y(20)
+                    .height_offset(-40)
+                    .direction(ContainerDirection::Row)
+                    .align_items(AlignItems::Center)
+                    .justify(JustifyContent::Center)
+                    .gap(20)
+                    .child(left_container)
+                    .child(center_container)
+                    .child(right_container)
+            }),
+            SaveStrategy::Temporary,
+        ))
     }
 }
 
@@ -228,9 +349,16 @@ impl Task for SpectatorTask {
             locale,
         };
 
+        let canvas = MasterCanvas::from_asset(get_background_asset(), context.into()).await?;
+
         let cross_asset =
             crate::utils::assets::Asset::new(crate::utils::assets::AssetType::Other, "ban-x.png");
         let mut cross = Sprite::from_asset(&cross_asset, 0, 0).await?;
+
+        if input.is_cherry.unwrap_or(false) {
+            return render_context.render_cherry(&input, canvas, cross).await;
+        }
+
         cross.resize_to_width(55);
 
         let left_ban_ids: Vec<Option<u32>> = input
@@ -269,7 +397,7 @@ impl Task for SpectatorTask {
             let reversed = player.team_id != 100;
             let me = player.puuid.as_deref() == Some(&input.default.puuid);
             let comp = render_context
-                .player_component(player, me, reversed)
+                .player_component(player, me, reversed, 88)
                 .await?;
             if player.team_id == 100 {
                 left_players.push(comp);
@@ -290,7 +418,6 @@ impl Task for SpectatorTask {
             .justify(JustifyContent::SpaceBetween)
             .childs(right_players.into_iter());
 
-        let canvas = MasterCanvas::from_asset(get_background_asset(), context.into()).await?;
         let size = canvas.dimensions();
 
         Ok(TaskOutcome::Render(
@@ -363,5 +490,10 @@ mod test {
     #[tokio::test]
     async fn test_spectator_streamer() {
         crate::assert_task!(super::SpectatorTask, "test_files/spectator_streamer.json");
+    }
+
+    #[tokio::test]
+    async fn test_spectator_cherry() {
+        crate::assert_task!(super::SpectatorTask, "test_files/spectator_cherry.json");
     }
 }
